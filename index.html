@@ -12,6 +12,9 @@
 <meta name="apple-mobile-web-app-title" content="CKW Projekte">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -303,6 +306,16 @@
   .bz-box { display: flex; align-items: flex-start; gap: 8px; color: var(--text); font-size: 14px; margin: 0 0 9px; cursor: pointer; }
   .bz-box input { width: 17px; height: 17px; margin-top: 1px; flex-shrink: 0; accent-color: #1f3864; }
   @media (max-width: 700px) { .bz-2 { grid-template-columns: 1fr; } }
+  /* Anmeldung und Cloud */
+  .login { position: fixed; inset: 0; z-index: 50; background: var(--bg); display: none; align-items: center; justify-content: center; padding: 16px; }
+  body.gesperrt .login { display: flex; }
+  body.gesperrt .layout { display: none; }
+  .login-card { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 34px 30px; width: min(400px, 100%); box-shadow: 0 10px 40px rgba(0,0,0,.08); }
+  .side-user { padding: 10px 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .side-user b { color: var(--text); font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .side-user button { margin-top: 6px; }
+  .collapsed .side-user { padding: 10px 0; text-align: center; }
+  .collapsed .side-user .side-txt { display: none; }
   /* Wochenplan */
   table.wk { min-width: 860px; table-layout: fixed; }
   table.wk th, table.wk td { border-right: 1px solid #f0efea; vertical-align: top; padding: 8px; }
@@ -344,7 +357,7 @@
   }
 </style>
 </head>
-<body>
+<body class="gesperrt">
 <div class="layout" id="layout">
   <aside>
     <div class="brand">
@@ -352,9 +365,26 @@
       <button class="side-toggle" id="sideToggle" onclick="toggleSide()" title="Leiste ein-/ausklappen">«</button>
     </div>
     <nav id="nav"></nav>
+    <div class="side-user" id="sideUser"></div>
     <div class="side-foot" id="sideFoot"></div>
   </aside>
   <main id="app"></main>
+</div>
+<div id="login" class="login">
+  <div class="login-card">
+    <div class="logo" style="font-size:42px">CKW<i style="width:12px;height:12px"></i></div>
+    <h2 style="margin:18px 0 4px">Projekte &amp; Terminpläne</h2>
+    <p class="muted" id="login-info" style="margin-top:0">Anmeldung wird geprüft …</p>
+    <form id="login-form" onsubmit="event.preventDefault();anmelden()" hidden>
+      <label for="l-mail">E-Mail</label>
+      <input id="l-mail" type="email" autocomplete="username" required>
+      <label for="l-pw" style="margin-top:12px">Passwort</label>
+      <input id="l-pw" type="password" autocomplete="current-password" required>
+      <button type="submit" id="l-btn" style="width:100%;margin-top:18px">Anmelden</button>
+      <a href="#" class="muted" style="display:block;margin-top:12px;font-size:13px" onclick="event.preventDefault();passwortReset()">Passwort vergessen?</a>
+    </form>
+    <div id="login-fehler" class="note" style="margin-top:14px" hidden></div>
+  </div>
 </div>
 <dialog id="dlg"></dialog>
 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJson(this)">
@@ -693,9 +723,13 @@ function migrate(d) {
   return d;
 }
 function save() {
+  speichereLokal();
+  scheduleAutoBackup();
+  cloudPlanen();
+}
+function speichereLokal() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); }
   catch (e) { toast('Speichern im Browser nicht möglich – bitte Backup erstellen.'); }
-  scheduleAutoBackup();
 }
 const S = () => state.settings;
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -870,6 +904,7 @@ function renderSide() {
   else if (!st.autoBackup) { farbe = '#9aa5b1'; txt = 'Auto-Backup: aus'; }
   else { farbe = '#58d68d'; txt = `Auto-Backup aktiv${b.last ? '<br><span style="opacity:.75">zuletzt ' + new Date(b.last).toLocaleString('de-CH', { dateStyle: 'short', timeStyle: 'short' }) + '</span>' : ''}`; }
   $('sideFoot').innerHTML = `<span class="dot" style="background:${farbe}" title="${txt.replace(/<.*$/, '')}"></span><span class="side-txt">${txt}</span>`;
+  renderCloud();
 }
 
 let sideCollapsed = false;
@@ -2225,9 +2260,17 @@ function viewBackup() {
     ${auto}
   </div>
   <div class="card">
-    <h3>Daten</h3>
-    <p class="muted" style="margin-top:0">Die Daten liegen im Speicher dieses Browsers. Auf einem anderen Gerät sind sie nur über ein Backup verfügbar.</p>
-    <div class="muted">${state.projects.length} Projekte · ${state.projects.reduce((n, p) => n + p.termine.length, 0)} Termine</div>
+    <h3>Cloud (Firebase)</h3>
+    <p class="muted" style="margin-top:0">Alle Projekte und Einstellungen werden automatisch in deinem Firebase-Konto gespeichert und auf allen Geräten abgeglichen, auf denen du angemeldet bist. Offline gemachte Änderungen werden nachgeladen, sobald wieder Internet da ist.</p>
+    <div class="row" style="gap:16px">
+      <div><label>Angemeldet als</label><b>${esc(cloud.user?.email || '–')}</b></div>
+      <div><label>Status</label><b>☁ ${cloudText()}</b>${cloud.fehler ? `<div class="muted">${esc(cloud.fehler)}</div>` : ''}</div>
+      <div><label>Umfang</label><b>${state.projects.length} Projekte · ${state.projects.reduce((n, p) => n + p.termine.length, 0)} Termine</b></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="sec" ${cloud.user ? '' : 'disabled'} onclick="cloudSchreiben(true).then(()=>{toast('Alles in die Cloud gespeichert.');render()}).catch(e=>toast('Fehler: '+e.message))">Jetzt alles synchronisieren</button>
+      <button class="sec" ${cloud.user ? '' : 'disabled'} onclick="abmelden()">Abmelden</button>
+    </div>
   </div>`;
 }
 function setAuto(k, v) { state.settings[k] = v; save(); render(); }
@@ -2500,8 +2543,181 @@ function pdf(pid) {
   doc.save(`Terminplan_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
 }
 
+// ---------- Anmeldung und Cloud-Speicher (Firebase) ----------
+// Der apiKey ist bei Firebase-Web-Apps öffentlich; geschützt sind die Daten über die Firestore-Regeln.
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyAm0YXF0rqF61kGevH2y4VL4dJ8ygMGMfs',
+  authDomain: 'projektverwaltung-84fda.firebaseapp.com',
+  projectId: 'projektverwaltung-84fda',
+  storageBucket: 'projektverwaltung-84fda.firebasestorage.app',
+  messagingSenderId: '74944237693',
+  appId: '1:74944237693:web:7f9b62ca379c63a3bb6114'
+};
+const ERLAUBTE_MAIL = 'nicola.jundt@ckw.ch';
+// Firestore: nutzer/{uid}/daten/einstellungen und nutzer/{uid}/projekte/{projektId}, Inhalt jeweils als JSON-Text
+const cloud = { user: null, db: null, status: 'aus', fehler: '', zuletzt: null, synced: {}, timer: null, unsub: [] };
+const EINST = '__einstellungen';
+const nutzerRef = () => cloud.db.collection('nutzer').doc(cloud.user.uid);
+
+function cloudStart() {
+  if (!window.firebase) return zeigeLogin('Der Anmeldedienst ist nicht erreichbar – bitte Internetverbindung prüfen und neu laden.', false);
+  firebase.initializeApp(FIREBASE_CONFIG);
+  cloud.db = firebase.firestore();
+  cloud.db.enablePersistence({ synchronizeTabs: true }).catch(() => {}); // offline weiterarbeiten
+  firebase.auth().onAuthStateChanged(async u => {
+    if (!u) { cloudStop(); return zeigeLogin(); }
+    if ((u.email || '').toLowerCase() !== ERLAUBTE_MAIL) {
+      await firebase.auth().signOut();
+      return zeigeLogin(`Kein Zugriff für ${u.email}.`);
+    }
+    cloud.user = u;
+    $('login-info').textContent = 'Daten werden geladen …';
+    try { await cloudLaden(); }
+    catch (e) {
+      cloudStatus('fehler', e.message);
+      toast(e.code === 'permission-denied' ? 'Cloud: keine Berechtigung – bitte die Firestore-Regeln prüfen.' : 'Cloud nicht erreichbar – es wird mit den Daten auf diesem Gerät gearbeitet.');
+    }
+    cloudAbonnieren();
+    document.body.classList.remove('gesperrt');
+    render();
+  });
+}
+function zeigeLogin(fehler = '', formular = true) {
+  document.body.classList.add('gesperrt');
+  $('login-info').textContent = formular ? 'Bitte melde dich an.' : '';
+  $('login-form').hidden = !formular;
+  if (!$('l-mail').value) $('l-mail').value = ERLAUBTE_MAIL;
+  $('login-fehler').hidden = !fehler; $('login-fehler').textContent = fehler;
+  if (formular) setTimeout(() => $('l-pw').focus(), 50);
+}
+async function anmelden() {
+  const mail = $('l-mail').value.trim().toLowerCase(), pw = $('l-pw').value;
+  if (mail !== ERLAUBTE_MAIL) return zeigeLogin('Diese E-Mail-Adresse hat keinen Zugang.');
+  $('l-btn').disabled = true; $('l-btn').textContent = 'Anmelden …';
+  try { await firebase.auth().signInWithEmailAndPassword(mail, pw); $('l-pw').value = ''; }
+  catch (e) {
+    const t = {
+      'auth/invalid-credential': 'E-Mail oder Passwort ist falsch.', 'auth/wrong-password': 'E-Mail oder Passwort ist falsch.',
+      'auth/user-not-found': 'E-Mail oder Passwort ist falsch.', 'auth/too-many-requests': 'Zu viele Versuche – bitte später erneut versuchen oder Passwort zurücksetzen.',
+      'auth/network-request-failed': 'Keine Internetverbindung.'
+    }[e.code] || 'Anmeldung fehlgeschlagen (' + (e.code || e.message) + ').';
+    zeigeLogin(t);
+  }
+  $('l-btn').disabled = false; $('l-btn').textContent = 'Anmelden';
+}
+async function passwortReset() {
+  const mail = $('l-mail').value.trim().toLowerCase();
+  if (mail !== ERLAUBTE_MAIL) return zeigeLogin('Bitte die freigegebene E-Mail-Adresse eingeben.');
+  try { await firebase.auth().sendPasswordResetEmail(mail); zeigeLogin(`Ein Link zum Zurücksetzen wurde an ${mail} gesendet.`); }
+  catch (e) { zeigeLogin('Senden nicht möglich (' + (e.code || e.message) + ').'); }
+}
+async function abmelden() {
+  if (!confirm('Abmelden? Die Daten bleiben in der Cloud gespeichert, die Kopie auf diesem Gerät wird gelöscht.')) return;
+  clearTimeout(cloud.timer);
+  try { await cloudSchreiben(); } catch (e) { /* Schreibvorgang wartet offline weiter */ }
+  cloudStop();
+  await firebase.auth().signOut();
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  state = migrate({}); render();
+}
+function cloudStop() { cloud.unsub.forEach(f => f()); cloud.unsub = []; cloud.user = null; cloud.synced = {}; cloudStatus('aus'); }
+
+async function cloudLaden() {
+  cloudStatus('laedt');
+  const ref = nutzerRef();
+  const [es, ps] = await Promise.all([ref.collection('daten').doc('einstellungen').get(), ref.collection('projekte').get()]);
+  if (es.exists || !ps.empty) {
+    const projekte = ps.docs.map(x => JSON.parse(x.data().json));
+    // Projekte, die nur auf diesem Gerät existieren (z.B. vor der Anmeldung erfasst), bleiben erhalten
+    state.projects.forEach(p => { if (!projekte.some(x => x.id === p.id)) projekte.push(p); });
+    state = migrate({ settings: es.exists ? JSON.parse(es.data().json) : state.settings, projects: projekte });
+    // Stand der Cloud merken, damit nur Abweichungen (lokale Projekte, Umstellungen aus migrate) hochgeladen werden
+    cloud.synced = {};
+    if (es.exists) cloud.synced[EINST] = es.data().json;
+    ps.docs.forEach(x => cloud.synced[x.id] = x.data().json);
+    speichereLokal();
+    await cloudSchreiben();
+  } else {
+    await cloudSchreiben(true); // erste Anmeldung: Daten dieses Geräts hochladen
+  }
+  cloudStatus('ok');
+}
+function cloudPlanen() {
+  if (!cloud.user) return;
+  clearTimeout(cloud.timer);
+  cloudStatus('speichert');
+  cloud.timer = setTimeout(() => cloudSchreiben().catch(e => cloudStatus('fehler', e.message)), 800);
+}
+async function cloudSchreiben(alles) {
+  if (!cloud.user) return;
+  const ref = nutzerRef(), batch = cloud.db.batch(), jetzt = firebase.firestore.FieldValue.serverTimestamp();
+  const neu = { [EINST]: JSON.stringify(state.settings) };
+  state.projects.forEach(p => neu[p.id] = JSON.stringify(p));
+  let n = 0;
+  Object.entries(neu).forEach(([id, json]) => {
+    if (!alles && cloud.synced[id] === json) return;
+    if (json.length > 950000) { toast(id === EINST ? 'Einstellungen zu gross für die Cloud – bitte ein kleineres Logo verwenden.' : 'Ein Projekt ist zu gross für die Cloud (Unterschrift/Bilder verkleinern).'); return; }
+    batch.set(id === EINST ? ref.collection('daten').doc('einstellungen') : ref.collection('projekte').doc(id), { json, geaendert: jetzt });
+    n++;
+  });
+  Object.keys(cloud.synced).forEach(id => { if (!(id in neu)) { batch.delete(ref.collection('projekte').doc(id)); n++; } });
+  if (!n) return cloudStatus('ok');
+  cloud.synced = neu; // Firestore puffert die Änderungen auch offline zuverlässig
+  cloudStatus(navigator.onLine ? 'speichert' : 'offline');
+  await batch.commit();
+  cloudStatus('ok');
+}
+// Änderungen von anderen Geräten übernehmen
+function cloudAbonnieren() {
+  const ref = nutzerRef();
+  const anwenden = () => { speichereLokal(); if ($('dlg').open) cloud.spaeter = true; else render(); };
+  cloud.unsub.push(ref.collection('projekte').onSnapshot(snap => {
+    if (snap.metadata.hasPendingWrites) return;
+    let geaendert = false;
+    snap.docChanges().forEach(ch => {
+      const id = ch.doc.id;
+      if (ch.type === 'removed') {
+        if (id in cloud.synced) { delete cloud.synced[id]; state.projects = state.projects.filter(p => p.id !== id); geaendert = true; }
+        return;
+      }
+      const json = ch.doc.data().json;
+      if (cloud.synced[id] === json) return; // eigene Änderung
+      const p = JSON.parse(json), i = state.projects.findIndex(x => x.id === id);
+      if (i >= 0) state.projects[i] = p; else state.projects.push(p);
+      cloud.synced[id] = json; geaendert = true;
+    });
+    if (geaendert) { state = migrate(state); anwenden(); }
+  }, e => cloudStatus('fehler', e.message)));
+  cloud.unsub.push(ref.collection('daten').doc('einstellungen').onSnapshot(doc => {
+    if (doc.metadata.hasPendingWrites || !doc.exists) return;
+    const json = doc.data().json;
+    if (cloud.synced[EINST] === json) return;
+    state.settings = JSON.parse(json); cloud.synced[EINST] = json;
+    state = migrate(state); anwenden();
+  }, e => cloudStatus('fehler', e.message)));
+  $('dlg').addEventListener('close', () => { if (cloud.spaeter) { cloud.spaeter = false; render(); } });
+}
+function cloudStatus(s, fehler = '') {
+  cloud.status = s; cloud.fehler = fehler;
+  if (s === 'ok') cloud.zuletzt = new Date();
+  if ($('sideUser')) renderCloud();
+}
+window.addEventListener('online', () => { if (cloud.user) cloudSchreiben(true).catch(() => {}); });
+window.addEventListener('offline', () => { if (cloud.user) cloudStatus('offline'); });
+function cloudText() {
+  return { aus: 'nicht angemeldet', laedt: 'lädt …', speichert: 'speichert …', offline: 'offline – wird später synchronisiert',
+    fehler: 'Fehler beim Speichern', ok: 'synchronisiert' + (cloud.zuletzt ? ' ' + cloud.zuletzt.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' }) : '') }[cloud.status];
+}
+function renderCloud() {
+  const farbe = { ok: '#58d68d', speichert: '#5dade2', laedt: '#5dade2', offline: '#f5b041', fehler: '#e74c3c', aus: '#9aa5b1' }[cloud.status];
+  $('sideUser').innerHTML = cloud.user
+    ? `<span class="dot" style="background:${farbe}" title="Cloud: ${cloudText()}"></span><span class="side-txt"><b>${esc(cloud.user.email)}</b>☁ ${cloudText()}<br>
+       <button class="sec sm" onclick="abmelden()">Abmelden</button></span>` : '';
+}
+
 render();
 initBackup();
+cloudStart();
 // Offline-Unterstützung und Installierbarkeit (nur über http/https, nicht als lokale Datei)
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
