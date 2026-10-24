@@ -1,0 +1,2509 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projekte & Terminpläne</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ebeae6">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CKW Projekte">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ebeae6; --side: #f8f8f5; --card: #fff; --text: #18181b; --muted: #74747c; --line: #e8e7e2;
+    --ink: #18181b; --brand: #18181b; --brand-dark: #000; --brand-2: #f1f0eb; --lime: #bfd62f; --bar: #93b81c;
+    --danger: #c0392b; --ok: #2e8b3e; --warn: #c27c0e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+  .layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .layout.collapsed { grid-template-columns: 64px 1fr; }
+  .side-toggle { background: rgba(255,255,255,.12); border: none; width: 30px; height: 30px; padding: 0; border-radius: 6px; color: #fff; font-size: 16px; flex-shrink: 0; }
+  .collapsed .brand { padding: 16px 0; justify-content: center; }
+  .collapsed .brand-txt, .collapsed nav a span, .collapsed .side-txt { display: none; }
+  .collapsed nav a { justify-content: center; padding: 10px 0; }
+  .collapsed .side-foot { padding: 14px 0; text-align: center; }
+  .collapsed .side-foot .dot { margin: 0; }
+  main { padding: 24px 24px 60px; min-width: 0; max-width: 1200px; width: 100%; margin: 0 auto; }
+  aside { background: var(--brand); color: #fff; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+  .brand { padding: 16px 12px 14px 18px; border-bottom: 1px solid rgba(255,255,255,.15); display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 66px; }
+  .brand-txt { min-width: 0; }
+  .brand b { display: block; font-size: 16px; }
+  .brand span { font-size: 12px; opacity: .8; }
+  nav { padding: 10px 8px; display: flex; flex-direction: column; gap: 2px; }
+  nav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: #fff; text-decoration: none; opacity: .85; font-size: 15px; }
+  nav a:hover { background: rgba(255,255,255,.1); opacity: 1; }
+  nav a.active { background: #fff; color: var(--brand); opacity: 1; font-weight: 600; }
+  nav svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .side-foot { margin-top: auto; padding: 14px 18px; font-size: 12px; border-top: 1px solid rgba(255,255,255,.15); opacity: .9; }
+  .side-foot button { margin-top: 6px; background: #fff; color: var(--brand); border-color: #fff; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .page-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .page-head h1 { font-size: 22px; margin: 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+  h2 { font-size: 17px; margin: 0 0 14px; }
+  h3 { font-size: 15px; margin: 0 0 10px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: #fff; color: var(--text); }
+  input:disabled { background: #f1f3f6; color: var(--muted); }
+  textarea { min-height: 60px; resize: vertical; }
+  input[type=color] { padding: 2px; height: 38px; }
+  .check { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--text); margin: 0; }
+  .check input { width: auto; }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  button { font: inherit; border: 1px solid var(--brand); background: var(--brand); color: #fff; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+  button.sec { background: #fff; color: var(--brand); }
+  button.danger { background: #fff; color: var(--danger); border-color: var(--danger); }
+  button.sm { padding: 4px 9px; font-size: 13px; }
+  button:hover { filter: brightness(1.08); }
+  button.plus { width: 42px; height: 42px; border-radius: 50%; padding: 0; font-size: 26px; line-height: 1; box-shadow: 0 3px 10px rgba(0,85,140,.3); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  tr.click { cursor: pointer; } tr.click:hover td { background: #f8fafc; }
+  .table-wrap { overflow-x: auto; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .empty { color: var(--muted); padding: 20px; text-align: center; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 6px; flex-shrink: 0; }
+  .pnum { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-2); display: inline-block; padding: 2px 8px; border-radius: 99px; }
+  .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; display: inline-block; }
+  .b-laufend { background: #e3f4e8; color: var(--ok); } .b-geplant { background: var(--brand-2); color: var(--brand); }
+  .b-abgeschlossen { background: #eceff3; color: var(--muted); } .b-leer { background: #fdf2e0; color: var(--warn); }
+  .tag-int { font-size: 11px; background: var(--brand); color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+  .tag-sub { font-size: 11px; background: #fdf2e0; color: #9a5b00; border: 1px solid #f3d9a8; padding: 0 6px; border-radius: 4px; margin-left: 6px; }
+  .tag-ext { font-size: 11px; background: #fff; color: var(--muted); border: 1px solid var(--line); padding: 0 6px; border-radius: 4px; margin-left: 6px; }
+  .tag-pl { font-size: 11px; background: #fdecea; color: var(--danger); padding: 1px 6px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+  .tag-warn { font-size: 11px; background: var(--danger); color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 600; margin-left: 6px; }
+  .g-pl { position: absolute; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); border: 2px solid #fff; transform: translateX(-3px); z-index: 2; }
+  .cal-pl { display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: var(--danger); border-radius: 3px; padding: 0 4px; margin-left: 3px; vertical-align: 1px; cursor: pointer; max-width: 80px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; flex-wrap: wrap; }
+  .tabs button { background: none; color: var(--muted); border: none; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 14px; }
+  .tabs button.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+  /* Projekte */
+  .projects { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .pcard { border: 1px solid var(--line); border-left: 5px solid var(--c, var(--brand)); border-radius: 10px; padding: 14px; background: #fff; cursor: pointer; transition: box-shadow .15s; }
+  .pcard:hover { box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+  /* Dashboard */
+  .kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 18px; }
+  .kpi { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .kpi b { font-size: 26px; display: block; }
+  .kpi span { font-size: 13px; color: var(--muted); }
+  .next { background: linear-gradient(135deg, var(--brand), var(--brand-dark)); color: #fff; border: none; }
+  .next .muted { color: rgba(255,255,255,.8); }
+  .next .big { font-size: 24px; font-weight: 700; margin: 6px 0 2px; }
+  .next .when { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 14px; }
+  .next .when div b { display: block; font-size: 17px; }
+  .next button { background: #fff; color: var(--brand); border-color: #fff; margin-top: 14px; }
+  .cols { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .progress div { height: 100%; background: var(--ok); }
+  .li { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .li:last-child { border-bottom: none; }
+  .li .date { width: 86px; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  /* Terminplan (Gantt im Tagesraster) */
+  .xg { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  .xg-inner { position: relative; width: max-content; }
+  .xg-row { display: flex; border-bottom: 1px solid #e8ecf1; min-height: 32px; }
+  .xg-left { position: sticky; left: 0; z-index: 3; display: grid; grid-template-columns: 1fr 100px 80px 80px; width: 480px; flex-shrink: 0; background: #fff; border-right: 2px solid var(--line); font-size: 13px; }
+  .xg-left > div { padding: 5px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; align-self: center; }
+  .xg-row.task .xg-left { cursor: pointer; }
+  .xg-row.task .xg-left > div:first-child { padding-left: 22px; }
+  .xg-row.task:hover .xg-left { filter: brightness(.97); }
+  .xg-track { position: relative; flex-shrink: 0; }
+  .xg-head { background: #2c3440; color: #fff; }
+  .xg-head .xg-left { background: #2c3440; color: #fff; font-weight: 600; font-size: 12px; border-right-color: #2c3440; }
+  .xg-wk { position: absolute; top: 0; height: 22px; border-left: 1px solid rgba(255,255,255,.25); padding: 4px 5px; white-space: nowrap; overflow: hidden; font-size: 11px; }
+  .xg-day { position: absolute; top: 22px; height: 26px; text-align: center; font-size: 10px; line-height: 1.15; padding-top: 2px; color: #dfe5eb; border-left: 1px solid rgba(255,255,255,.08); }
+  .xg-day.we { color: #8a96a3; }
+  .xg-group .xg-left > div { font-weight: 700; }
+  .xg-bar { position: absolute; top: 8px; height: 16px; border-radius: 3px; overflow: hidden; min-width: 4px; }
+  .xg-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(0,0,0,.3); }
+  .xg-sum { position: absolute; top: 13px; height: 6px; border-radius: 3px; opacity: .55; }
+  .xg-ms { position: absolute; top: 9px; width: 13px; height: 13px; transform: rotate(45deg); }
+  .xg-pl { position: absolute; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); border: 2px solid #fff; z-index: 2; }
+  .xg-today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--danger); z-index: 2; pointer-events: none; }
+  .prog { height: 6px; background: #e3e7ec; border-radius: 3px; overflow: hidden; display: inline-block; width: 40px; vertical-align: middle; margin-right: 6px; }
+  .prog div { height: 100%; background: var(--ok); }
+  .seg { display: inline-flex; border: 1px solid var(--brand); border-radius: 6px; overflow: hidden; }
+  .seg button { border: none; border-radius: 0; padding: 4px 10px; font-size: 13px; background: #fff; color: var(--brand); }
+  .seg button.on { background: var(--brand); color: #fff; }
+  /* Checkliste */
+  .ck-row { display: flex; gap: 10px; align-items: flex-start; padding: 7px 8px; border-bottom: 1px solid #eef1f5; }
+  .ck-row:last-child { border-bottom: none; }
+  .ck-row input[type=checkbox] { width: 18px; height: 18px; margin: 1px 0 0; flex-shrink: 0; accent-color: var(--ok); cursor: pointer; }
+  .ck-row.done .ck-txt > span:first-child { color: var(--muted); text-decoration: line-through; text-decoration-color: #b8c0ca; }
+  .ck-row.lvl0 .ck-txt > span:first-child { font-weight: 600; }
+  .ck-txt { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+  .ck-txt input[type=date] { padding: 3px 6px; width: 150px; }
+  .ck-am { font-size: 11px; color: var(--ok); }
+  .ck-notiz { flex-basis: 100%; font-size: 12px; color: var(--muted); background: #f8fafc; border-left: 3px solid var(--line); padding: 3px 8px; white-space: pre-wrap; }
+  .ck-btn { background: none; border: none; color: var(--muted); padding: 0 4px; font-size: 14px; }
+  .ck-btn:hover { color: var(--brand); }
+  .ck-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .ck-phase.complete h3::after { content: ' ✓'; color: var(--ok); }
+  textarea.code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; min-height: 420px; line-height: 1.45; }
+  /* Kalender */
+  .cal { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .cal-head { display: grid; grid-template-columns: repeat(7, 1fr); background: #f8fafc; border-bottom: 1px solid var(--line); }
+  .cal-head div { padding: 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--line); min-height: 96px; }
+  .cal-week:last-child { border-bottom: none; }
+  .cal-day { grid-row: 1 / -1; border-right: 1px solid var(--line); }
+  .cal-day:nth-child(14n-1) { border-right: none; }
+  .cal-day.we { background: #fafbfc; }
+  .cal-num { grid-row: 1; padding: 4px 6px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 2px; align-items: center; min-width: 0; }
+  .cal-num.out { color: #b8c0ca; }
+  .cal-num.today span { background: var(--danger); color: #fff; border-radius: 99px; padding: 1px 6px; font-weight: 700; }
+  .cal-bar { z-index: 1; margin: 2px 3px; height: 21px; line-height: 21px; font-size: 11.5px; color: #fff; padding: 0 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; font-weight: 500; }
+  .cal-bar:hover { filter: brightness(1.1); }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d2733; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10; }
+  .toast.show { opacity: 1; }
+  dialog { border: none; border-radius: 12px; padding: 22px; width: min(460px, calc(100vw - 32px)); box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  dialog::backdrop { background: rgba(20,30,40,.45); }
+  .note { background: #fdf2e0; border: 1px solid #f3d9a8; color: #7a5300; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; }
+  /* ---------- Look: hell, weich, abgerundet ---------- */
+  body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -0.005em; }
+  .layout { gap: 14px; padding: 14px; }
+  .layout.collapsed { grid-template-columns: 72px 1fr; }
+  aside { background: var(--side); color: var(--text); border: 1px solid var(--line); border-radius: 24px; height: calc(100vh - 28px); top: 14px; overflow: hidden; }
+  .brand { border-bottom: none; padding: 20px 14px 8px 20px; }
+  .logo { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: #111; }
+  .logo i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); margin-left: 2px; }
+  .logo img { height: 30px; display: block; }
+  #brandSub { display: block; margin-top: 8px; font-size: 12px; color: var(--muted); opacity: 1; }
+  .side-toggle { background: #ecebe6; color: var(--text); border-radius: 10px; }
+  nav { padding: 8px 12px; overflow-y: auto; }
+  nav a { color: var(--text); opacity: 1; border-radius: 12px; padding: 9px 12px; font-size: 14.5px; min-width: 0; }
+  nav a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  nav a:hover { background: #efeee9; }
+  nav a.active { background: #e7e6e0; color: var(--text); font-weight: 600; }
+  .nav-sec { font-size: 12px; color: var(--muted); padding: 16px 12px 4px; }
+  nav .nav-proj { font-size: 13.5px; padding: 7px 12px; }
+  .pdot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .collapsed .nav-sec { display: none; }
+  .side-foot { border-top: 1px solid var(--line); color: var(--muted); opacity: 1; }
+  .side-foot button { background: var(--ink); color: #fff; border-color: var(--ink); }
+  main { padding: 18px 10px 60px; }
+  .page-head h1, .dash-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .card { border-radius: 22px; border-color: var(--line); padding: 20px 22px; box-shadow: 0 1px 2px rgba(20,20,10,.03); }
+  h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+  input, select, textarea { border-radius: 10px; border-color: #e3e2dc; background: #fbfbf9; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #bdbcb4; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,.05); }
+  button { border-radius: 12px; padding: 9px 16px; background: var(--ink); border-color: var(--ink); font-weight: 500; }
+  button:hover { filter: none; background: #000; }
+  button.sec { background: #fff; color: var(--text); border-color: #e3e2dc; }
+  button.sec:hover { background: #f5f4f0; }
+  button.danger:hover { background: #fdf1ef; }
+  button.sm { padding: 5px 11px; border-radius: 10px; }
+  button.plus { box-shadow: 0 4px 14px rgba(0,0,0,.18); border-radius: 50%; padding: 0; }
+  .pnum { background: #f1f0eb; color: var(--text); }
+  .tabs { border-bottom: none; background: #e4e3de; border-radius: 14px; padding: 4px; display: inline-flex; gap: 2px; }
+  .tabs button { border: none; border-radius: 10px; padding: 7px 14px; color: var(--muted); background: none; }
+  .tabs button:hover { background: rgba(255,255,255,.5); }
+  .tabs button.active { background: #fff; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .kpi { border-radius: 20px; padding: 16px 18px; border-color: var(--line); }
+  .kpi b { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; }
+  .pcard { border-radius: 20px; border-color: var(--line); }
+  .next { background: linear-gradient(135deg, #f8f6ec, #eeecdf); color: var(--text); border: 1px solid var(--line); }
+  .next .muted { color: var(--muted); }
+  .next .big { font-weight: 600; letter-spacing: -0.02em; }
+  .next button { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .next-grid { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  .progress { background: #ecebe6; border-radius: 99px; }
+  .progress div, .prog div { background: var(--bar); border-radius: 99px; }
+  .ck-row input[type=checkbox] { accent-color: var(--bar); }
+  .xg, .cal { border-radius: 16px; }
+  .xg-head, .xg-head .xg-left { background: #1d1d1f; border-right-color: #1d1d1f; }
+  dialog { border-radius: 22px; }
+  .note { border-radius: 12px; }
+  .seg { border-color: #e3e2dc; border-radius: 12px; }
+  .seg button { color: var(--text); padding: 5px 12px; }
+  .seg button.on { background: var(--ink); color: #fff; }
+  th { font-weight: 500; }
+  .dash-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .search { position: relative; }
+  .search input { border-radius: 99px; padding: 10px 16px 10px 38px; width: 280px; background: #fff; }
+  .search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); }
+  .tabs { flex-wrap: wrap; }
+  .tag-wichtig { font-size: 10.5px; background: #f4f8dc; color: #5b6b0c; border: 1px solid #dfe9a8; padding: 0 6px; border-radius: 99px; }
+  .tag-ok { font-size: 11px; background: #e9f5e3; color: var(--ok); padding: 1px 8px; border-radius: 99px; font-weight: 600; }
+  code { background: #f1f0eb; padding: 1px 5px; border-radius: 5px; font-size: 12px; }
+  /* Mail-Dialog */
+  .copyrow { display: flex; gap: 8px; margin-bottom: 10px; }
+  .copyrow input { flex: 1; }
+  /* Checklisten-Editor */
+  .ed-list { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .ed-row { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-bottom: 1px solid #f0efea; background: #fff; }
+  .ed-row:last-child { border-bottom: none; }
+  .ed-row > input { flex: 1; min-width: 120px; padding: 6px 9px; }
+  .ed-phase { background: #f4f3ee; }
+  .ed-phase > input { font-weight: 600; }
+  .ed-tools { display: flex; gap: 0; }
+  .ed-mail { width: auto; max-width: 190px; padding: 5px 6px; font-size: 12.5px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); border: 1px solid #e3e2dc; border-radius: 99px; padding: 3px 9px; margin: 0; cursor: pointer; white-space: nowrap; user-select: none; }
+  .chip input { display: none; }
+  .chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  /* Dashboard: vor Baustart offen */
+  .of-proj { padding: 10px 0; border-bottom: 1px solid #efeee9; }
+  .of-proj:last-child { border-bottom: none; }
+  .of-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; cursor: pointer; margin-bottom: 4px; }
+  .of-item { display: flex; align-items: center; gap: 10px; padding: 4px 0 4px 2px; font-size: 14px; }
+  .of-item input { width: 17px; height: 17px; accent-color: var(--bar); flex-shrink: 0; cursor: pointer; }
+  .of-item > span { flex: 1; min-width: 0; }
+  /* Baufreigabe, Einklappen */
+  .frei { border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; font-weight: 500; }
+  .frei.ok { background: #eef6e6; color: #3d5a12; border: 1px solid #cfe3b8; }
+  .frei.rot { background: #fdecea; color: #8e2318; border: 1px solid #f3c2bb; cursor: pointer; }
+  .rot-txt { color: var(--danger); }
+  .ck-row.rot { background: #fdf3f1; box-shadow: inset 3px 0 0 var(--danger); }
+  .ck-row.rot .ck-txt > span:first-child { color: #8e2318; }
+  .ck-phase.rot { border-color: #f3c2bb; }
+  .ck-klick { cursor: pointer; user-select: none; }
+  .ck-phase.zu { padding-bottom: 14px; }
+  .ck-pfeil { width: 18px; flex-shrink: 0; display: inline-block; text-align: center; color: var(--muted); padding: 0; }
+  .of-proj.kritisch .of-head b { color: #8e2318; }
+  .of-item.rot > span { color: #8e2318; }
+  .of-head .link:hover { text-decoration: underline; }
+  /* IBN-Rapport */
+  .rap { font-size: 14px; }
+  .rap-logo { text-align: center; margin: 4px 0 14px; }
+  .rap-logo img { height: 38px; }
+  .rap-bar { background: #969696; color: #fff; font-weight: 700; font-size: 13px; padding: 4px 8px; margin: 10px 0 4px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .rap-kopf { justify-content: space-between; }
+  .rap-kopf input { width: auto; padding: 2px 6px; border-radius: 6px; background: #fff; margin-left: 4px; }
+  .rap-titel { margin: 6px 0; font-size: 15px; border: none; border-bottom: 1px solid var(--line); border-radius: 0; background: none; padding: 4px 2px; }
+  .rap-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .rap textarea { min-height: 0; }
+  .rap-tab { margin-top: 10px; min-width: 760px; }
+  .rap-tab th { background: #969696; color: #fff; font-weight: 700; font-size: 12px; padding: 5px 4px; text-align: center; }
+  .rap-tab td { padding: 2px; border-bottom: 1px solid #e4e4e4; }
+  .rap-tab td input { padding: 4px 5px; border-radius: 6px; font-size: 13px; }
+  .rap-out { text-align: right; font-weight: 600; padding-right: 6px !important; white-space: nowrap; }
+  .rap-cb { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 0 12px; color: inherit; font-size: 12.5px; font-weight: 700; }
+  .rap-cb input { width: auto; }
+  .rap-fuss { justify-content: space-between; }
+  .rap-unter { display: grid; grid-template-columns: 1fr 1fr 1.4fr 0.7fr; gap: 12px; align-items: end; margin-top: 10px; }
+  #r-sig { width: 100%; max-width: 320px; height: 90px; border: 1px dashed #bbb; border-radius: 10px; background: #fff; touch-action: none; cursor: crosshair; }
+  @media (max-width: 700px) { .rap-2, .rap-unter { grid-template-columns: 1fr; } }
+  /* Checkliste Blitzschutz (LASOLTEC) */
+  .bz-kopf { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 3px solid #f6c400; padding-bottom: 8px; margin-bottom: 10px; }
+  .bz-kopf h2 { margin: 4px 0 0; color: #1f3864; font-weight: 400; font-size: 24px; }
+  .bz h3 { color: #2f5496; margin: 16px 0 8px; }
+  .bz-feld { margin-bottom: 10px; }
+  .bz-feld textarea { min-height: 0; }
+  .bz-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .bz-box { display: flex; align-items: flex-start; gap: 8px; color: var(--text); font-size: 14px; margin: 0 0 9px; cursor: pointer; }
+  .bz-box input { width: 17px; height: 17px; margin-top: 1px; flex-shrink: 0; accent-color: #1f3864; }
+  @media (max-width: 700px) { .bz-2 { grid-template-columns: 1fr; } }
+  /* Wochenplan */
+  table.wk { min-width: 860px; table-layout: fixed; }
+  table.wk th, table.wk td { border-right: 1px solid #f0efea; vertical-align: top; padding: 8px; }
+  table.wk th { background: #f7f6f2; }
+  table.wk .heute { background: #fbfce9; }
+  .wk-chip { border-left: 4px solid; background: #f7f6f2; border-radius: 6px; padding: 4px 7px; margin-bottom: 5px; font-size: 12.5px; cursor: pointer; line-height: 1.3; }
+  .wk-chip small { display: block; color: var(--muted); font-size: 11px; }
+  .wk-pl { display: inline-block; margin-top: 3px; font-size: 10.5px; font-weight: 600; color: #fff; background: var(--danger); border-radius: 4px; padding: 0 5px; }
+  .print-only { display: none; }
+  @media print {
+    aside, .no-print, .toast { display: none !important; }
+    .print-only { display: block; }
+    body { background: #fff; }
+    .layout { display: block; padding: 0; }
+    main { padding: 0; max-width: none; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+    table.wk { min-width: 0; }
+  }
+  @media (max-width: 800px) {
+    .layout { padding: 8px; gap: 8px; }
+    aside { top: 8px; border-radius: 16px; }
+    .nav-sec, nav .nav-proj { display: none; }
+    .search input { width: 100%; }
+    .next-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 800px) {
+    .layout, .layout.collapsed { grid-template-columns: 1fr; }
+    .collapsed nav a span { display: inline; }
+    .collapsed nav a { padding: 8px 10px; }
+    aside { position: sticky; height: auto; order: -1; z-index: 5; }
+    .brand { display: none; }
+    nav { flex-direction: row; overflow-x: auto; padding: 6px; }
+    nav a { padding: 8px 10px; font-size: 13px; white-space: nowrap; }
+    .side-foot { display: none; }
+    main { padding: 16px 16px 60px; }
+    .xg-left { width: 230px; grid-template-columns: 1fr 60px; }
+    .xg-left > div:nth-child(3), .xg-left > div:nth-child(4) { display: none; }
+    .cal-bar { font-size: 10px; padding: 0 3px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout" id="layout">
+  <aside>
+    <div class="brand">
+      <div class="brand-txt"><div class="logo" id="sideLogo"></div><span id="brandSub"></span></div>
+      <button class="side-toggle" id="sideToggle" onclick="toggleSide()" title="Leiste ein-/ausklappen">«</button>
+    </div>
+    <nav id="nav"></nav>
+    <div class="side-foot" id="sideFoot"></div>
+  </aside>
+  <main id="app"></main>
+</div>
+<dialog id="dlg"></dialog>
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJson(this)">
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- Stammdaten ----------
+const DEFAULT_SETTINGS = {
+  name: 'Nicola Jundt', firma: 'CKW Gebäudetechnik AG', strasse: 'Bleumattstrasse 1', ort: '4622 Egerkingen',
+  telefon: '', email: '', autoBackup: false, tageskopien: true
+};
+// art: intern = Montage durch uns, sub = Subunternehmer in unserem Auftrag, extern = andere Firma
+const STANDARD_GEWERKE = [
+  { name: 'Elektriker', art: 'intern', farbe: '#00558c' },
+  { name: 'Elektriker', art: 'extern', farbe: '#5dade2' },
+  { name: 'PV-Montage', art: 'intern', farbe: '#d4a017' },
+  { name: 'PV-Montage', art: 'sub', farbe: '#e67e22' },
+  { name: 'CKW Service (IBN)', art: 'intern', kontakt: 'Melih', farbe: '#16a085' },
+  { name: 'Kernbohrer', art: 'extern', farbe: '#7f8c8d' },
+  { name: 'Unabhängige Kontrolle', art: 'extern', kontakt: 'Pascal Vogel', email: 'pascal.vogel@hbb-control.ch', farbe: '#8e44ad' },
+  { name: 'Blitzschutzabnahme', art: 'extern', kontakt: 'Philipp Lägeler', farbe: '#c0392b' },
+  { name: 'Dachdecker', art: 'extern', farbe: '#8d6e63' },
+  { name: 'Gerüstbauer', art: 'extern', farbe: '#2c3e50' },
+  { name: 'Transport', art: 'extern', firma: 'Häuselmann', farbe: '#27ae60' },
+  { name: 'Kran', art: 'extern', firma: 'Flück AG', farbe: '#e84393' }
+];
+const ARTEN = { intern: 'intern', sub: 'Subunternehmer', extern: 'extern' };
+const PALETTE = ['#00558c', '#16a085', '#e67e22', '#8e44ad', '#c0392b', '#2c7be5', '#7f8c8d', '#d4a017', '#27ae60', '#d35400'];
+// Gut unterscheidbare Farben für automatische Vorschläge
+const FARBEN = ['#00558c', '#e67e22', '#16a085', '#8e44ad', '#c0392b', '#d4a017', '#2c7be5', '#27ae60', '#e84393', '#8d6e63',
+  '#2c3e50', '#5dade2', '#7f8c8d', '#f39c12', '#1abc9c', '#9b59b6', '#a93226', '#6c5ce7', '#00b894', '#b7950b', '#e17055', '#0984e3', '#6d4c41', '#fd79a8'];
+function freieFarbe(belegt) {
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const abstand = (a, b) => { const x = rgb(a), y = rgb(b); return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]); };
+  const frei = c => belegt.every(b => abstand(c, b) > 70);
+  const f = FARBEN.find(frei);
+  if (f) return f;
+  // alle Vorschläge belegt: zufällige Farbe mit möglichst grossem Abstand
+  let best = '#000000', bestD = -1;
+  for (let i = 0; i < 60; i++) {
+    const c = '#' + [0, 0, 0].map(() => Math.floor(40 + Math.random() * 180).toString(16).padStart(2, '0')).join('');
+    const d = Math.min(...belegt.map(b => abstand(c, b)));
+    if (d > bestD) { best = c; bestD = d; }
+  }
+  return best;
+}
+const stdKopie = () => STANDARD_GEWERKE.map(g => ({ firma: '', adresse: '', kontakt: '', email: '', ...g }));
+
+// Checkliste als Text: "# Phase", Einrückung mit 2 Leerzeichen = Unterpunkt,
+// [datum] = Datumsfeld (Punkt gilt mit Datum als erledigt), [oder] = einer der Unterpunkte genügt,
+// [!] = wichtig vor Baustart (erscheint im Dashboard; bei einer Phase: alle ihre Punkte), [mail: Name] = Mailvorlage zum Kopieren,
+// [dok: ibn] = IBN-Rapport (Formular mit PDF)
+const CHECKLISTE_VORLAGE = `# Planung & Bewilligung [!]
+Auftrag / Vertrag unterschrieben [!]
+Begehung vor Ort
+  Begehung am [datum]
+  Fotos erstellt und abgelegt
+  Dachzustand und Zugang geprüft
+Statik geprüft [!]
+Baumeldung bei Aleks [!] [mail: Baumeldung einreichen]
+  Baupläne
+  Feuerwehrplan
+  Eingereicht durch Aleks
+    Bewilligt
+Elektroschema
+  Ticket für TAG / IA erstellt [mail: TAG / IA einreichen]
+TAG / IA [!]
+  TAG bewilligt
+  IA bewilligt
+Layout durch Kunde bewilligt [!]
+  K2 Auslegung
+  Ballast-/Montagedetail
+  Layout
+  Stringplan
+Gerüstplan / Situationsplan [!]
+Pronovo-Anmeldung (EIV) eingereicht
+
+# Koordination / Terminierung [!]
+Baustart definiert [datum] [!]
+Terminplan erstellt und versendet [!]
+Baustelleninstallation geklärt (Zufahrt, Parkplatz, Mulde, WC) [!]
+Kunde über Bauablauf informiert
+
+# Beschaffung & Baustellenlogistik [!]
+Material bestellt [!] [mail: Material bestellen]
+  Solarmarkt / Krannich
+  EPOS
+  Verrimetall WR-Gehäuse
+Gerüst [oder] [!]
+  Bauseits
+  Bestellt [mail: Gerüst bestellen]
+Kran [oder] [!]
+  Bauseits
+  Bestellt [mail: Kran bestellen]
+Kranstandort / Strassenbenützung bewilligt (falls nötig)
+TioTio [oder] [!]
+  Bauseits
+  Bestellt
+Transport organisiert [!] [mail: Transport organisieren]
+Zähler / Smart Meter beim Netzbetreiber bestellt
+
+# Abnahme, Messung & Gutachten
+Apparatebestellung durch Elektriker
+IBN
+  Termin von Melih [datum] [mail: IBN-Termin anfragen]
+  IBN Dok. an Melih geschickt [dok: ibn]
+  Kontrolle MPP
+Unabhängige Kontrolle [mail: Unabhängige Kontrolle anmelden]
+  Pascal Vogel - pascal.vogel@hbb-control.ch
+  Sicherheitsnachweis (SiNa) erhalten
+Blitzschutzattest [mail: Blitzschutzattest anfragen] [dok: blitz]
+  Philipp Lägeler
+Abnahmeprotokoll
+  Erstellt
+  Vom Kunden unterschrieben
+NAKA
+Fotos
+  Erstellt
+  Abgelegt
+
+# Projektabschluss & Dokumentation
+Monitoring eingerichtet und Kunde instruiert
+Pronovo-Beglaubigung / HKN gemeldet
+Gerüst abgebaut, Baustelle geräumt
+Statikbericht revidiert
+Pläne für Projektdoku revidiert
+Projektdoku versendet
+Schlussrechnung
+Garantie`;
+
+// Anfrage ans Meldewesen (TAG / IA und IBN)
+const MELDEWESEN_TEXT = `Welche Aufgaben möchte ich beim Meldewesen beantragen?
+Elektroschema kontrollieren & TAG / IA (AC/DC) einreichen, IB Datum und Planung festlegen
+
+Sind folgende Projektdaten und Fotos korrekt erfasst und abgelegt?
+UMBAU - JA alle Daten und Fotos sind komplett und korrekt im Projektorder abgelegt
+
+Projektangaben: {projektnummer} / {projekt}
+
+Projektleiter: {pl}
+Fachmitarbeiterin: Aleksandra Gasic
+
+Baustart: {baustart_datum}
+Bauende: {bauende_datum}
+Wunschdatum IB: {ibn_datum}
+
+Link MSD:
+Link SharePoint:
+
+AC-Installation: extern (Apparatebestellung wird durch PL beim externen Elektriker angefordert)
+Externer AC-Installateur: {elektriker_extern}
+
+Wurde das Elektroschema durch das ernannte Kontrollorgan am Ressort überprüft? (Vieraugenprinzip)
+Ja
+
+Besondere Bemerkungen:
+`;
+// Platzhalter: {projektnummer} {projekt} {ort} {baustart} {bauende} {baustart_datum} {bauende_datum} {ibn_datum} {elektriker_extern} {termin} {termine}
+// {gewerk} {gewerk_firma} {gewerk_kontakt} {pl} {pl_telefon} {pl_mail} {firma} {signatur}
+const MAIL_VORLAGEN = [
+  { name: 'Gerüst bestellen', gewerk: 'Gerüstbauer', an: '', betreff: 'Gerüstbestellung {projektnummer} {projekt}, {ort}',
+    text: `Guten Tag {gewerk_kontakt}
+
+Für unser Projekt {projektnummer} {projekt} in {ort} möchten wir ein Gerüst bestellen.
+
+Termin:
+{termine}
+
+Den Gerüst- und Situationsplan sende ich im Anhang mit. Bitte bestätigen Sie mir den Termin kurz.` },
+  { name: 'Kran bestellen', gewerk: 'Kran', an: '', betreff: 'Kranbestellung {projektnummer} {projekt}, {ort}',
+    text: `Guten Tag {gewerk_kontakt}
+
+Für unser PV-Projekt {projektnummer} {projekt} in {ort} benötigen wir einen Kran.
+
+Termin: {termin}
+Material: PV-Module und Unterkonstruktion (Paletten / Gewicht: ___)
+Standort Kran: ___
+
+Bitte teilen Sie mir mit, ob eine Strassenbenützungsbewilligung nötig ist.` },
+  { name: 'Transport organisieren', gewerk: 'Transport', an: '', betreff: 'Transportauftrag {projektnummer} {projekt}, {ort}',
+    text: `Guten Tag {gewerk_kontakt}
+
+Für unser Projekt {projektnummer} {projekt} bitten wir Sie um folgenden Transport:
+
+Termin: {termin}
+Abholort: ___
+Lieferadresse: {ort}
+Material: ___` },
+  { name: 'Material bestellen', gewerk: '', an: '', betreff: 'Materialbestellung {projektnummer} {projekt}',
+    text: `Guten Tag
+
+Für unser Projekt {projektnummer} {projekt} in {ort} bestellen wir folgendes Material:
+
+- ___
+
+Gewünschter Liefertermin: vor Baustart am {baustart}
+Lieferadresse: {ort}` },
+  { name: 'Baumeldung einreichen', gewerk: '', an: '', betreff: 'Baumeldung {projektnummer} {projekt}, {ort}',
+    text: `Hallo Aleks
+
+Im Anhang findest du die Baupläne und den Feuerwehrplan für das Projekt {projektnummer} {projekt} in {ort}.
+Kannst du bitte die Baumeldung einreichen? Geplanter Baustart ist am {baustart}.` },
+  { name: 'TAG / IA einreichen', gewerk: '', an: '', betreff: 'Meldewesen TAG / IA {projektnummer} {projekt}', text: MELDEWESEN_TEXT },
+  { name: 'IBN-Termin anfragen', gewerk: 'CKW Service (IBN)', an: '', betreff: 'Meldewesen IBN {projektnummer} {projekt}', text: MELDEWESEN_TEXT },
+  { name: 'Unabhängige Kontrolle anmelden', gewerk: 'Unabhängige Kontrolle', an: '', betreff: 'Unabhängige Kontrolle {projektnummer} {projekt}, {ort}',
+    text: `Guten Tag {gewerk_kontakt}
+
+Gerne melde ich die unabhängige Kontrolle für unsere PV-Anlage {projektnummer} {projekt} in {ort} an.
+Möglicher Termin: {termin}
+
+Die Unterlagen für den Sicherheitsnachweis sende ich im Anhang mit.` },
+  { name: 'Blitzschutzattest anfragen', gewerk: 'Blitzschutzabnahme', an: '', betreff: 'Blitzschutzattest {projektnummer} {projekt}, {ort}',
+    text: `Guten Tag {gewerk_kontakt}
+
+Für die PV-Anlage {projektnummer} {projekt} in {ort} benötigen wir ein Blitzschutzattest.
+Möglicher Termin: {termin}
+
+Im Anhang sende ich Ihnen die ausgefüllte Checkliste Blitzschutz & Photovoltaik sowie die angekreuzten Unterlagen.` }
+];
+
+// Gruss und Signatur stehen bereits im Mailprogramm; ältere Vorlagen werden beim Laden gekürzt
+const ohneGruss = t => String(t || '').replace(/\n\s*(Freundliche Grüsse|Danke und Gruss)\b[\s\S]*$/, '').trimEnd();
+
+// eine Zeile pro Eintrag; Grundlage für Checkliste und Editor
+function zeilenAusText(text) {
+  const flags = (s, z) => s.replace(/\[(datum|oder|!|mail:[^\]]*|dok:[^\]]*)\]/gi, (m, f) => {
+    f = f.toLowerCase();
+    if (f === 'datum') z.datum = true; else if (f === 'oder') z.oder = true; else if (f === '!') z.wichtig = true;
+    else if (f.startsWith('mail:')) z.mail = m.slice(6, -1).trim(); else z.dok = m.slice(5, -1).trim().toLowerCase();
+    return '';
+  }).replace(/\s+/g, ' ').trim();
+  return String(text || '').split('\n').filter(l => l.trim()).map(raw => {
+    if (raw.trim().startsWith('#')) { const z = { typ: 'phase', wichtig: false }; z.text = flags(raw.trim().replace(/^#+\s*/, ''), z); return z; }
+    const z = { typ: 'item', lvl: Math.floor(raw.replace(/\t/g, '  ').match(/^ */)[0].length / 2), datum: false, oder: false, wichtig: false, mail: '', dok: '' };
+    z.text = flags(raw.trim(), z);
+    return z;
+  });
+}
+function textAusZeilen(lines) {
+  return lines.filter(z => z.text.trim()).map(z => z.typ === 'phase' ? '\n# ' + z.text.trim() + (z.wichtig ? ' [!]' : '')
+    : '  '.repeat(z.lvl) + z.text.trim() + (z.datum ? ' [datum]' : '') + (z.oder ? ' [oder]' : '') + (z.wichtig ? ' [!]' : '')
+      + (z.mail ? ` [mail: ${z.mail}]` : '') + (z.dok ? ` [dok: ${z.dok}]` : '')).join('\n').trim();
+}
+// übernimmt [mail: …], [dok: …] und [!] aus der Standardvorlage für Phasen und Punkte mit gleichem Text und gleicher Position
+function flagsErgaenzen(text) {
+  const std = new Map(), stdPh = new Map();
+  const walk = n => { std.set(n.key, n); n.children.forEach(walk); };
+  parseCheckliste(CHECKLISTE_VORLAGE).forEach(ph => { stdPh.set(ph.titel.toLowerCase(), ph); ph.items.forEach(walk); });
+  let phase = 'Allgemein';
+  const stack = [], lines = zeilenAusText(text);
+  lines.forEach(z => {
+    if (z.typ === 'phase') { phase = z.text; stack.length = 0; if (stdPh.get(phase.toLowerCase())?.wichtig) z.wichtig = true; return; }
+    while (stack.length > z.lvl) stack.pop();
+    const s = std.get([phase, ...stack, z.text].join(' › ').toLowerCase());
+    if (s) { z.mail = z.mail || s.mail; z.dok = z.dok || s.dok; z.wichtig = z.wichtig || s.wichtig; }
+    stack.push(z.text);
+  });
+  return textAusZeilen(lines);
+}
+function parseCheckliste(text) {
+  const phasen = [], stack = [];
+  zeilenAusText(text).forEach(z => {
+    if (z.typ === 'phase') { phasen.push({ titel: z.text, wichtig: z.wichtig, items: [] }); stack.length = 0; return; }
+    if (!phasen.length) phasen.push({ titel: 'Allgemein', items: [] });
+    const ph = phasen[phasen.length - 1];
+    while (stack.length > z.lvl) stack.pop();
+    const parent = stack[stack.length - 1];
+    const node = { ...z, key: [ph.titel, ...stack.map(n => n.text), z.text].join(' › ').toLowerCase(), children: [],
+      label: [...stack.slice(-1).map(n => n.text), z.text].join(' › ') };
+    (parent ? parent.children : ph.items).push(node);
+    stack.push(node);
+  });
+  return phasen;
+}
+function chkDone(p, n) {
+  const st = p.chk[n.key] || {};
+  if (st.ok || (n.datum && st.datum)) return true;
+  if (!n.children.length) return false;
+  return n.oder ? n.children.some(c => chkDone(p, c)) : n.children.every(c => chkDone(p, c));
+}
+// gezählt werden die Hauptpunkte jeder Phase
+function chkStats(p) {
+  const ph = parseCheckliste(p.checkliste);
+  let done = 0, total = 0;
+  ph.forEach(x => x.items.forEach(n => { total++; if (chkDone(p, n)) done++; }));
+  return { done, total, ph, pct: total ? Math.round(done / total * 100) : 0 };
+}
+
+// ---------- Speicher ----------
+const KEY = 'ckw-projekte-v1';
+let state = migrate(load());
+let ui = { tab: 'termine', editTermin: null, editGewerk: null, setTab: 'backup', month: todayIso().slice(0, 7), showPl: true, zoom: 'tag', ganttScroll: true, nurOffen: false,
+  woche: null, nurIntern: false, ed: null, edText: false };
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+  catch (e) { return {}; }
+}
+function migrate(d) {
+  d.projects = d.projects || [];
+  d.settings = Object.assign({}, DEFAULT_SETTINGS, d.settings || {});
+  if (!Array.isArray(d.settings.standardGewerke)) d.settings.standardGewerke = stdKopie();
+  if (typeof d.settings.checklisteVorlage !== 'string') d.settings.checklisteVorlage = CHECKLISTE_VORLAGE;
+  if (!Array.isArray(d.settings.mailvorlagen)) d.settings.mailvorlagen = MAIL_VORLAGEN.map(m => ({ ...m }));
+  // Version 3: ältere Checklisten bekommen Mail-/Dokument-Verknüpfungen und "vor Baustart"-Markierungen der Standardvorlage,
+  // Mailvorlagen enden ohne Gruss und Signatur
+  if ((d.settings.chkVersion || 1) < 3) {
+    d.settings.checklisteVorlage = flagsErgaenzen(d.settings.checklisteVorlage);
+    d.projects.forEach(p => { if (typeof p.checkliste === 'string') p.checkliste = flagsErgaenzen(p.checkliste); });
+    d.settings.mailvorlagen.forEach(m => m.text = ohneGruss(m.text));
+    d.settings.chkVersion = 3;
+  }
+  // Version 4: Blitzschutzattest bekommt die LASOLTEC-Checkliste als Dokument
+  if (d.settings.chkVersion < 4) {
+    d.settings.checklisteVorlage = flagsErgaenzen(d.settings.checklisteVorlage);
+    d.projects.forEach(p => { if (typeof p.checkliste === 'string') p.checkliste = flagsErgaenzen(p.checkliste); });
+    d.settings.chkVersion = 4;
+  }
+  // Version 5: Meldewesen-Vorlage für TAG / IA und IBN
+  if (d.settings.chkVersion < 5) {
+    const neu = MAIL_VORLAGEN.find(m => m.name === 'TAG / IA einreichen');
+    if (!d.settings.mailvorlagen.some(m => m.name === neu.name)) d.settings.mailvorlagen.unshift({ ...neu });
+    const ibn = d.settings.mailvorlagen.find(m => m.name === 'IBN-Termin anfragen');
+    if (ibn) Object.assign(ibn, { text: MELDEWESEN_TEXT, betreff: 'Meldewesen IBN {projektnummer} {projekt}' });
+    d.settings.checklisteVorlage = flagsErgaenzen(d.settings.checklisteVorlage);
+    d.projects.forEach(p => { if (typeof p.checkliste === 'string') p.checkliste = flagsErgaenzen(p.checkliste); });
+    d.settings.chkVersion = 5;
+  }
+  d.projects.forEach((p, i) => {
+    if (!p.farbe) p.farbe = PALETTE[i % PALETTE.length];
+    if (typeof p.checkliste !== 'string') p.checkliste = d.settings.checklisteVorlage;
+    if (!p.chk) p.chk = {};
+    delete p.bauherr;
+    p.gewerke.forEach(g => { if (!g.art) g.art = g.eigen ? 'intern' : 'extern'; g.eigen = g.art === 'intern'; });
+  });
+  return d;
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch (e) { toast('Speichern im Browser nicht möglich – bitte Backup erstellen.'); }
+  scheduleAutoBackup();
+}
+const S = () => state.settings;
+const uid = () => Math.random().toString(36).slice(2, 10);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = id => document.getElementById(id);
+const val = id => $(id).value.trim();
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ---------- Datum ----------
+const DAY = 86400000;
+const toDate = s => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const isoOf = d => d.toISOString().slice(0, 10);
+const addDays = (d, n) => new Date(d.getTime() + n * DAY);
+const diffDays = (a, b) => Math.round((toDate(b) - toDate(a)) / DAY);
+const fmt = s => s ? s.split('-').reverse().join('.') : '';
+const WT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const fmtLong = s => s ? WT[toDate(s).getUTCDay()] + ', ' + fmt(s) : '';
+function todayIso() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function kw(d) {
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t - y0) / DAY + 1) / 7);
+}
+function arbeitstage(a, b) {
+  let n = 0;
+  for (let d = toDate(a); d <= toDate(b); d = addDays(d, 1)) { const w = d.getUTCDay(); if (w && w !== 6) n++; }
+  return n;
+}
+function relTage(iso) {
+  const n = diffDays(todayIso(), iso);
+  return n === 0 ? 'heute' : n === 1 ? 'morgen' : n > 0 ? `in ${n} Tagen` : `vor ${-n} Tagen`;
+}
+// Zeitachse: Montag der ersten Woche bis Sonntag der letzten Woche
+function zeitachse(termine) {
+  if (!termine.length) return null;
+  const min = Math.min(...termine.map(t => toDate(t.start)));
+  const max = Math.max(...termine.map(t => toDate(t.ende)));
+  const s = new Date(min); s.setUTCDate(s.getUTCDate() - ((s.getUTCDay() + 6) % 7));
+  const e = new Date(max); e.setUTCDate(e.getUTCDate() + (7 - (e.getUTCDay() || 7)));
+  const tage = Math.round((e - s) / DAY) + 1;
+  const wochen = [];
+  for (let i = 0; i < tage; i += 7) wochen.push(addDays(s, i));
+  return { start: s, tage, wochen, pos: iso => (toDate(iso) - s) / DAY / tage };
+}
+
+// ---------- Projekt-Helfer ----------
+const sortTermine = p => [...p.termine].sort((a, b) => a.start.localeCompare(b.start) || a.ende.localeCompare(b.ende));
+function gewerk(p, id) {
+  const g = p.gewerke.find(g => g.id === id) || { name: '–', farbe: '#999', firma: '' };
+  return g.eigen ? { ...g, firma: S().firma, adresse: [S().strasse, S().ort].filter(Boolean).join(', '), kontakt: g.kontakt || S().name } : g;
+}
+// eigen = Montage durch uns (intern); art unterscheidet zusätzlich Subunternehmer
+const artOf = g => g.art || (g.eigen ? 'intern' : 'extern');
+const artKurz = g => ({ intern: 'intern', sub: 'Sub', extern: 'extern' })[artOf(g)];
+const seiteTag = g => ({ intern: '<span class="tag-int">intern</span>', sub: '<span class="tag-sub">Subunternehmer</span>', extern: '<span class="tag-ext">extern</span>' })[artOf(g)];
+const gwKey = g => (g.name + '|' + artOf(g)).toLowerCase();
+function span(p) {
+  if (!p.termine.length) return null;
+  return { start: p.termine.reduce((m, t) => t.start < m ? t.start : m, '9999'), ende: p.termine.reduce((m, t) => t.ende > m ? t.ende : m, '0000') };
+}
+function status(p) {
+  const s = span(p), t = todayIso();
+  if (!s) return { key: 'leer', label: 'ohne Termine' };
+  if (t < s.start) return { key: 'geplant', label: 'geplant' };
+  if (t > s.ende) return { key: 'abgeschlossen', label: 'abgeschlossen' };
+  return { key: 'laufend', label: 'laufend' };
+}
+const meineEinsaetze = () => state.projects.flatMap(p => p.termine.filter(t => t.pl).map(t => ({ t, p, g: gewerk(p, t.gewerkId) })))
+  .sort((a, b) => a.t.start.localeCompare(b.t.start) || (a.t.plZeit || '').localeCompare(b.t.plZeit || ''));
+
+// Kalenderdatei (.ics) für Outlook / Google / Apple
+function icsDownload(pairs) {
+  const tx = s => String(s || '').replace(/\\/g, '\\\\').replace(/[,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+  const ev = pairs.map(([pid, tid]) => {
+    const p = findP(pid), t = p.termine.find(x => x.id === tid), g = gewerk(p, t.gewerkId);
+    const d = t.start.replace(/-/g, '');
+    let when;
+    if (t.plZeit) {
+      const [h, m] = t.plZeit.split(':').map(Number), e = h * 60 + m + 120;
+      const hm = n => String(Math.floor(n / 60) % 24).padStart(2, '0') + String(n % 60).padStart(2, '0');
+      when = [`DTSTART:${d}T${hm(h * 60 + m)}00`, `DTEND:${d}T${hm(Math.min(e, 23 * 60 + 59))}00`];
+    } else {
+      when = [`DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${isoOf(addDays(toDate(t.start), 1)).replace(/-/g, '')}`];
+    }
+    return ['BEGIN:VEVENT', `UID:${t.id}-${p.id}@projekte`, `DTSTAMP:${stamp}`, ...when,
+      `SUMMARY:${tx(`${p.nummer} ${p.name}: ${t.titel}`)}`, `LOCATION:${tx(p.ort)}`,
+      `DESCRIPTION:${tx(`Gewerk: ${g.name} (${ARTEN[artOf(g)]}${g.firma && !g.eigen ? ', ' + g.firma : ''})\nTermin: ${fmt(t.start)} – ${fmt(t.ende)}${t.bemerkung ? '\n' + t.bemerkung : ''}`)}`,
+      'END:VEVENT'].join('\r\n');
+  });
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Projekte//Terminplan//DE', 'CALSCALE:GREGORIAN', ...ev, 'END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+  a.download = pairs.length === 1 ? `Einsatz_${findP(pairs[0][0]).nummer}.ics` : `Meine_Einsaetze_${todayIso()}.ics`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+const badge = p => { const s = status(p); return `<span class="badge b-${s.key}">${s.label}</span>`; };
+const findP = id => state.projects.find(p => p.id === id);
+
+// ---------- Navigation ----------
+const ICONS = {
+  dashboard: '<path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z"/>',
+  projekte: '<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  termine: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  einstellungen: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
+};
+ICONS.woche = '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 14h3M13 14h3M8 17h3"/>';
+const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
+
+function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
+function nav(h) { if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
+function openProjekt(id) { ui.tab = 'termine'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
+window.addEventListener('hashchange', () => { render(); scrollTo(0, 0); });
+
+function render() {
+  const r = route();
+  chkKeys = [];
+  const active = r.page === 'projekt' ? 'projekte' : r.page;
+  $('nav').innerHTML = NAV.map(([k, l]) => `<a href="#/${k}" class="${active === k ? 'active' : ''}" title="${l}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg><span>${l}</span></a>`).join('') + navProjekte(r);
+  $('sideLogo').innerHTML = S().logo ? `<img src="${S().logo}" alt="Logo">` : 'CKW<i></i>';
+  $('layout').classList.toggle('collapsed', sideCollapsed);
+  $('sideToggle').textContent = sideCollapsed ? '»' : '«';
+  $('brandSub').textContent = `${S().firma} · ${S().name}`;
+  renderSide();
+  const p = r.page === 'projekt' && findP(r.id);
+  $('app').innerHTML =
+    p ? viewProjekt(p) :
+    r.page === 'projekte' ? viewProjekte() :
+    r.page === 'termine' ? viewKalender() :
+    r.page === 'woche' ? viewWoche() :
+    r.page === 'einstellungen' ? viewEinstellungen() : viewDashboard();
+  // Terminplan beim Öffnen auf die aktuelle Woche scrollen
+  if (r.page === 'projekte' && ui.q) filterProjekte(ui.q);
+  const xg = document.querySelector('.xg');
+  if (xg && ui.ganttScroll) { xg.scrollLeft = Math.max(0, +xg.dataset.today - 3 * +xg.dataset.w); ui.ganttScroll = false; }
+}
+
+// laufende und kommende Projekte als Schnellzugriff in der Leiste
+function navProjekte(r) {
+  const heute = todayIso();
+  const list = state.projects.map(p => ({ p, s: span(p) })).filter(x => x.s && x.s.ende >= heute)
+    .sort((a, b) => a.s.start.localeCompare(b.s.start)).slice(0, 6);
+  if (!list.length) return '';
+  return '<div class="nav-sec">Aktuelle Projekte</div>' + list.map(({ p }) =>
+    `<a href="#/projekt/${p.id}" class="nav-proj ${r.page === 'projekt' && r.id === p.id ? 'active' : ''}" title="${esc(p.nummer + ' ' + p.name)}"
+      onclick="event.preventDefault();openProjekt('${p.id}')"><span class="pdot" style="background:${p.farbe}"></span><span>${esc(p.nummer)} · ${esc(p.name)}</span></a>`).join('');
+}
+// Halbkreis-Anzeige aus Strichen
+function gauge(pct, label) {
+  let s = '';
+  for (let i = 0, n = 40; i <= n; i++) {
+    const a = Math.PI * (1 - i / n), c = Math.cos(a), sn = Math.sin(a);
+    s += `<line x1="${(100 + 68 * c).toFixed(1)}" y1="${(100 - 68 * sn).toFixed(1)}" x2="${(100 + 86 * c).toFixed(1)}" y2="${(100 - 86 * sn).toFixed(1)}"
+      stroke="${i / n * 100 <= pct && pct > 0 ? '#18181b' : '#d6d4cb'}" stroke-width="2.6" stroke-linecap="round"/>`;
+  }
+  return `<svg viewBox="0 0 200 112" width="230" role="img" aria-label="${label} ${pct}%">${s}
+    <text x="100" y="88" text-anchor="middle" font-size="28" font-weight="600" fill="#18181b" font-family="Inter, sans-serif">${pct}%</text>
+    <text x="100" y="106" text-anchor="middle" font-size="11" fill="#74747c" font-family="Inter, sans-serif">${label}</text></svg>`;
+}
+function renderSide() {
+  const b = backup, st = S();
+  let farbe, txt;
+  if (b.status === 'unsupported' || !b.dir) { farbe = '#9aa5b1'; txt = 'Auto-Backup: nicht eingerichtet'; }
+  else if (b.status === 'prompt') { farbe = '#f5b041'; txt = 'Backup-Ordner: Freigabe nötig<br><button class="sm" onclick="regrant()">Zugriff erlauben</button>'; }
+  else if (!st.autoBackup) { farbe = '#9aa5b1'; txt = 'Auto-Backup: aus'; }
+  else { farbe = '#58d68d'; txt = `Auto-Backup aktiv${b.last ? '<br><span style="opacity:.75">zuletzt ' + new Date(b.last).toLocaleString('de-CH', { dateStyle: 'short', timeStyle: 'short' }) + '</span>' : ''}`; }
+  $('sideFoot').innerHTML = `<span class="dot" style="background:${farbe}" title="${txt.replace(/<.*$/, '')}"></span><span class="side-txt">${txt}</span>`;
+}
+
+let sideCollapsed = false;
+try { sideCollapsed = localStorage.getItem(KEY + '-side') === '1'; } catch (e) {}
+function toggleSide() {
+  sideCollapsed = !sideCollapsed;
+  try { localStorage.setItem(KEY + '-side', sideCollapsed ? '1' : '0'); } catch (e) {}
+  render();
+}
+
+// ---------- Dashboard ----------
+// Punkte, die vor Baustart erledigt sein müssen: alle Hauptpunkte der Phasen mit [!] (Planung bis Beschaffung)
+// sowie einzeln mit [!] markierte Punkte in anderen Phasen
+function offenWichtig(p) {
+  const out = [];
+  const walk = (n, pfad) => {
+    if (n.wichtig && !chkDone(p, n)) out.push({ n, pfad });
+    n.children.forEach(c => walk(c, [...pfad, n.text]));
+  };
+  parseCheckliste(p.checkliste).forEach(ph => ph.items.forEach(n => {
+    if (ph.wichtig) { if (!chkDone(p, n)) out.push({ n, pfad: [ph.titel] }); }
+    else walk(n, [ph.titel]);
+  }));
+  return out;
+}
+const FREIGABE_TAGE = 7; // ab so vielen Tagen vor Baustart werden offene Punkte rot
+function freigabe(p) {
+  const s = span(p), offen = offenWichtig(p), tage = s ? diffDays(todayIso(), s.start) : null;
+  return { s, offen, tage, kritisch: offen.length > 0 && tage !== null && tage <= FREIGABE_TAGE && (s.ende >= todayIso()) };
+}
+function freigabeHinweis(p) {
+  const f = freigabe(p);
+  if (!f.s) return '';
+  if (!f.offen.length) return `<div class="frei ok">✓ Baufreigabe: alle Punkte bis «Beschaffung & Baustellenlogistik» sind erledigt.</div>`;
+  if (!f.kritisch) return '';
+  return `<div class="frei rot" onclick="ui.tab='checkliste';render()">⚠ ${f.tage < 0 ? `Bau läuft seit ${fmt(f.s.start)}` : f.tage === 0 ? 'Baustart ist heute' : `Baustart in ${f.tage} Tagen (${fmtLong(f.s.start)})`}
+    – ${f.offen.length} Punkt${f.offen.length > 1 ? 'e' : ''} vor Baustart noch offen. Der Bau darf erst starten, wenn alles erledigt ist.</div>`;
+}
+function viewOffen(today) {
+  const list = state.projects.map(p => ({ p, ...freigabe(p) }))
+    .filter(x => !x.s || x.s.ende >= today)
+    .sort((a, b) => (a.s ? a.s.start : '9999').localeCompare(b.s ? b.s.start : '9999'))
+    .filter(x => x.offen.length || (x.s && x.s.start >= today && diffDays(today, x.s.start) <= 30));
+  if (!list.length) return '';
+  return `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Baufreigabe – vor Baustart offen</h3><span class="muted">Planung, Koordination und Beschaffung müssen erledigt sein · rot ab ${FREIGABE_TAGE} Tagen vor Baustart</span></div>
+    ${list.slice(0, 6).map(({ p, s, offen, tage, kritisch }) => {
+      const wann = !s ? 'Baustart noch offen' : tage < 0 ? `läuft seit ${fmt(s.start)}` : `Baustart ${fmtLong(s.start)} · ${relTage(s.start)}`;
+      return `<div class="of-proj ${kritisch ? 'kritisch' : ''}">
+        <div class="of-head" onclick="ui.tab='checkliste';nav('projekt/${p.id}')" title="Projekt öffnen">
+          <span class="pdot" style="background:${p.farbe}"></span><b class="link">${esc(p.nummer)} ${esc(p.name)}</b>
+          <span class="${kritisch ? 'rot-txt' : 'muted'}">${wann}</span>
+          ${offen.length ? `<span class="${kritisch ? 'tag-warn' : 'tag-sub'}" style="margin-left:auto">${kritisch ? 'Baustart gefährdet · ' : ''}${offen.length} offen</span>` : '<span class="tag-ok" style="margin-left:auto">✓ Baufreigabe</span>'}
+        </div>
+        ${offen.slice(0, 8).map(({ n, pfad }) => {
+          const i = chkKeys.push(n) - 1;
+          return `<div class="of-item ${kritisch ? 'rot' : ''}"><input type="checkbox" onchange="chkSet('${p.id}',${i},true)" title="als erledigt markieren">
+            <span style="cursor:pointer" onclick="ui.tab='checkliste';nav('projekt/${p.id}')">${esc(n.text)}<span class="muted"> · ${esc(pfad.slice(1).join(' › ') || pfad[0])}</span></span>
+            ${n.mail ? `<button class="sec sm" onclick="mailDialog('${p.id}',${i})">✉ Mail</button>` : ''}</div>`;
+        }).join('')}
+        ${offen.length > 8 ? `<div class="muted" style="padding:4px 0 0 28px;cursor:pointer" onclick="ui.tab='checkliste';nav('projekt/${p.id}')">… und ${offen.length - 8} weitere</div>` : ''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function viewDashboard() {
+  const today = todayIso();
+  const mit = state.projects.map(p => ({ p, s: span(p) })).filter(x => x.s);
+  const geplant = mit.filter(x => x.s.start > today).sort((a, b) => a.s.start.localeCompare(b.s.start));
+  const laufend = mit.filter(x => x.s.start <= today && x.s.ende >= today).sort((a, b) => a.s.ende.localeCompare(b.s.ende));
+  const ohne = state.projects.length - mit.length;
+  const next = geplant[0];
+  const einsaetze = meineEinsaetze().filter(e => e.t.start >= today);
+  const proTag = {};
+  einsaetze.forEach(e => proTag[e.t.start] = (proTag[e.t.start] || 0) + 1);
+  const in30 = einsaetze.filter(e => diffDays(today, e.t.start) <= 30).length;
+  const termine =state.projects.flatMap(p => p.termine.filter(t => t.ende >= today).map(t => ({ t, p, g: gewerk(p, t.gewerkId) })))
+    .sort((a, b) => a.t.start.localeCompare(b.t.start)).slice(0, 8);
+
+  const nextCard = next ? `
+    <div class="card next" style="cursor:pointer" onclick="openProjekt('${next.p.id}')" title="Projekt öffnen"><div class="next-grid"><div>
+      <div class="muted">Nächstes Projekt</div>
+      <div class="big">${esc(next.p.nummer)} · ${esc(next.p.name)}</div>
+      <div class="muted">${esc(next.p.ort || '')}</div>
+      <div class="when">
+        <div><span class="muted">Start</span><b>${fmtLong(next.s.start)}</b><span class="muted">${relTage(next.s.start)} · KW ${kw(toDate(next.s.start))}</span></div>
+        <div><span class="muted">Ende</span><b>${fmtLong(next.s.ende)}</b><span class="muted">KW ${kw(toDate(next.s.ende))}</span></div>
+        <div><span class="muted">Dauer</span><b>${Math.ceil((diffDays(next.s.start, next.s.ende) + 1) / 7)} Wochen</b><span class="muted">${arbeitstage(next.s.start, next.s.ende)} Arbeitstage</span></div>
+        <div><span class="muted">Checkliste</span><b>${chkStats(next.p).done} / ${chkStats(next.p).total}</b><span class="muted">${chkStats(next.p).total - chkStats(next.p).done} Punkte offen</span></div>
+      </div>
+      ${freigabe(next.p).kritisch ? `<div class="rot-txt" style="margin-top:10px;font-weight:600">⚠ ${freigabe(next.p).offen.length} Punkte vor Baustart offen – Baustart gefährdet</div>` : ''}
+      <button onclick="event.stopPropagation();openProjekt('${next.p.id}')">Projekt öffnen</button>
+    </div>${gauge(chkStats(next.p).pct, 'Checkliste erledigt')}</div></div>` : `
+    <div class="card next">
+      <div class="muted">Nächstes Projekt</div>
+      <div class="big">Kein geplantes Projekt</div>
+      <div class="muted">Lege ein Projekt an und erfasse Termine im Terminplan.</div>
+      <button onclick="neuesProjektDialog()">+ Neues Projekt</button>
+    </div>`;
+
+  return `
+  <div class="dash-head">
+    <div>
+      <div style="font-size:17px;margin-bottom:6px">Willkommen zurück, ${esc(S().name.split(' ')[0])}</div>
+      <h1>Projekt- & Terminübersicht</h1>
+      <div class="muted" style="margin-top:4px">${fmtLong(today)} · KW ${kw(toDate(today))}</div>
+    </div>
+    <div class="row">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input placeholder="Projekt suchen…" onkeydown="if(event.key==='Enter'){ui.q=this.value;nav('projekte')}"></div>
+      <button onclick="neuesProjektDialog()">+ Neues Projekt</button>
+    </div>
+  </div>
+  ${nextCard}
+  ${viewOffen(today)}
+  <div class="kpis">
+    <div class="kpi"><b>${state.projects.length}</b><span>Projekte total</span></div>
+    <div class="kpi"><b style="color:var(--ok)">${laufend.length}</b><span>laufend</span></div>
+    <div class="kpi"><b style="color:var(--brand)">${geplant.length}</b><span>geplant</span></div>
+    <div class="kpi"><b style="color:var(--warn)">${ohne}</b><span>ohne Termine</span></div>
+    <div class="kpi"><b style="color:var(--danger)">${in30}</b><span>meine Einsätze (30 Tage)</span></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <h3 style="margin:0">Meine Einsätze vor Ort</h3>
+      ${einsaetze.length ? `<button class="sec sm" onclick="icsDownload(${esc(JSON.stringify(einsaetze.map(e => [e.p.id, e.t.id])))})">📅 Alle in Outlook übernehmen</button>` : ''}
+    </div>
+    ${einsaetze.length ? einsaetze.slice(0, 10).map(({ t, p, g }) => `<div class="li" onclick="openProjekt('${p.id}')">
+      <span class="date" style="width:130px"><b style="color:var(--text)">${fmtLong(t.start)}</b><br>${t.plZeit ? 'ab ' + t.plZeit : 'ganztags'} · ${relTage(t.start)}</span>
+      <span class="swatch" style="background:${p.farbe}"></span>
+      <div style="flex:1;min-width:0">${t.meilenstein ? '◆ ' : ''}<b>${esc(t.titel)}</b>${proTag[t.start] > 1 ? '<span class="tag-warn">Doppelbelegung</span>' : ''}
+        <div class="muted">${esc(p.nummer)} ${esc(p.name)}${p.ort ? ' · ' + esc(p.ort) : ''} · ${esc(g.name)} (${ARTEN[artOf(g)]})</div></div>
+      <button class="sec sm" title="In Outlook / Kalender übernehmen" onclick="event.stopPropagation();icsDownload([['${p.id}','${t.id}']])">📅</button>
+    </div>`).join('') : '<div class="empty">Noch keine Einsätze geplant. Setze im Terminplan bei einem Termin das Häkchen «Ich bin am 1. Tag vor Ort».</div>'}
+  </div>
+  <div class="cols">
+    <div class="card">
+      <h3>Laufende Projekte</h3>
+      ${laufend.length ? laufend.map(({ p, s }) => {
+        const pr = Math.min(100, Math.round((diffDays(s.start, today) + 1) / (diffDays(s.start, s.ende) + 1) * 100));
+        return `<div class="li" onclick="openProjekt('${p.id}')"><span class="swatch" style="background:${p.farbe}"></span>
+          <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">bis ${fmt(s.ende)} · Zeit ${pr}% · Checkliste ${chkStats(p).done}/${chkStats(p).total}</div>
+          <div class="progress"><div style="width:${pr}%"></div></div></div></div>`;
+      }).join('') : '<div class="empty">Zurzeit läuft kein Projekt.</div>'}
+    </div>
+    <div class="card">
+      <h3>Nächste Termine</h3>
+      ${termine.length ? termine.map(({ t, p, g }) => `<div class="li" onclick="openProjekt('${p.id}')">
+        <span class="date">${t.start <= today ? 'läuft' : fmt(t.start)}</span><span class="swatch" style="background:${g.farbe}"></span>
+        <div style="flex:1;min-width:0"><span style="${g.eigen ? 'font-weight:600' : ''}">${t.meilenstein ? '◆ ' : ''}${esc(t.titel)}</span>
+        <div class="muted">${esc(p.nummer)} · ${esc(g.name)}</div></div></div>`).join('') : '<div class="empty">Keine anstehenden Termine.</div>'}
+    </div>
+  </div>`;
+}
+
+// ---------- Projekte ----------
+function viewProjekte() {
+  const list = [...state.projects].sort((a, b) => b.nummer.localeCompare(a.nummer, 'de', { numeric: true }));
+  return `
+  <div class="page-head">
+    <h1>Projekte</h1>
+    <div class="row">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input placeholder="Projekt suchen…" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)"></div>
+      <button class="plus" title="Neues Projekt" onclick="neuesProjektDialog()">+</button>
+    </div>
+  </div>
+  ${list.length ? `<div class="projects">${list.map(p => { const s = span(p), ck = chkStats(p); return `
+    <div class="pcard" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '')).toLowerCase())}" onclick="openProjekt('${p.id}')">
+      <div class="row" style="justify-content:space-between"><span class="pnum">${esc(p.nummer)}</span>
+        <div class="row" style="gap:4px">${freigabe(p).kritisch ? '<span class="tag-warn" style="margin:0">Freigabe fehlt</span>' : ''}${badge(p)}</div></div>
+      <h3 style="margin:8px 0 4px">${esc(p.name)}</h3>
+      <div class="muted">${esc(p.ort || '–')}</div>
+      <div class="muted" style="margin-top:6px">${s ? fmt(s.start) + ' – ' + fmt(s.ende) : 'noch keine Termine'} · ${p.termine.length} Termine</div>
+      <div class="muted" style="margin-top:8px">Checkliste ${ck.done}/${ck.total}</div>
+      <div class="progress"><div style="width:${ck.pct}%"></div></div>
+    </div>`; }).join('')}</div>`
+    : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
+}
+function filterProjekte(q) {
+  ui.q = q; q = q.toLowerCase();
+  document.querySelectorAll('.pcard').forEach(c => c.style.display = c.dataset.q.includes(q) ? '' : 'none');
+}
+
+function neuesProjektDialog() {
+  const d = $('dlg');
+  d.innerHTML = `
+    <h2>Neues Projekt</h2>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div><label>Projektnummer *</label><input id="np-nr" placeholder="z.B. 2026-0142"></div>
+      <div><label>Projektname *</label><input id="np-name" placeholder="z.B. MFH Sonnenhof"></div>
+      <div><label>Ort / Adresse</label><input id="np-ort"></div>
+      <div><label>Farbe im Kalender</label><input type="color" id="np-farbe" value="${freieFarbe(state.projects.map(p => p.farbe))}"></div>
+    </div>
+    <div class="row" style="margin-top:16px;justify-content:flex-end">
+      <button class="sec" onclick="$('dlg').close()">Abbrechen</button>
+      <button onclick="neuesProjekt()">Projekt erstellen</button>
+    </div>`;
+  d.showModal(); $('np-nr').focus();
+  d.onkeydown = e => { if (e.key === 'Enter') neuesProjekt(); };
+}
+function neuesProjekt() {
+  const nummer = val('np-nr'), name = val('np-name');
+  if (!nummer || !name) return toast('Projektnummer und Name sind Pflicht.');
+  if (state.projects.some(p => p.nummer === nummer)) return toast('Diese Projektnummer existiert bereits.');
+  const p = {
+    id: uid(), nummer, name, ort: val('np-ort'), farbe: $('np-farbe').value, bemerkung: '', erstellt: todayIso(),
+    gewerke: S().standardGewerke.map(g => ({ ...g, id: uid(), fix: true, eigen: g.art === 'intern' })), termine: [],
+    checkliste: S().checklisteVorlage, chk: {}
+  };
+  state.projects.push(p); save(); $('dlg').close(); openProjekt(p.id);
+}
+
+// ---------- Projektansicht ----------
+function viewProjekt(p) {
+  return `
+  <div class="row" style="justify-content:space-between;margin-bottom:14px">
+    <button class="sec sm" onclick="nav('projekte')">← Alle Projekte</button>
+    <button onclick="pdf('${p.id}')">Terminplan als PDF</button>
+  </div>
+  <div class="card" style="border-left:5px solid ${p.farbe}">
+    <div class="row"><span class="pnum">${esc(p.nummer)}</span>${badge(p)}</div>
+    <h2 style="margin:8px 0 2px">${esc(p.name)}</h2>
+    <div class="muted">${p.ort ? esc(p.ort) + ' · ' : ''}Projektleiter: ${esc(S().name)}</div>
+  </div>
+  ${freigabeHinweis(p)}
+  <div class="tabs">
+    ${[['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
+      `<button class="${ui.tab === k ? 'active' : ''}" onclick="ui.tab='${k}';ui.ganttScroll=true;render()">${l}</button>`).join('')}
+  </div>
+  ${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'gewerke' ? viewGewerke(p) : viewInfo(p)}`;
+}
+
+// ---------- Checkliste ----------
+let chkKeys = [];
+// Eingeklappt-Zustand: ohne eigene Wahl ist ein Bereich zu, sobald er komplett erledigt ist
+const istZu = (p, key, fertig) => (p.ckZu && key in p.ckZu) ? p.ckZu[key] : fertig;
+function chkZu(pid, i) {
+  const p = findP(pid), n = chkKeys[i];
+  p.ckZu = p.ckZu || {};
+  p.ckZu[n.key] = !istZu(p, n.key, n.fertig);
+  save(); render();
+}
+function chkAlleZu(pid, zu) {
+  const p = findP(pid), z = p.ckZu = {};
+  parseCheckliste(p.checkliste).forEach(ph => { z['phase:' + ph.titel.toLowerCase()] = zu; ph.items.forEach(n => { if (n.children.length) z[n.key] = zu; }); });
+  save(); render();
+}
+function viewCheckliste(p) {
+  const { done, total, ph, pct } = chkStats(p);
+  const sp = span(p), fg = freigabe(p);
+  const pflicht = new Set(fg.offen.map(o => o.n.key));
+  const node = (n, lvl) => {
+    const st = p.chk[n.key] || {}, ok = chkDone(p, n);
+    const auto = ok && !st.ok && !(n.datum && st.datum);
+    if (ui.nurOffen && ok) return '';
+    const i = chkKeys.push({ ...n, fertig: ok }) - 1;
+    const zu = n.children.length && istZu(p, n.key, ok);
+    const pfeil = n.children.length
+      ? `<button class="ck-btn ck-pfeil" title="${zu ? 'aufklappen' : 'zuklappen'}" onclick="chkZu('${p.id}',${i})">${zu ? '▸' : '▾'}</button>` : '<span class="ck-pfeil"></span>';
+    const sub = n.children.length ? `<span class="muted">${n.children.filter(c => chkDone(p, c)).length}/${n.children.length}${n.oder ? ' · eines davon' : ''}</span>` : '';
+    const baustart = /baustart/i.test(n.text) && !st.datum && sp
+      ? `<button class="sec sm" onclick="chkDatum('${p.id}',${i},'${sp.start}')">aus Terminplan: ${fmt(sp.start)}</button>` : '';
+    const rot = fg.kritisch && pflicht.has(n.key);
+    return `<div class="ck-row lvl${lvl} ${ok ? 'done' : ''} ${rot ? 'rot' : ''}" style="padding-left:${lvl * 28 + 4}px">
+      ${pfeil}<input type="checkbox" ${ok ? 'checked' : ''} ${auto ? 'disabled title="Automatisch erledigt (Unterpunkte)"' : ''} onchange="chkSet('${p.id}',${i},this.checked)">
+      <div class="ck-txt"><span>${esc(n.text)}</span>${sub}${rot ? '<span class="tag-warn">Baustart gefährdet</span>' : n.wichtig ? '<span class="tag-wichtig">vor Baustart</span>' : ''}
+        ${n.mail ? `<button class="sec sm" onclick="mailDialog('${p.id}',${i})">✉ Mail</button>` : ''}
+        ${DOKS[n.dok] ? `<button class="sec sm" onclick="${DOKS[n.dok].fn}('${p.id}')">📄 ${DOKS[n.dok].label}${DOKS[n.dok].hat(p) ? ' bearbeiten' : ' ausfüllen'}</button>` : ''}
+        ${n.datum ? `<input type="date" value="${st.datum || ''}" onchange="chkDatum('${p.id}',${i},this.value)">` : ''}${baustart}
+        ${st.ok && st.am ? `<span class="ck-am">✓ ${fmt(st.am)}</span>` : ''}
+        ${st.notiz ? `<div class="ck-notiz">${esc(st.notiz)}</div>` : ''}
+      </div>
+      <button class="ck-btn" title="Notiz" onclick="chkNotiz('${p.id}',${i})">✎</button>
+    </div>${zu ? '' : n.children.map(c => node(c, lvl + 1)).join('')}`;
+  };
+  return `
+  <div class="card">
+    <div class="ck-head">
+      <div><b style="font-size:20px">${done} / ${total}</b> <span class="muted">Punkte erledigt · ${pct}%</span></div>
+      <div class="row">
+        <label class="check"><input type="checkbox" ${ui.nurOffen ? 'checked' : ''} onchange="ui.nurOffen=this.checked;render()"> nur offene</label>
+        <button class="sec sm" onclick="chkAlleZu('${p.id}',false)">Alle aufklappen</button>
+        <button class="sec sm" onclick="chkAlleZu('${p.id}',true)">Alle zuklappen</button>
+        <button class="sec sm" onclick="chkEditor('${p.id}')">Checkliste anpassen</button>
+      </div>
+    </div>
+    <div class="progress" style="height:10px"><div style="width:${pct}%"></div></div>
+  </div>
+  ${ph.map((x, pi) => {
+    const d = x.items.filter(n => chkDone(p, n)).length, fertig = d === x.items.length;
+    const key = 'phase:' + x.titel.toLowerCase(), i = chkKeys.push({ key, fertig }) - 1, zu = istZu(p, key, fertig);
+    const rot = fg.kritisch && x.wichtig && !fertig;
+    return `<div class="card ck-phase ${fertig ? 'complete' : ''} ${zu ? 'zu' : ''} ${rot ? 'rot' : ''}">
+      <div class="ck-head ck-klick" onclick="chkZu('${p.id}',${i})" title="${zu ? 'aufklappen' : 'zuklappen'}">
+        <h3 style="margin:0"><span class="ck-pfeil">${zu ? '▸' : '▾'}</span> ${pi + 1}. ${esc(x.titel)}</h3>
+        <div class="row">${x.wichtig ? `<span class="${rot ? 'tag-warn' : 'tag-wichtig'}">${rot ? 'vor Baustart offen' : 'vor Baustart'}</span>` : ''}<span class="muted">${d}/${x.items.length}</span></div>
+      </div>
+      <div class="progress" style="margin:${zu ? '0' : '0 0 6px'}"><div style="width:${x.items.length ? d / x.items.length * 100 : 0}%"></div></div>
+      ${zu ? '' : (x.items.map(n => node(n, 0)).join('') || '<div class="muted" style="padding:8px">Alles erledigt.</div>')}
+    </div>`;
+  }).join('')}`;
+}
+// chkKeys: Knoten der aktuell angezeigten Checklisten-Punkte (Index wird in onclick verwendet)
+const chkState = (p, i) => p.chk[chkKeys[i].key] = p.chk[chkKeys[i].key] || {};
+function chkSet(pid, i, v) {
+  const p = findP(pid), st = chkState(p, i);
+  st.ok = v; st.am = v ? todayIso() : '';
+  save(); render();
+}
+function chkDatum(pid, i, v) { const p = findP(pid); chkState(p, i).datum = v; save(); render(); }
+function chkNotiz(pid, i) {
+  const p = findP(pid), st = chkState(p, i);
+  const n = prompt('Notiz zu diesem Punkt:', st.notiz || '');
+  if (n === null) return;
+  st.notiz = n.trim(); save(); render();
+}
+// ---------- Mailvorlagen ----------
+// IBN-Datum: Termin des IBN-Gewerks im Terminplan, sonst das Datum aus der Checkliste ("Termin von Melih")
+function ibnDatum(p) {
+  const g = p.gewerke.map(x => gewerk(p, x.id)).find(x => /ibn/i.test(x.name));
+  const t = g && sortTermine(p).find(x => x.gewerkId === g.id);
+  if (t) return fmt(t.start);
+  const st = Object.entries(p.chk).find(([k, s]) => /ibn/.test(k) && /termin/.test(k) && s.datum);
+  return st ? fmt(st[1].datum) : '';
+}
+// Mailvorlage eines Gewerks: direkt gewählt (g.mailvorlage), "keine", oder die Vorlage, die das Gewerk per Name nennt
+function effektiveVorlage(g) {
+  if (g.mailvorlage === 'keine') return '';
+  if (g.mailvorlage) return g.mailvorlage;
+  return S().mailvorlagen.find(m => m.gewerk && m.gewerk.toLowerCase() === g.name.toLowerCase())?.name || '';
+}
+function vorlageSelect(g, attr) {
+  const akt = effektiveVorlage(g), namen = S().mailvorlagen.map(m => m.name);
+  return `<select ${attr}><option value="keine" ${akt ? '' : 'selected'}>– keine –</option>
+    ${[...new Set([...namen, akt].filter(Boolean))].map(n => `<option value="${esc(n)}" ${n === akt ? 'selected' : ''}>✉ ${esc(n)}</option>`).join('')}</select>`;
+}
+function mailFuellen(p, v) {
+  const s = S(), sp = span(p);
+  // zuerst das Gewerk, an dem die Vorlage direkt verknüpft ist, sonst über den Gewerk-Namen der Vorlage
+  const alle = p.gewerke.map(x => gewerk(p, x.id));
+  const g = alle.find(x => (x.mailvorlage || '').toLowerCase() === v.name.toLowerCase()) || alle.find(x => effektiveVorlage(x) === v.name) || null;
+  const gt = g ? sortTermine(p).filter(t => t.gewerkId === g.id) : [];
+  const von = t => t.start === t.ende ? fmtLong(t.start) : `${fmtLong(t.start)} – ${fmtLong(t.ende)}`;
+  const vars = {
+    // ohne Eintrag im Terminplan bleiben die Felder leer zum selbst Ausfüllen
+    projektnummer: p.nummer, projekt: p.name, ort: p.ort || '', baustart: sp ? fmtLong(sp.start) : '', bauende: sp ? fmtLong(sp.ende) : '',
+    termin: gt[0] ? von(gt[0]) : '', termine: gt.map(t => `- ${t.titel}: ${von(t)}`).join('\n'),
+    baustart_datum: sp ? fmt(sp.start) : '', bauende_datum: sp ? fmt(sp.ende) : '', ibn_datum: ibnDatum(p),
+    elektriker_extern: (() => { const e = alle.find(x => /elektr/i.test(x.name) && artOf(x) !== 'intern'); return e ? [e.firma, e.kontakt].filter(Boolean).join(', ') : ''; })(),
+    gewerk: g?.name || '', gewerk_firma: g?.firma || '', gewerk_kontakt: g?.kontakt || '',
+    pl: s.name, pl_telefon: s.telefon, pl_mail: s.email, firma: s.firma,
+    signatur: [s.name, 'Projektleiter', s.firma, s.strasse, s.ort, s.telefon && 'Tel. ' + s.telefon, s.email].filter(Boolean).join('\n')
+  };
+  const fill = t => String(t || '').replace(/\{(\w+)\}/g, (m, k) => k in vars ? vars[k] : m).replace(/[ \t]+$/gm, '');
+  return { an: fill(v.an) || g?.email || '', betreff: fill(v.betreff), text: fill(v.text), g, gt, sp };
+}
+let mailPunkt = null; // { pid, node } des Checklisten-Punkts, zu dem der Mail-Dialog offen ist
+function mailDialog(pid, i) {
+  const p = findP(pid), node = chkKeys[i], name = node.mail;
+  const v = S().mailvorlagen.find(m => m.name.toLowerCase() === name.toLowerCase());
+  if (!v) return toast(`Mailvorlage «${name}» nicht gefunden – unter Einstellungen → Mailvorlagen anlegen.`);
+  const punkt = mailPunkt = { pid, node };
+  const m = mailFuellen(p, v), d = $('dlg');
+  const hinweis = [
+    v.gewerk && !m.g ? `Das Gewerk «${esc(v.gewerk)}» ist in diesem Projekt nicht vorhanden.` : '',
+    m.g && !m.gt.length ? `«${esc(m.g.name)}» hat noch keinen Termin im Terminplan – Termin bitte selbst eintragen.` : '',
+    !m.sp && /\{baustart\}/.test(v.text) ? 'Der Baustart ist noch nicht im Terminplan.' : '',
+    !m.an ? 'Keine E-Mail-Adresse hinterlegt (beim Gewerk eintragen).' : ''
+  ].filter(Boolean);
+  const erledigt = chkDone(p, node);
+  d.style.width = 'min(680px, calc(100vw - 32px))';
+  d.innerHTML = `<h2>✉ ${esc(v.name)}</h2>
+    <p class="muted" style="margin-top:0">Aus dem Terminplan von ${esc(p.nummer)} ${esc(p.name)} ausgefüllt. Text anpassen, kopieren und im Mail einfügen.
+      Beim Kopieren wird «${esc(node.label)}» in der Checkliste abgehakt${erledigt ? ' (ist bereits erledigt)' : ''}.</p>
+    ${hinweis.length ? `<div class="note">${hinweis.join('<br>')}</div>` : ''}
+    <label>An</label><div class="copyrow"><input id="m-an" value="${esc(m.an)}" placeholder="E-Mail-Adresse (beim Gewerk hinterlegen)"><button class="sec sm" onclick="kopiere($('m-an').value)">Kopieren</button></div>
+    <label>Betreff</label><div class="copyrow"><input id="m-betreff" value="${esc(m.betreff)}"><button class="sec sm" onclick="kopiere($('m-betreff').value)">Kopieren</button></div>
+    <label>Text</label><textarea id="m-text" style="min-height:280px;line-height:1.45">${esc(m.text)}</textarea>
+    <div class="row" style="margin-top:14px;justify-content:space-between">
+      <button class="sec" onclick="mailVersendet();location.href='mailto:'+encodeURIComponent($('m-an').value)+'?subject='+encodeURIComponent($('m-betreff').value)+'&body='+encodeURIComponent($('m-text').value)">In Outlook öffnen</button>
+      <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button onclick="kopiere($('m-text').value, mailVersendet)">Text kopieren</button></div>
+    </div>`;
+  d.onkeydown = null;
+  d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; if (mailPunkt === punkt) mailPunkt = null; }, { once: true });
+}
+// Checklisten-Punkt abhaken, sobald die Mail kopiert bzw. geöffnet wurde
+function mailVersendet() {
+  if (!mailPunkt) return;
+  const p = findP(mailPunkt.pid), k = mailPunkt.node.key, st = p.chk[k] = p.chk[k] || {};
+  const neu = !st.ok;
+  st.ok = true;
+  if (neu) st.am = todayIso();
+  const notiz = `Mail versendet am ${fmt(todayIso())}`;
+  if (!(st.notiz || '').includes(notiz)) st.notiz = [st.notiz, notiz].filter(Boolean).join('\n');
+  save(); render();
+  if (neu) toast(`Kopiert · «${mailPunkt.node.label}» abgehakt.`);
+}
+function kopiere(text, danach) {
+  const ok = () => { toast('In die Zwischenablage kopiert.'); if (danach) danach(); };
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).then(ok, () => kopiereAlt(text, ok));
+  kopiereAlt(text, ok);
+}
+function kopiereAlt(text, ok) {
+  const t = document.createElement('textarea'); t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+  ($('dlg').open ? $('dlg') : document.body).appendChild(t); t.select();
+  try { document.execCommand('copy'); ok(); } catch (e) { toast('Kopieren nicht möglich – bitte markieren und Strg+C drücken.'); }
+  t.remove();
+}
+
+// ---------- IBN-Rapport (nach Vorlage WebRapport) ----------
+const zahl = v => parseFloat(String(v ?? '').replace(',', '.')) || 0;
+const fmtH = n => n ? String(Math.round(n * 100) / 100) : '';
+const fmtFr = n => n ? n.toFixed(2) : '';
+const leer7 = () => ['', '', '', '', '', '', ''];
+function ibnDefaults(p) {
+  const g = p.gewerke.map(x => gewerk(p, x.id)).find(x => /ibn/i.test(x.name));
+  const t = g ? sortTermine(p).find(x => x.gewerkId === g.id) : null;
+  // ohne Termin im Terminplan: Datum aus der Checkliste ("Termin von Melih")
+  let termin = t ? t.start : '';
+  if (!termin) Object.entries(p.chk).forEach(([k, st]) => { if (!termin && /ibn/.test(k) && /termin/.test(k) && st.datum) termin = st.datum; });
+  return {
+    termin, zeit: t?.plZeit || '', titel: 'IBN PV-Anlage', kunde: '', objekt: [p.name, p.ort].filter(Boolean).join('\n'), arbeiten: '', bemerkungen: '',
+    monteure: [{ name: g?.kontakt || '', kw: termin ? String(kw(toDate(termin))) : '', h: leer7(), art: 'MONT', preis: '' }, { name: '', kw: '', h: leer7(), art: '', preis: '' }],
+    material: Array.from({ length: 5 }, () => ({ text: '', art: '', menge: '', preis: '' })),
+    keinMaterial: false, zusatzblatt: false, fertig: '', datum: todayIso(), von: S().name, unterschrift: ''
+  };
+}
+function ibnSummen(r) {
+  const mont = r.monteure.map(m => { const menge = m.h.reduce((a, h) => a + zahl(h), 0); return { menge, betrag: menge * zahl(m.preis) }; });
+  const mat = r.material.map(m => zahl(m.menge) * zahl(m.preis));
+  return { mont, mat, total: mont.reduce((a, m) => a + m.menge, 0) };
+}
+let ibnPid = null;
+function ibnDialog(pid) {
+  const p = findP(pid), d = $('dlg');
+  if (!p.ibn) { p.ibn = ibnDefaults(p); save(); }
+  ibnPid = pid;
+  const r = p.ibn, jahr = (r.termin || todayIso()).slice(0, 4);
+  const f = (pfad, val, attr = '') => `data-f="${pfad}" value="${esc(val)}" oninput="ibnSet(this)" ${attr}`;
+  d.style.width = 'min(920px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="rap">
+    <div class="rap-logo">${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:38px">CKW<i style="width:11px;height:11px"></i></div>'}</div>
+    <div class="rap-bar rap-kopf"><span>Projekt-Nr.: <b>${esc(p.nummer)}</b></span>
+      <span>Termin: <input type="date" ${f('termin', r.termin)}></span><span>Zeit: <input type="time" ${f('zeit', r.zeit)}></span></div>
+    <input class="rap-titel" ${f('titel', r.titel)}>
+    <div class="rap-2">
+      <div><div class="rap-bar">👤 Kunde:</div><textarea rows="4" data-f="kunde" oninput="ibnSet(this)" placeholder="Name, Adresse, Telefon">${esc(r.kunde)}</textarea></div>
+      <div><div class="rap-bar">🏠 Objekt:</div><textarea rows="4" data-f="objekt" oninput="ibnSet(this)">${esc(r.objekt)}</textarea></div>
+    </div>
+    <div class="rap-bar">Ausgeführte Arbeiten: (Text in Rechnung)</div>
+    <textarea rows="8" data-f="arbeiten" oninput="ibnSet(this)">${esc(r.arbeiten)}</textarea>
+    <div class="rap-bar">Bemerkungen / Infos (Intern erscheint nicht in Rechnung)</div>
+    <textarea rows="3" data-f="bemerkungen" oninput="ibnSet(this)">${esc(r.bemerkungen)}</textarea>
+    <div class="table-wrap"><table class="rap-tab">
+      <tr><th style="width:150px">🕓 Monteur</th><th>KW ${jahr}</th>${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(t => `<th>${t}</th>`).join('')}<th>Artikel-Nr.</th><th>Menge</th><th>Preis</th><th>Betrag</th></tr>
+      ${r.monteure.map((m, i) => `<tr><td><input ${f(`monteure.${i}.name`, m.name)}></td><td><input ${f(`monteure.${i}.kw`, m.kw)}></td>
+        ${m.h.map((h, j) => `<td><input inputmode="decimal" ${f(`monteure.${i}.h.${j}`, h)} placeholder="h"></td>`).join('')}
+        <td><input ${f(`monteure.${i}.art`, m.art)}></td><td class="rap-out" id="r-mm${i}"></td><td><input inputmode="decimal" ${f(`monteure.${i}.preis`, m.preis)}></td><td class="rap-out" id="r-mb${i}"></td></tr>`).join('')}
+    </table></div>
+    <div class="table-wrap"><table class="rap-tab">
+      <tr><th style="text-align:left">🔧 Material / Ausmass
+        <label class="rap-cb"><input type="checkbox" data-f="keinMaterial" onchange="ibnSet(this)" ${r.keinMaterial ? 'checked' : ''}> Kein Material</label>
+        <label class="rap-cb"><input type="checkbox" data-f="zusatzblatt" onchange="ibnSet(this)" ${r.zusatzblatt ? 'checked' : ''}> Zusatzblatt/LS</label></th>
+        <th style="width:110px">Artikel-Nr.</th><th style="width:70px">Menge</th><th style="width:80px">Preis</th><th style="width:80px">Betrag</th></tr>
+      ${r.material.map((m, i) => `<tr><td><input ${f(`material.${i}.text`, m.text)}></td><td><input ${f(`material.${i}.art`, m.art)}></td>
+        <td><input inputmode="decimal" ${f(`material.${i}.menge`, m.menge)}></td><td><input inputmode="decimal" ${f(`material.${i}.preis`, m.preis)}></td><td class="rap-out" id="r-xb${i}"></td></tr>`).join('')}
+    </table></div>
+    <div class="row" style="margin:4px 0 10px"><button class="sec sm" onclick="findP(ibnPid).ibn.material.push({text:'',art:'',menge:'',preis:''});save();ibnDialog(ibnPid)">+ Materialzeile</button></div>
+    <div class="rap-bar rap-fuss"><span>Weg- und Rüstzeiten gehen zu Lasten des Auftraggebers</span>
+      <span><label class="rap-cb"><input type="radio" name="r-fertig" value="ja" onchange="findP(ibnPid).ibn.fertig='ja';save()" ${r.fertig === 'ja' ? 'checked' : ''}> Arbeit fertig</label>
+      <label class="rap-cb"><input type="radio" name="r-fertig" value="nein" onchange="findP(ibnPid).ibn.fertig='nein';save()" ${r.fertig === 'nein' ? 'checked' : ''}> Arbeit nicht fertig</label></span></div>
+    <div class="rap-unter">
+      <div><label>Datum</label><input type="date" ${f('datum', r.datum)}></div>
+      <div><label>Ausgefüllt von</label><input ${f('von', r.von)}></div>
+      <div><label>✗ Unterschrift Monteur <a href="#" onclick="event.preventDefault();ibnSigLoeschen()">löschen</a></label><canvas id="r-sig" width="320" height="90"></canvas></div>
+      <div><label>Total Arbeit</label><b id="r-total" style="font-size:18px"></b></div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="danger sm" onclick="if(confirm('Rapport leeren und mit Projektdaten neu beginnen?')){findP(ibnPid).ibn=ibnDefaults(findP(ibnPid));save();ibnDialog(ibnPid)}">Neu beginnen</button>
+    <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button onclick="ibnPdf(ibnPid)">Als PDF speichern</button></div>
+  </div>`;
+  d.onkeydown = null;
+  if (!d.open) d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; render(); }, { once: true });
+  ibnRechnen();
+  ibnSigInit();
+}
+// Wert anhand des Pfads (z.B. "monteure.0.h.3") speichern
+function ibnSet(el) {
+  const r = findP(ibnPid).ibn, teile = el.dataset.f.split('.');
+  let o = r;
+  teile.slice(0, -1).forEach(k => o = o[k]);
+  o[teile[teile.length - 1]] = el.type === 'checkbox' ? el.checked : el.value;
+  save(); ibnRechnen();
+}
+function ibnRechnen() {
+  const r = findP(ibnPid).ibn, s = ibnSummen(r);
+  s.mont.forEach((m, i) => { $('r-mm' + i).textContent = fmtH(m.menge); $('r-mb' + i).textContent = fmtFr(m.betrag); });
+  s.mat.forEach((b, i) => { $('r-xb' + i).textContent = fmtFr(b); });
+  $('r-total').textContent = s.total ? fmtH(s.total) + ' h' : '–';
+}
+function ibnSigInit() {
+  const c = $('r-sig'), ctx = c.getContext('2d'), r = findP(ibnPid).ibn;
+  ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111';
+  if (r.unterschrift) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = r.unterschrift; }
+  let zeichnen = false;
+  const pos = e => { const b = c.getBoundingClientRect(); return [(e.clientX - b.left) * c.width / b.width, (e.clientY - b.top) * c.height / b.height]; };
+  c.onpointerdown = e => { zeichnen = true; c.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.moveTo(...pos(e)); };
+  c.onpointermove = e => { if (!zeichnen) return; ctx.lineTo(...pos(e)); ctx.stroke(); };
+  c.onpointerup = () => { if (!zeichnen) return; zeichnen = false; r.unterschrift = c.toDataURL('image/png'); save(); };
+}
+function ibnSigLoeschen() {
+  const c = $('r-sig'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  findP(ibnPid).ibn.unterschrift = ''; save();
+}
+function ibnPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), r = p.ibn, sum = ibnSummen(r);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, M = 12, B = W - 2 * M, GRAU = [150, 150, 150];
+  const bar = (x, y, w, txt, h = 5.5) => {
+    doc.setFillColor(...GRAU); doc.rect(x, y, w, h, 'F');
+    if (txt) { doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255); doc.text(txt, x + 1.5, y + h - 1.6); }
+  };
+  const text = (t, x, y, w, minH) => {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(20);
+    const lines = doc.splitTextToSize(t || '', w);
+    doc.text(lines, x + 1, y + 4.5);
+    return Math.max(minH, lines.length * 4.3 + 3);
+  };
+  const neueSeite = (y, h) => { if (y + h > 285) { doc.addPage(); return 15; } return y; };
+
+  pdfLogo(doc, W / 2, 9, 10, true);
+  let y = 27;
+  bar(M, y, B, '');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255);
+  doc.text(`Projekt-Nr.:  ${p.nummer}`, M + 1.5, y + 3.9);
+  doc.text(`Termin:  ${fmt(r.termin)}`, M + 118, y + 3.9);
+  doc.text(`Zeit:  ${r.zeit}`, M + 158, y + 3.9);
+  y += 10;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(20); doc.text(r.titel || '', M + 1, y);
+  y += 3;
+  const halb = B / 2 - 2;
+  bar(M, y, halb, 'Kunde:'); bar(M + halb + 4, y, halb, 'Objekt:');
+  y += 5.5;
+  y += Math.max(text(r.kunde, M, y, halb - 2, 22), text(r.objekt, M + halb + 4, y, halb - 2, 22)) + 2;
+  bar(M, y, B, 'Ausgeführte Arbeiten: (Text in Rechnung)'); y += 5.5;
+  y += text(r.arbeiten, M, y, B - 2, 70) + 2;
+  y = neueSeite(y, 40);
+  bar(M, y, B, 'Bemerkungen / Infos (Intern erscheint nicht in Rechnung)'); y += 5.5;
+  y += text(r.bemerkungen, M, y, B - 2, 12) + 1;
+
+  const kopf = { fillColor: GRAU, textColor: 255, fontStyle: 'bold', fontSize: 7.5, halign: 'center' };
+  const stil = { fontSize: 8.5, cellPadding: 1.4, lineColor: [200, 200, 200], lineWidth: 0.2, minCellHeight: 6, textColor: 20 };
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M }, theme: 'grid', styles: stil, headStyles: kopf,
+    head: [['Monteur', 'KW ' + (r.termin || todayIso()).slice(0, 4), 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So', 'Artikel-Nr.', 'Menge', 'Preis', 'Betrag']],
+    body: r.monteure.map((m, i) => [m.name, m.kw, ...m.h.map(h => fmtH(zahl(h))), m.art, fmtH(sum.mont[i].menge), m.preis ? fmtFr(zahl(m.preis)) : '', fmtFr(sum.mont[i].betrag)]),
+    columnStyles: { 0: { cellWidth: 36, halign: 'left' }, 1: { cellWidth: 14, halign: 'center' }, ...Object.fromEntries([2, 3, 4, 5, 6, 7, 8].map(c => [c, { cellWidth: 10, halign: 'center' }])),
+      9: { cellWidth: 20, halign: 'right' }, 10: { cellWidth: 14, halign: 'right' }, 11: { cellWidth: 16, halign: 'right' }, 12: { cellWidth: 16, halign: 'right' } }
+  });
+  const cb = v => v ? '[X]' : '[  ]';
+  doc.autoTable({
+    startY: doc.lastAutoTable.finalY + 2, margin: { left: M, right: M }, theme: 'grid', styles: stil, headStyles: kopf,
+    head: [[{ content: `Material / Ausmass        ${cb(r.keinMaterial)} Kein Material        ${cb(r.zusatzblatt)} Zusatzblatt/LS`, styles: { halign: 'left' } }, 'Artikel-Nr.', 'Menge', 'Preis', 'Betrag']],
+    body: r.material.map((m, i) => [m.text, m.art, m.menge ? fmtH(zahl(m.menge)) : '', m.preis ? fmtFr(zahl(m.preis)) : '', fmtFr(sum.mat[i])]),
+    columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 20, halign: 'right' }, 2: { cellWidth: 14, halign: 'right' }, 3: { cellWidth: 16, halign: 'right' }, 4: { cellWidth: 16, halign: 'right' } }
+  });
+  y = neueSeite(doc.lastAutoTable.finalY + 3, 30);
+  bar(M, y, 112, 'Weg- und Rüstzeiten gehen zu Lasten des Auftraggebers');
+  bar(M + 128, y, 26, `${cb(r.fertig === 'ja')} Arbeit fertig`); bar(M + 156, y, 30, `${cb(r.fertig === 'nein')} Arbeit nicht fertig`);
+  y += 16;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(20);
+  doc.text(`Datum:  ${fmt(r.datum)}`, M, y);
+  doc.text(`Ausgefüllt von:  ${r.von || ''}`, M + 42, y);
+  doc.setFont('helvetica', 'bold'); doc.text('X', M + 96, y); doc.setFont('helvetica', 'normal');
+  doc.text('Unterschrift Monteur:', M + 100, y);
+  if (r.unterschrift) try { doc.addImage(r.unterschrift, 'PNG', M + 100, y - 13.5, 36, 10.1); } catch (e) { /* ohne Unterschrift weiter */ }
+  doc.text(`Total Arbeit:  ${sum.total ? fmtH(sum.total) + ' h' : ''}`, M + 146, y);
+  doc.save(`IBN-Rapport_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
+  toast('IBN-Rapport als PDF gespeichert.');
+}
+
+// ---------- Checkliste Blitzschutz & Photovoltaik (Original-PDF der LASOLTEC GmbH wird ausgefüllt) ----------
+const PDFLIB_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+const geladen = {};
+function ladeScript(src) {
+  return geladen[src] = geladen[src] || new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src; s.onload = res;
+    s.onerror = () => { delete geladen[src]; s.remove(); rej(new Error(src)); };
+    document.head.appendChild(s);
+  });
+}
+const BLITZ_AUFGABEN = [['beratung', 'Beratung für die Planung'], ['besichtigung', 'Besichtigung Projekt'], ['planung', 'Planung erstellen'], ['kontrolle', 'Kontrolle & Installationsattest Blitzschutzsystem']];
+const BLITZ_UNTERLAGEN = [['grundriss', 'Grundrisspläne'], ['blitz', 'Pläne der Blitzschutzanlage'], ['pv', 'Pläne der Photovoltaikanlage'], ['feuerwehr', 'Feuerwehrplan der Photovoltaikanlage'], ['mpp', 'MPP und SINA des Gebäude']];
+function blitzDefaults(p) {
+  return {
+    kunde: (p.ibn?.kunde || '').split('\n').map(s => s.trim()).filter(Boolean).join(', '),
+    projekt: [p.name, p.ort].filter(Boolean).join(', '),
+    pl: [S().name, S().telefon, S().email].filter(Boolean).join(', '),
+    klasse: '', ohm: '',
+    aufgaben: { beratung: false, besichtigung: false, planung: false, kontrolle: true },
+    unterlagen: { grundriss: false, blitz: false, pv: false, feuerwehr: false, mpp: false }
+  };
+}
+let blitzPid = null;
+function blitzDialog(pid) {
+  const p = findP(pid), d = $('dlg');
+  if (!p.blitz) { p.blitz = blitzDefaults(p); save(); }
+  blitzPid = pid;
+  const b = p.blitz;
+  const feld = (k, label, hinweis = '') => `<div class="bz-feld"><label>${label}</label>
+    <textarea rows="2" data-b="${k}" oninput="blitzSet(this)" placeholder="${hinweis}">${esc(b[k])}</textarea></div>`;
+  const box = (gruppe, [k, l]) => `<label class="bz-box"><input type="checkbox" data-b="${gruppe}.${k}" onchange="blitzSet(this)" ${b[gruppe][k] ? 'checked' : ''}> ${l}</label>`;
+  d.style.width = 'min(760px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="bz">
+    <div class="bz-kopf"><div><div class="muted">Vorlage LASOLTEC GmbH · Hohrainweg 103 · 4444 Rümlingen</div>
+      <h2>Checkliste – Blitzschutz &amp; Photovoltaik</h2></div><span class="pnum">${esc(p.nummer)}</span></div>
+    <p class="muted" style="margin-top:0">Wird in das Original-Dokument von LASOLTEC eingetragen und als PDF gespeichert. Max. 2 Zeilen pro Feld.</p>
+    <h3>1. Allgemeine Projektangaben</h3>
+    ${feld('kunde', 'Kundenadresse', 'Name, Strasse, PLZ Ort')}
+    ${feld('projekt', 'Projektadresse (falls abweichend)')}
+    ${feld('pl', 'Verantwortlicher Projektleiter CKW')}
+    <div class="grid">
+      <div class="bz-feld"><label>Blitzschutzklasse des Gebäudes</label><input list="bz-klassen" data-b="klasse" value="${esc(b.klasse)}" oninput="blitzSet(this)" placeholder="z.B. LPS III">
+        <datalist id="bz-klassen"><option>LPS I</option><option>LPS II</option><option>LPS III</option><option>LPS IV</option><option>Kein äusserer Blitzschutz</option></datalist></div>
+      <div class="bz-feld"><label>Niederohmmessung der Blitzschutzanlage (Ohm-Wert)</label><input data-b="ohm" value="${esc(b.ohm)}" oninput="blitzSet(this)" placeholder="z.B. 0.4 Ω"></div>
+    </div>
+    <div class="bz-2">
+      <div><h3>2. Aufgabe LASOLTEC</h3>${BLITZ_AUFGABEN.map(a => box('aufgaben', a)).join('')}</div>
+      <div><h3>3. Mitgesendete Unterlagen</h3>${BLITZ_UNTERLAGEN.map(u => box('unterlagen', u)).join('')}</div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="danger sm" onclick="if(confirm('Checkliste leeren und mit Projektdaten neu beginnen?')){findP(blitzPid).blitz=blitzDefaults(findP(blitzPid));save();blitzDialog(blitzPid)}">Neu beginnen</button>
+    <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button id="bz-pdf" onclick="blitzPdf(blitzPid)">Als PDF speichern</button></div>
+  </div>`;
+  d.onkeydown = null;
+  if (!d.open) d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; render(); }, { once: true });
+}
+function blitzSet(el) {
+  const b = findP(blitzPid).blitz, [k, sub] = el.dataset.b.split('.');
+  if (sub) b[k][sub] = el.checked; else b[k] = el.value;
+  save();
+}
+async function blitzPdf(pid) {
+  const p = findP(pid), b = p.blitz, knopf = $('bz-pdf');
+  if (knopf) { knopf.disabled = true; knopf.textContent = 'Erstelle PDF …'; }
+  try {
+    await Promise.all([ladeScript('lasoltec-vorlage.js'), ladeScript(PDFLIB_URL)]);
+    const { PDFDocument, StandardFonts, rgb } = PDFLib;
+    const doc = await PDFDocument.load(Uint8Array.from(atob(window.LASOLTEC_PDF), c => c.charCodeAt(0)));
+    const seite = doc.getPages()[0];
+    const font = await doc.embedFont(StandardFonts.Helvetica), fett = await doc.embedFont(StandardFonts.HelveticaBold);
+    const blau = rgb(0.05, 0.16, 0.42);
+    // nur Zeichen, die die Standardschrift darstellen kann
+    const sauber = s => [...String(s || '')].map(ch => { try { font.encodeText(ch); return ch; } catch (e) { return ch === 'Ω' ? 'Ohm' : ''; } }).join('');
+    const umbrechen = (txt, size, maxW) => sauber(txt).split('\n').flatMap(absatz => {
+      const out = []; let z = '';
+      absatz.split(/\s+/).filter(Boolean).forEach(w => {
+        const t = z ? z + ' ' + w : w;
+        if (font.widthOfTextAtSize(t, size) > maxW && z) { out.push(z); z = w; } else z = t;
+      });
+      return z ? [...out, z] : out;
+    });
+    // Koordinaten aus der Vorlage (Grundlinie der Unterstrich-Linien bzw. der ☐-Zeichen, Ursprung unten links)
+    const feld = (txt, linieY) => {
+      let size = 10, zeilen = umbrechen(txt, size, 420);
+      if (zeilen.length > 2) { size = 8.5; zeilen = umbrechen(txt, size, 420); }
+      zeilen = zeilen.slice(0, 2);
+      zeilen.forEach((z, i) => seite.drawText(z, { x: 91, y: linieY + 3 + (zeilen.length - 1 - i) * 10.5, size, font, color: blau }));
+    };
+    feld(b.kunde, 491.8); feld(b.projekt, 442.3); feld(b.pl, 392.6); feld(b.klasse, 342.9); feld(b.ohm, 293.2);
+    const kreuz = (x, y) => seite.drawText('X', { x: x + 1.7, y: y + 0.3, size: 10.5, font: fett, color: blau });
+    [233.4, 206.6, 179.8, 152.9].forEach((y, i) => { if (b.aufgaben[BLITZ_AUFGABEN[i][0]]) kreuz(90, y); });
+    [213.8, 186.9, 160.1, 133.2, 106.5].forEach((y, i) => { if (b.unterlagen[BLITZ_UNTERLAGEN[i][0]]) kreuz(324.1, y); });
+    const daten = await doc.save();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([daten], { type: 'application/pdf' }));
+    a.download = `Checkliste_Blitzschutz_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_');
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Checkliste Blitzschutz als PDF gespeichert.');
+  } catch (e) {
+    toast('PDF konnte nicht erstellt werden – Internetverbindung prüfen und die Datei lasoltec-vorlage.js mit hochladen.');
+  }
+  if (knopf) { knopf.disabled = false; knopf.textContent = 'Als PDF speichern'; }
+}
+// Dokumente, die an Checklisten-Punkten hängen können ([dok: …])
+const DOKS = {
+  ibn: { label: 'IBN-Rapport', fn: 'ibnDialog', hat: p => !!p.ibn },
+  blitz: { label: 'Checkliste Blitzschutz', fn: 'blitzDialog', hat: p => !!p.blitz }
+};
+
+// ---------- Checklisten-Editor (für Vorlage und einzelne Projekte) ----------
+function edStart(target, text) { ui.ed = { target, lines: zeilenAusText(text) }; ui.edText = false; }
+function edHtml() {
+  if (ui.edText) return `<textarea class="code" id="ed-text" oninput="ui.ed.lines=zeilenAusText(this.value)">${esc(textAusZeilen(ui.ed.lines))}</textarea>
+    <p class="muted"><b># Titel</b> = Phase · 2 Leerzeichen = Unterpunkt · <b>[datum]</b> · <b>[oder]</b> · <b>[!]</b> = vor Baustart · <b>[mail: Name]</b></p>`;
+  const L = ui.ed.lines, namen = S().mailvorlagen.map(m => m.name);
+  const tools = i => `<div class="ed-tools">
+      <button class="ck-btn" title="nach oben" onclick="edOp(${i},'up')">↑</button><button class="ck-btn" title="nach unten" onclick="edOp(${i},'down')">↓</button>
+      <button class="ck-btn" title="Punkt darunter einfügen" onclick="edOp(${i},'add')">＋</button><button class="ck-btn" title="löschen" onclick="edOp(${i},'del')">✕</button></div>`;
+  const chip = (i, z, k, l, tip) => `<label class="chip ${z[k] ? 'on' : ''}" title="${tip}"><input type="checkbox" ${z[k] ? 'checked' : ''} onchange="edSet(${i},'${k}',this.checked)">${l}</label>`;
+  return `<div class="ed-list">${L.map((z, i) => z.typ === 'phase'
+    ? `<div class="ed-row ed-phase"><input value="${esc(z.text)}" oninput="ui.ed.lines[${i}].text=this.value" placeholder="Phase">
+        ${chip(i, z, 'wichtig', 'ganze Phase vor Baustart', 'Alle Punkte dieser Phase müssen vor Baustart erledigt sein')}${tools(i)}</div>`
+    : `<div class="ed-row" style="padding-left:${z.lvl * 26 + 6}px">
+        <button class="ck-btn" title="ausrücken" onclick="edOp(${i},'out')">‹</button><button class="ck-btn" title="einrücken (Unterpunkt)" onclick="edOp(${i},'in')">›</button>
+        <input value="${esc(z.text)}" oninput="ui.ed.lines[${i}].text=this.value" placeholder="Punkt">
+        ${chip(i, z, 'wichtig', 'vor Baustart', 'Erscheint im Dashboard, bis er erledigt ist')}${chip(i, z, 'datum', 'Datum', 'Datumsfeld anzeigen')}${chip(i, z, 'oder', 'oder', 'Einer der Unterpunkte genügt')}<select class="ed-mail" onchange="edSet(${i},'dok',this.value)" title="Dokument zum Ausfüllen (PDF)"><option value="">kein Dokument</option>
+          ${Object.entries(DOKS).map(([k, dk]) => `<option value="${k}" ${z.dok === k ? 'selected' : ''}>📄 ${dk.label}</option>`).join('')}</select>
+        <select class="ed-mail" onchange="edSet(${i},'mail',this.value)"><option value="">kein Mail</option>
+          ${[...new Set([...namen, z.mail].filter(Boolean))].map(n => `<option value="${esc(n)}" ${n === z.mail ? 'selected' : ''}>✉ ${esc(n)}</option>`).join('')}</select>
+        ${tools(i)}</div>`).join('')}</div>
+    <div class="row" style="margin-top:10px"><button class="sec sm" onclick="edOp(ui.ed.lines.length-1,'add')">+ Punkt</button><button class="sec sm" onclick="edOp(-1,'phase')">+ Phase</button></div>`;
+}
+const edRender = () => { $('ed').innerHTML = edHtml(); };
+function edSet(i, k, v) { ui.ed.lines[i][k] = v; edRender(); }
+function edOp(i, op) {
+  const L = ui.ed.lines, z = L[i];
+  if (op === 'in' && z.typ === 'item') { const prev = L[i - 1]; z.lvl = Math.min(z.lvl + 1, prev && prev.typ === 'item' ? prev.lvl + 1 : 0); }
+  if (op === 'out' && z.typ === 'item') z.lvl = Math.max(0, z.lvl - 1);
+  if (op === 'up' && i > 0) [L[i - 1], L[i]] = [L[i], L[i - 1]];
+  if (op === 'down' && i < L.length - 1) [L[i + 1], L[i]] = [L[i], L[i + 1]];
+  if (op === 'del') L.splice(i, 1);
+  if (op === 'add') L.splice(i + 1, 0, { typ: 'item', lvl: z && z.typ === 'item' ? z.lvl : 0, text: '', datum: false, oder: false, wichtig: false, mail: '' });
+  if (op === 'phase') L.push({ typ: 'phase', text: 'Neue Phase' });
+  edRender();
+  if (op === 'add' || op === 'phase') { const ins = $('ed').querySelectorAll('.ed-row input:not([type])'); const el = ins[op === 'add' ? i + 1 : ins.length - 1]; el && el.focus(); }
+}
+function edToggleText() {
+  if (ui.edText && $('ed-text')) ui.ed.lines = zeilenAusText($('ed-text').value);
+  ui.edText = !ui.edText; edRender();
+}
+function chkEditor(pid) {
+  const p = findP(pid), d = $('dlg');
+  edStart(pid, p.checkliste);
+  d.style.width = 'min(980px, calc(100vw - 32px))';
+  d.innerHTML = `<div class="ck-head"><h2 style="margin:0">Checkliste für ${esc(p.nummer)} anpassen</h2>
+      <button class="sec sm" onclick="edToggleText()">Als Text bearbeiten</button></div>
+    <p class="muted" style="margin-top:4px">Abgehakte Punkte bleiben erhalten, solange der Text gleich bleibt.</p>
+    <div id="ed" style="max-height:60vh;overflow:auto">${edHtml()}</div>
+    <div class="row" style="margin-top:14px;justify-content:space-between">
+      <button class="sec" onclick="edStart('${pid}',S().checklisteVorlage);edRender()">Standard-Vorlage laden</button>
+      <div class="row"><button class="sec" onclick="$('dlg').close()">Abbrechen</button>
+      <button onclick="findP('${pid}').checkliste=textAusZeilen(ui.ed.lines);save();$('dlg').close();render();toast('Checkliste gespeichert.')">Speichern</button></div>
+    </div>`;
+  d.onkeydown = null;
+  d.showModal();
+  d.addEventListener('close', () => d.style.width = '', { once: true });
+}
+
+function viewTermine(p) {
+  const t = ui.editTermin ? p.termine.find(x => x.id === ui.editTermin) : null;
+  const termine = sortTermine(p);
+  return `
+  <div class="card">
+    <h3>${t ? 'Termin bearbeiten' : 'Termin hinzufügen'}</h3>
+    <div class="grid">
+      <div><label>Gewerk *</label><select id="t-gw">${p.gewerke.map(g0 => { const g = gewerk(p, g0.id);
+        return `<option value="${g.id}" ${t && t.gewerkId === g.id ? 'selected' : ''}>${esc(g.name)} (${artKurz(g)})${!g.eigen && g.firma ? ' – ' + esc(g.firma) : ''}</option>`; }).join('')}</select></div>
+      <div><label>Tätigkeit *</label><input id="t-titel" value="${esc(t?.titel)}" placeholder="z.B. Rohinstallation EG"></div>
+      <div><label>Start *</label><input type="date" id="t-start" value="${t?.start || ''}"></div>
+      <div><label>Ende *</label><input type="date" id="t-ende" value="${t?.ende || ''}"></div>
+      <div><label>Startet nach (Abhängigkeit)</label><select id="t-nach" onchange="$('t-abst-w').style.display=this.value?'':'none'">
+        <option value="">– unabhängig –</option>
+        ${(() => { const nein = t ? nachfolger(p, t.id) : new Set(); return sortTermine(p).filter(x => !nein.has(x.id))
+          .map(x => `<option value="${x.id}" ${t?.nach === x.id ? 'selected' : ''}>${esc(gewerk(p, x.gewerkId).name)}: ${esc(x.titel)} (bis ${fmt(x.ende)})</option>`).join(''); })()}
+      </select></div>
+      <div id="t-abst-w" style="${t?.nach ? '' : 'display:none'}"><label>Abstand danach (Arbeitstage)</label><input type="number" id="t-abst" min="0" value="${t?.abstand || 0}"></div>
+      <div><label>Fortschritt</label><select id="t-fs">${[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(v =>
+        `<option value="${v}" ${(t?.fortschritt || 0) === v ? 'selected' : ''}>${v} %</option>`).join('')}</select></div>
+      <div><label>Bemerkung</label><input id="t-bem" value="${esc(t?.bemerkung)}"></div>
+      <div><label>&nbsp;</label><label class="check"><input type="checkbox" id="t-ms" ${t?.meilenstein ? 'checked' : ''} onchange="if(this.checked)$('t-pl').checked=true"> Meilenstein</label></div>
+    </div>
+    <div class="row" style="margin-top:12px;padding:10px 12px;background:#fdf5f4;border-radius:8px;gap:16px">
+      <label class="check"><input type="checkbox" id="t-pl" ${t?.pl ? 'checked' : ''}> <b>Ich bin am 1. Tag vor Ort</b> (Baustart, Meilenstein, Abnahme …)</label>
+      <div class="row"><label style="margin:0">ab</label><input type="time" id="t-plzeit" value="${t?.plZeit || ''}" style="width:110px"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="speichereTermin('${p.id}')">${t ? 'Änderungen speichern' : 'Hinzufügen'}</button>
+      ${t ? `<button class="sec" onclick="ui.editTermin=null;render()">Abbrechen</button>` : ''}
+    </div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h3 style="margin:0">Terminplan</h3>
+      <div class="row">
+        <div class="seg"><button class="${ui.zoom !== 'woche' ? 'on' : ''}" onclick="ui.zoom='tag';ui.ganttScroll=true;render()">Tage</button><button class="${ui.zoom === 'woche' ? 'on' : ''}" onclick="ui.zoom='woche';ui.ganttScroll=true;render()">Wochen</button></div>
+        <button class="sec sm" onclick="ui.ganttScroll=true;render()">Heute</button>
+      </div>
+    </div>
+    ${termine.length ? gantt(p, termine) : '<div class="empty">Noch keine Termine erfasst.</div>'}
+  </div>
+  ${termine.length ? `<div class="card"><h3>Termine</h3><div class="table-wrap"><table>
+    <tr><th>Gewerk</th><th>Tätigkeit</th><th>Start</th><th>Ende</th><th>AT</th><th>Fortschritt</th><th>Ich vor Ort</th><th>Bemerkung</th><th></th></tr>
+    ${termine.map(x => { const g = gewerk(p, x.gewerkId); return `<tr>
+      <td style="white-space:nowrap"><span class="swatch" style="background:${g.farbe}"></span>${esc(g.name)}${seiteTag(g)}</td>
+      <td>${x.meilenstein ? '◆ ' : ''}${esc(x.titel)}</td>
+      <td>${fmt(x.start)}</td><td>${fmt(x.ende)}</td>
+      <td>${arbeitstage(x.start, x.ende)}</td>
+      <td style="white-space:nowrap"><span class="prog"><div style="width:${x.fortschritt || 0}%"></div></span><small>${x.fortschritt || 0}%</small></td>
+      <td>${x.pl ? `<span class="tag-pl">${fmt(x.start)}${x.plZeit ? ' ' + x.plZeit : ''}</span>` : ''}</td>
+      <td class="muted">${esc(x.bemerkung)}</td>
+      <td style="white-space:nowrap">${x.pl ? `<button class="sec sm" title="In Outlook / Kalender übernehmen" onclick="icsDownload([['${p.id}','${x.id}']])">📅</button> ` : ''}<button class="sec sm" onclick="ui.editTermin='${x.id}';render();scrollTo(0,0)">Bearbeiten</button>
+        <button class="danger sm" onclick="loescheTermin('${p.id}','${x.id}')">✕</button></td></tr>`; }).join('')}
+  </table></div></div>` : ''}`;
+}
+
+// Termine nach Gewerk gruppiert, Gruppen in der Reihenfolge ihres ersten Termins
+function ganttGruppen(p, termine) {
+  const map = new Map();
+  termine.forEach(t => { if (!map.has(t.gewerkId)) map.set(t.gewerkId, []); map.get(t.gewerkId).push(t); });
+  return [...map].map(([gid, items]) => ({ g: gewerk(p, gid), items, start: items[0].start, ende: items.reduce((m, t) => t.ende > m ? t.ende : m, '0000') }));
+}
+function gantt(p, termine) {
+  const ax = zeitachse(termine), tagMode = ui.zoom !== 'woche', w = tagMode ? 24 : 8, TW = ax.tage * w;
+  const s0 = isoOf(ax.start), idx = iso => diffDays(s0, iso);
+  const raster = `background-image:repeating-linear-gradient(to right, transparent 0 ${5 * w}px, rgba(0,0,0,.045) ${5 * w}px ${7 * w}px),` +
+    `repeating-linear-gradient(to right, ${tagMode ? `#e6eaef 0 1px, transparent 1px ${w}px` : `#d5dbe2 0 1px, transparent 1px ${7 * w}px`})`;
+  const tint = (c, a) => `background:linear-gradient(${c}${a},${c}${a}),#fff`;
+  const row = (cls, left, track, leftStyle = '', attr = '') =>
+    `<div class="xg-row ${cls}"><div class="xg-left" style="${leftStyle}" ${attr}>${left}</div><div class="xg-track" style="width:${TW}px;${raster}">${track}</div></div>`;
+
+  const wochen = ax.wochen.map((d, i) => `<div class="xg-wk" style="left:${i * 7 * w}px;width:${7 * w}px">KW ${kw(d)}${tagMode ? ' · ' + fmt(isoOf(d)).slice(0, 6) : ''}</div>`).join('');
+  let tage = '';
+  if (tagMode) for (let i = 0; i < ax.tage; i++) {
+    const d = addDays(ax.start, i), wd = (d.getUTCDay() + 6) % 7;
+    tage += `<div class="xg-day ${wd > 4 ? 'we' : ''}" style="left:${i * w}px;width:${w}px">${d.getUTCDate()}<br>${'MDMDFSS'[wd]}</div>`;
+  }
+  const head = `<div class="xg-row xg-head" style="height:${tagMode ? 48 : 24}px"><div class="xg-left">
+      <div>Gewerk / Aufgabe</div><div>Fortschritt</div><div>Start</div><div>Ende</div></div>
+      <div class="xg-track" style="width:${TW}px">${wochen}${tage}</div></div>`;
+
+  const body = ganttGruppen(p, termine).map(gr => {
+    const g = gr.g;
+    const kopf = row('xg-group', `<div style="grid-column:1/-1"><span class="swatch" style="background:${g.farbe}"></span>${esc(g.name)}${seiteTag(g)}
+        <span class="muted" style="font-weight:400;margin-left:6px">${esc(g.firma || '')}</span></div>`,
+      `<div class="xg-sum" style="left:${idx(gr.start) * w}px;width:${(diffDays(gr.start, gr.ende) + 1) * w}px;background:${g.farbe}"></div>`, tint(g.farbe, '38'));
+    return kopf + gr.items.map(t => {
+      const f = t.fortschritt || 0, l = idx(t.start) * w;
+      const bar = t.meilenstein
+        ? `<div class="xg-ms" style="left:${l + w / 2 - 6.5}px;background:${g.farbe}" title="${esc(t.titel)}: ${fmt(t.start)}"></div>`
+        : `<div class="xg-bar" style="left:${l + 1}px;width:${(diffDays(t.start, t.ende) + 1) * w - 2}px;background:${g.farbe}" title="${esc(t.titel)}: ${fmt(t.start)} – ${fmt(t.ende)} · ${f}%"><i style="width:${f}%"></i></div>`;
+      const pl = t.pl ? `<div class="xg-pl" style="left:${l - 3}px" title="Ich bin vor Ort: ${fmt(t.start)}${t.plZeit ? ' ab ' + t.plZeit : ''}"></div>` : '';
+      const vor = t.nach && p.termine.find(x => x.id === t.nach);
+      return row('task', `<div title="${esc(t.titel)}${vor ? ' – startet nach: ' + esc(vor.titel) : ''}">${vor ? '<span class="muted">↳ </span>' : ''}${t.meilenstein ? '◆ ' : ''}${esc(t.titel)}</div>
+          <div>${t.meilenstein ? '' : `<span class="prog"><div style="width:${f}%"></div></span><small>${f}%</small>`}</div>
+          <div>${fmt(t.start)}</div><div>${fmt(t.ende)}</div>`,
+        bar + pl, tint(g.farbe, '14'), `onclick="ui.editTermin='${t.id}';render();scrollTo(0,0)" title="Klicken zum Bearbeiten"`);
+    }).join('');
+  }).join('');
+
+  const ti = idx(todayIso()), LW = innerWidth <= 800 ? 230 : 480;
+  const heute = ti >= 0 && ti < ax.tage ? `<div class="xg-today" style="left:${LW + ti * w + w / 2 - 1}px" title="Heute"></div>` : '';
+  return `<div class="xg" data-today="${Math.max(0, ti) * w}" data-w="${w}"><div class="xg-inner">${head}${body}${heute}</div></div>`;
+}
+
+function speichereTermin(pid) {
+  const p = findP(pid);
+  const d = { gewerkId: val('t-gw'), titel: val('t-titel'), start: val('t-start'), ende: val('t-ende'), bemerkung: val('t-bem'), meilenstein: $('t-ms').checked,
+    pl: $('t-pl').checked, plZeit: val('t-plzeit'), fortschritt: +$('t-fs').value, nach: val('t-nach'), abstand: Math.max(0, +val('t-abst') || 0) };
+  if (d.meilenstein && d.start && !d.ende) d.ende = d.start;
+  // mit Abhängigkeit genügt die Dauer: fehlender Start wird berechnet
+  if (d.nach && !d.start) { d.start = d.ende || todayIso(); if (!d.ende) d.ende = d.start; }
+  if (!d.gewerkId || !d.titel || !d.start || !d.ende) return toast('Bitte Gewerk, Tätigkeit, Start und Ende ausfüllen.');
+  if (d.ende < d.start) return toast('Das Ende liegt vor dem Start.');
+  if (ui.editTermin) Object.assign(p.termine.find(x => x.id === ui.editTermin), d);
+  else p.termine.push({ id: uid(), ...d });
+  const n = verschiebeAbhaengige(p);
+  ui.editTermin = null; save(); render(); toast(n ? `Termin gespeichert · ${n} abhängige Termine angepasst.` : 'Termin gespeichert.');
+}
+function loescheTermin(pid, tid) {
+  if (!confirm('Termin löschen?')) return;
+  const p = findP(pid);
+  p.termine = p.termine.filter(x => x.id !== tid);
+  verschiebeAbhaengige(p); save(); render();
+}
+
+// ---------- Abhängigkeiten ----------
+function addArbeitstage(iso, n) {
+  let d = toDate(iso);
+  while (n > 0) { d = addDays(d, 1); const w = d.getUTCDay(); if (w && w !== 6) n--; }
+  return isoOf(d);
+}
+// alle Termine, die (direkt oder indirekt) nach tid starten – dürfen nicht Vorgänger von tid werden
+function nachfolger(p, tid) {
+  const s = new Set([tid]);
+  let neu = true;
+  while (neu) { neu = false; p.termine.forEach(t => { if (t.nach && s.has(t.nach) && !s.has(t.id)) { s.add(t.id); neu = true; } }); }
+  return s;
+}
+// Start = nächster Arbeitstag nach Ende des Vorgängers + Abstand; Anzahl Arbeitstage bleibt gleich. Gibt Anzahl verschobener Termine zurück.
+function verschiebeAbhaengige(p) {
+  const moved = new Set();
+  for (let runde = 0; runde <= p.termine.length; runde++) {
+    let geaendert = false;
+    p.termine.forEach(t => {
+      if (!t.nach) return;
+      const v = p.termine.find(x => x.id === t.nach);
+      if (!v) { t.nach = ''; return; }
+      const start = addArbeitstage(v.ende, 1 + (t.abstand || 0));
+      if (start !== t.start) {
+        const at = Math.max(1, arbeitstage(t.start, t.ende));
+        t.start = start; t.ende = addArbeitstage(start, at - 1);
+        moved.add(t.id); geaendert = true;
+      }
+    });
+    if (!geaendert) break;
+  }
+  return moved.size;
+}
+
+// ---------- Gewerke ----------
+function viewGewerke(p) {
+  const raw = ui.editGewerk ? p.gewerke.find(x => x.id === ui.editGewerk) : null;
+  const g = raw && gewerk(p, raw.id), own = !!raw?.eigen, art = raw ? artOf(raw) : 'extern';
+  const dis = own ? 'disabled' : '';
+  const fehlend = S().standardGewerke.filter(s => !p.gewerke.some(x => gwKey(x) === gwKey(s)));
+  return `
+  <div class="card">
+    <h3>${g ? 'Gewerk bearbeiten' : 'Gewerk hinzufügen'}</h3>
+    <div class="grid">
+      <div><label>Gewerk *</label><input id="g-name" value="${esc(g?.name)}" placeholder="z.B. Fensterbau"></div>
+      <div><label>Montage durch</label><select id="g-seite" onchange="toggleSeite()">
+        <option value="extern" ${art === 'extern' ? 'selected' : ''}>Extern (andere Firma)</option>
+        <option value="sub" ${art === 'sub' ? 'selected' : ''}>Subunternehmer (in unserem Auftrag)</option>
+        <option value="intern" ${art === 'intern' ? 'selected' : ''}>Intern (${esc(S().firma)})</option></select></div>
+      <div><label id="g-firma-l">${art === 'sub' ? 'Firma Subunternehmer' : 'Firma'}</label><input id="g-firma" value="${esc(own ? S().firma : g?.firma)}" data-ext="${esc(own ? '' : g?.firma)}" ${dis}></div>
+      <div><label>Adresse</label><input id="g-adr" value="${esc(g?.adresse)}" data-ext="${esc(own ? '' : g?.adresse)}" ${dis}></div>
+      <div><label id="g-kontakt-l">${own ? 'Verantwortlich / Chefmonteur' : 'Kontaktperson / Telefon'}</label><input id="g-kontakt" value="${esc(g?.kontakt)}"></div>
+      <div><label>E-Mail (für Mailvorlagen)</label><input id="g-mail" type="email" value="${esc(g?.email || '')}"></div>
+      <div><label>Mailvorlage</label>${vorlageSelect(g || { name: '', mailvorlage: 'keine' }, 'id="g-vorlage"')}</div>
+      <div><label>Farbe ${g ? '' : '(freie Farbe vorgeschlagen)'}</label><input type="color" id="g-farbe" value="${g?.farbe || freieFarbe(p.gewerke.map(x => x.farbe))}"></div>
+    </div>
+    <div class="muted" id="g-hint" style="margin-top:8px;${own ? '' : 'display:none'}">Firma und Adresse kommen bei internen Gewerken aus den Einstellungen.</div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="speichereGewerk('${p.id}')">${g ? 'Änderungen speichern' : 'Hinzufügen'}</button>
+      ${g ? `<button class="sec" onclick="ui.editGewerk=null;render()">Abbrechen</button>` : ''}
+    </div>
+  </div>
+  ${fehlend.length ? `<div class="note">${fehlend.length} Standard-Gewerke fehlen in diesem Projekt (${fehlend.map(s => esc(s.name) + ' ' + artKurz(s)).join(', ')}).
+    <button class="sm" onclick="ergaenzeStandard('${p.id}')">Ergänzen</button></div>` : ''}
+  <div class="card"><div class="table-wrap"><table>
+    <tr><th>Gewerk</th><th>Firma</th><th>Adresse</th><th>Kontakt</th><th>Termine</th><th></th></tr>
+    ${p.gewerke.map(r => { const x = gewerk(p, r.id); return `<tr>
+      <td><span class="swatch" style="background:${x.farbe}"></span>${esc(x.name)}${seiteTag(x)}</td>
+      <td>${esc(x.firma)}</td><td class="muted">${esc(x.adresse)}</td><td class="muted">${esc(x.kontakt)}${x.email ? '<br>' + esc(x.email) : ''}${effektiveVorlage(x) ? `<br><span class="tag-wichtig" style="margin:0">✉ ${esc(effektiveVorlage(x))}</span>` : ''}</td>
+      <td>${p.termine.filter(t => t.gewerkId === x.id).length}</td>
+      <td style="white-space:nowrap"><button class="sec sm" onclick="ui.editGewerk='${x.id}';render();scrollTo(0,0)">Bearbeiten</button>
+        ${x.fix ? '' : `<button class="danger sm" onclick="loescheGewerk('${p.id}','${x.id}')">✕</button>`}</td></tr>`; }).join('')}
+  </table></div></div>`;
+}
+function ergaenzeStandard(pid) {
+  const p = findP(pid);
+  S().standardGewerke.filter(s => !p.gewerke.some(x => gwKey(x) === gwKey(s)))
+    .forEach(s => p.gewerke.push({ ...s, id: uid(), fix: true, eigen: s.art === 'intern' }));
+  save(); render(); toast('Standard-Gewerke ergänzt.');
+}
+function toggleSeite() {
+  const intern = $('g-seite').value === 'intern';
+  $('g-firma-l').textContent = $('g-seite').value === 'sub' ? 'Firma Subunternehmer' : 'Firma';
+  ['g-firma', 'g-adr'].forEach(id => { const el = $(id); el.disabled = intern; });
+  $('g-firma').value = intern ? S().firma : $('g-firma').dataset.ext;
+  $('g-adr').value = intern ? [S().strasse, S().ort].filter(Boolean).join(', ') : $('g-adr').dataset.ext;
+  $('g-kontakt-l').textContent = intern ? 'Verantwortlich / Chefmonteur' : 'Kontaktperson / Telefon';
+  $('g-hint').style.display = intern ? '' : 'none';
+}
+function speichereGewerk(pid) {
+  const p = findP(pid);
+  const raw = ui.editGewerk && p.gewerke.find(x => x.id === ui.editGewerk);
+  const art = $('g-seite').value, intern = art === 'intern';
+  const d = intern
+    ? { name: val('g-name'), kontakt: val('g-kontakt'), email: val('g-mail'), mailvorlage: val('g-vorlage'), farbe: $('g-farbe').value, art, eigen: true, firma: '', adresse: '' }
+    : { name: val('g-name'), firma: val('g-firma'), adresse: val('g-adr'), kontakt: val('g-kontakt'), email: val('g-mail'), mailvorlage: val('g-vorlage'), farbe: $('g-farbe').value, art, eigen: false };
+  if (!d.name) return toast('Bitte einen Gewerk-Namen eingeben.');
+  if (raw) Object.assign(raw, d);
+  else p.gewerke.push({ id: uid(), ...d });
+  ui.editGewerk = null; save(); render(); toast('Gewerk gespeichert.');
+}
+function loescheGewerk(pid, gid) {
+  const p = findP(pid);
+  const n = p.termine.filter(t => t.gewerkId === gid).length;
+  if (!confirm(n ? `Gewerk und ${n} zugehörige Termine löschen?` : 'Gewerk löschen?')) return;
+  p.gewerke = p.gewerke.filter(x => x.id !== gid);
+  p.termine = p.termine.filter(t => t.gewerkId !== gid); save(); render();
+}
+
+// ---------- Projektdaten ----------
+function viewInfo(p) {
+  return `<div class="card">
+    <div class="grid">
+      <div><label>Projektnummer *</label><input id="i-nr" value="${esc(p.nummer)}"></div>
+      <div><label>Projektname *</label><input id="i-name" value="${esc(p.name)}"></div>
+      <div><label>Ort / Adresse</label><input id="i-ort" value="${esc(p.ort)}"></div>
+      <div><label>Farbe im Kalender</label><input type="color" id="i-farbe" value="${p.farbe}"></div>
+    </div>
+    <div style="margin-top:12px"><label>Bemerkung (erscheint auf dem PDF)</label><textarea id="i-bem">${esc(p.bemerkung)}</textarea></div>
+    <div class="row" style="margin-top:12px;justify-content:space-between">
+      <button onclick="speichereInfo('${p.id}')">Speichern</button>
+      <button class="danger" onclick="loescheProjekt('${p.id}')">Projekt löschen</button>
+    </div>
+  </div>`;
+}
+function speichereInfo(pid) {
+  const p = findP(pid);
+  const nummer = val('i-nr'), name = val('i-name');
+  if (!nummer || !name) return toast('Projektnummer und Name sind Pflicht.');
+  if (state.projects.some(x => x.nummer === nummer && x.id !== pid)) return toast('Diese Projektnummer existiert bereits.');
+  Object.assign(p, { nummer, name, ort: val('i-ort'), farbe: $('i-farbe').value, bemerkung: val('i-bem') });
+  save(); render(); toast('Projektdaten gespeichert.');
+}
+function loescheProjekt(pid) {
+  const p = findP(pid);
+  if (!confirm(`Projekt ${p.nummer} – ${p.name} wirklich löschen?`)) return;
+  state.projects = state.projects.filter(x => x.id !== pid); save(); nav('projekte');
+}
+
+// ---------- Wochenplan ----------
+const wochenStart = iso => { const d = toDate(iso); return isoOf(addDays(d, -((d.getUTCDay() + 6) % 7))); };
+// am Wochenende nur zeigen, wenn der Termin dort beginnt oder endet (sonst wird über das Wochenende nicht gearbeitet)
+const aktivAm = (t, d) => t.start <= d && t.ende >= d && (toDate(d).getUTCDay() % 6 !== 0 || d === t.start || d === t.ende);
+function viewWoche() {
+  const today = todayIso();
+  if (!ui.woche) ui.woche = wochenStart(today);
+  const ws = ui.woche, tage = [...Array(7)].map((_, i) => isoOf(addDays(toDate(ws), i))), we = tage[6];
+  const rows = state.projects.map(p => ({
+    p, t: sortTermine(p).filter(t => t.start <= we && t.ende >= ws && (!ui.nurIntern || artOf(gewerk(p, t.gewerkId)) !== 'extern'))
+  })).filter(r => r.t.length).sort((a, b) => a.t[0].start.localeCompare(b.t[0].start));
+  const zeigen = tage.filter((d, i) => i < 5 || rows.some(r => r.t.some(t => aktivAm(t, d))));
+  const shift = n => isoOf(addDays(toDate(ws), 7 * n));
+  const einsaetze = meineEinsaetze().filter(e => e.t.start >= ws && e.t.start <= we).length;
+  return `
+  <div class="page-head no-print">
+    <div><h1>Wochenplan</h1><div class="muted" style="margin-top:4px">KW ${kw(toDate(ws))} · ${fmt(ws)} – ${fmt(we)} · ${rows.length} Baustellen · ${einsaetze} Einsätze von mir</div></div>
+    <div class="row">
+      <label class="check" style="margin-right:8px"><input type="checkbox" ${ui.nurIntern ? 'checked' : ''} onchange="ui.nurIntern=this.checked;render()"> nur unsere Montage (intern + Sub)</label>
+      <button class="sec sm" onclick="ui.woche='${shift(-1)}';render()">‹</button>
+      <button class="sec sm" onclick="ui.woche=null;render()">Diese Woche</button>
+      <button class="sec sm" onclick="ui.woche='${shift(1)}';render()">›</button>
+      <button class="sec sm" onclick="print()">Drucken</button>
+    </div>
+  </div>
+  <div class="print-only"><h2>Wochenplan KW ${kw(toDate(ws))} · ${fmt(ws)} – ${fmt(we)}</h2></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    ${rows.length ? `<div class="table-wrap"><table class="wk">
+      <tr><th style="width:200px">Projekt</th>${zeigen.map(d => `<th class="${d === today ? 'heute' : ''}">${WT[toDate(d).getUTCDay()]} ${fmt(d).slice(0, 6)}</th>`).join('')}</tr>
+      ${rows.map(({ p, t }) => `<tr>
+        <td><div style="display:flex;gap:8px;align-items:flex-start;cursor:pointer" onclick="openProjekt('${p.id}')"><span class="pdot" style="background:${p.farbe};margin-top:4px"></span>
+          <div><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">${esc(p.ort || '')}</div></div></div></td>
+        ${zeigen.map(d => `<td class="${d === today ? 'heute' : ''}">${t.filter(x => aktivAm(x, d)).map(x => {
+          const g = gewerk(p, x.gewerkId);
+          return `<div class="wk-chip" style="border-left-color:${g.farbe}" onclick="openProjekt('${p.id}')" title="${esc(x.titel)}: ${fmt(x.start)} – ${fmt(x.ende)}">
+            ${x.meilenstein ? '◆ ' : ''}${esc(x.titel)}<small>${esc(g.name)}${!g.eigen && g.firma ? ' · ' + esc(g.firma) : ''}</small>
+            ${x.pl && x.start === d ? `<span class="wk-pl">Ich vor Ort${x.plZeit ? ' ab ' + x.plZeit : ''}</span>` : ''}</div>`;
+        }).join('')}</td>`).join('')}
+      </tr>`).join('')}
+    </table></div>` : '<div class="empty">In dieser Woche sind keine Arbeiten geplant.</div>'}
+  </div>`;
+}
+
+// ---------- Alle Termine (Kalender) ----------
+function viewKalender() {
+  const [y, m] = ui.month.split('-').map(Number);
+  const first = new Date(Date.UTC(y, m - 1, 1)), last = new Date(Date.UTC(y, m, 0));
+  const gridStart = addDays(first, -((first.getUTCDay() + 6) % 7));
+  const gridEnd = addDays(last, 6 - ((last.getUTCDay() + 6) % 7));
+  const today = todayIso();
+  const spans = state.projects.map(p => ({ p, s: span(p) })).filter(x => x.s).sort((a, b) => a.s.start.localeCompare(b.s.start));
+  const plTag = {};
+  meineEinsaetze().forEach(e => (plTag[e.t.start] = plTag[e.t.start] || []).push(e));
+
+  let weeks = '';
+  for (let ws = gridStart; ws <= gridEnd; ws = addDays(ws, 7)) {
+    const wsI = isoOf(ws), weI = isoOf(addDays(ws, 6));
+    const segs = spans.filter(x => x.s.start <= weI && x.s.ende >= wsI);
+    const rows = `minmax(26px, auto) ${segs.map(() => '25px').join(' ')} 1fr`;
+    let cells = '';
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(ws, i), di = isoOf(d);
+      const cls = [d.getUTCMonth() !== m - 1 && 'out', i >= 5 && 'we', di === today && 'today'].filter(Boolean).join(' ');
+      const pls = ui.showPl ? (plTag[di] || []).map(({ p, t }) =>
+        `<b class="cal-pl" title="Ich vor Ort: ${esc(p.nummer)} ${esc(p.name)} – ${esc(t.titel)}${t.plZeit ? ' ab ' + t.plZeit : ''}" onclick="openProjekt('${p.id}')">${t.plZeit || 'PL'} ${esc(p.nummer)}</b>`).join('') : '';
+      cells += `<div class="cal-day ${cls}" style="grid-column:${i + 1}"></div>
+        <div class="cal-num ${cls}" style="grid-column:${i + 1}"><span>${d.getUTCDate()}</span>${pls}</div>`;
+    }
+    const bars = segs.map(({ p, s }, lane) => {
+      const a = s.start > wsI ? s.start : wsI, b = s.ende < weI ? s.ende : weI;
+      const l = s.start < wsI ? '0' : '5px', r = s.ende > weI ? '0' : '5px';
+      return `<div class="cal-bar" style="grid-column:${diffDays(wsI, a) + 1} / span ${diffDays(a, b) + 1};grid-row:${lane + 2};background:${p.farbe};border-radius:${l} ${r} ${r} ${l}"
+        title="${esc(p.nummer)} ${esc(p.name)}: ${fmt(s.start)} – ${fmt(s.ende)}" onclick="openProjekt('${p.id}')">${esc(p.nummer)} · ${esc(p.name)}</div>`;
+    }).join('');
+    weeks += `<div class="cal-week" style="grid-template-rows:${rows}">${cells}${bars}</div>`;
+  }
+
+  const shift = n => { const d = new Date(Date.UTC(y, m - 1 + n, 1)); return isoOf(d).slice(0, 7); };
+  return `
+  <div class="page-head">
+    <h1>Alle Termine</h1>
+    <div class="row">
+      <label class="check" style="margin-right:12px"><input type="checkbox" ${ui.showPl ? 'checked' : ''} onchange="ui.showPl=this.checked;render()"> <span class="cal-pl" style="margin:0">PL</span> Meine Einsätze anzeigen</label>
+      <button class="sec sm" onclick="ui.month='${shift(-1)}';render()">‹</button>
+      <b style="min-width:140px;text-align:center">${MONATE[m - 1]} ${y}</b>
+      <button class="sec sm" onclick="ui.month='${shift(1)}';render()">›</button>
+      <button class="sec sm" onclick="ui.month='${today.slice(0, 7)}';render()">Heute</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow-x:auto">
+    <div class="cal" style="border:none;min-width:640px">
+      <div class="cal-head">${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(d => `<div>${d}</div>`).join('')}</div>
+      ${weeks}
+    </div>
+  </div>
+  <div class="card">
+    <h3>Projektdauer</h3>
+    ${spans.length ? `<div class="table-wrap"><table>
+      <tr><th>Projekt</th><th>Start</th><th>Ende</th><th>Dauer</th><th>Status</th></tr>
+      ${spans.map(({ p, s }) => `<tr class="click" onclick="openProjekt('${p.id}')">
+        <td><span class="swatch" style="background:${p.farbe}"></span><b>${esc(p.nummer)}</b> ${esc(p.name)}</td>
+        <td>${fmt(s.start)}</td><td>${fmt(s.ende)}</td>
+        <td>${Math.ceil((diffDays(s.start, s.ende) + 1) / 7)} Wo. · ${arbeitstage(s.start, s.ende)} AT</td>
+        <td>${badge(p)}</td></tr>`).join('')}
+    </table></div>` : '<div class="empty">Noch keine Projekte mit Terminen.</div>'}
+  </div>`;
+}
+
+// ---------- Einstellungen ----------
+function viewEinstellungen() {
+  return `
+  <div class="page-head"><h1>Einstellungen</h1></div>
+  <div class="tabs">
+    ${[['backup', 'Backup'], ['firma', 'Projektleiter & Firma'], ['gewerke', 'Standard-Gewerke'], ['checkliste', 'Checkliste'], ['mails', 'Mailvorlagen'], ['app', 'App']].map(([k, l]) =>
+      `<button class="${ui.setTab === k ? 'active' : ''}" onclick="ui.setTab='${k}';render()">${l}</button>`).join('')}
+  </div>
+  ${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, mails: viewMails, app: viewApp }[ui.setTab] || viewBackup)()}`;
+}
+
+function viewChkVorlage() {
+  if (!ui.ed || ui.ed.target !== 'vorlage') edStart('vorlage', S().checklisteVorlage);
+  return `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Checkliste – Vorlage</h3>
+      <button class="sec sm" onclick="edToggleText()">${ui.edText ? 'Zurück zur Liste' : 'Als Text bearbeiten'}</button></div>
+    <p class="muted" style="margin-top:4px">Jedes neue Projekt bekommt diese Checkliste.
+      <b>›</b> macht einen Unterpunkt · <b>vor Baustart</b> = erscheint im Dashboard, bis erledigt · <b>Datum</b> = Datumsfeld ·
+      <b>oder</b> = einer der Unterpunkte genügt · <b>✉</b> = Mailvorlage zum Kopieren.</p>
+    <div id="ed">${edHtml()}</div>
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <div class="row">
+        <button onclick="vorlageSpeichern()">Speichern</button>
+        <button class="sec" onclick="if(confirm('Vorlage auf das Original zurücksetzen?')){edStart('vorlage',CHECKLISTE_VORLAGE);edRender()}">Standard laden</button>
+      </div>
+      <button class="sec" onclick="vorlageAnAlle()">Speichern und auf alle Projekte anwenden</button>
+    </div>
+  </div>`;
+}
+function vorlageSpeichern() {
+  if (ui.edText && $('ed-text')) ui.ed.lines = zeilenAusText($('ed-text').value);
+  state.settings.checklisteVorlage = textAusZeilen(ui.ed.lines); save(); toast('Vorlage gespeichert.');
+}
+function vorlageAnAlle() {
+  if (!confirm('Die Checkliste aller Projekte durch diese Vorlage ersetzen? Abgehakte Punkte mit gleichem Text bleiben erhalten.')) return;
+  vorlageSpeichern();
+  state.projects.forEach(p => p.checkliste = state.settings.checklisteVorlage);
+  save(); toast('Vorlage auf alle Projekte angewendet.');
+}
+
+function viewMails() {
+  const L = S().mailvorlagen, gw = [...new Set(S().standardGewerke.map(g => g.name))];
+  return `<div class="card">
+    <h3>Mailvorlagen</h3>
+    <p class="muted" style="margin-top:0">In der Checkliste erscheint bei verknüpften Punkten ein <b>✉ Mail</b>-Knopf. Die Platzhalter werden mit den Projektdaten gefüllt:
+      <code>{projektnummer}</code> <code>{projekt}</code> <code>{ort}</code> <code>{baustart}</code> <code>{bauende}</code> <code>{termin}</code> <code>{termine}</code>
+      <code>{gewerk}</code> <code>{gewerk_firma}</code> <code>{gewerk_kontakt}</code> <code>{pl}</code> <code>{pl_telefon}</code> <code>{pl_mail}</code> <code>{firma}</code> <code>{signatur}</code> <code>{baustart_datum}</code> <code>{bauende_datum}</code> <code>{ibn_datum}</code> <code>{elektriker_extern}</code>.
+      <b>{termin}</b> / <b>{termine}</b> sind die Termine des verknüpften Gewerks im Terminplan. Ist «An» leer, wird die E-Mail des Gewerks verwendet.</p>
+  </div>
+  ${L.map((m, i) => `<div class="card">
+    <div class="grid">
+      <div><label>Name</label><input value="${esc(m.name)}" onchange="updMail(${i},'name',this.value)"></div>
+      <div><label>Gewerk (für Termine & Adresse)</label><select onchange="updMail(${i},'gewerk',this.value)"><option value="">– keines –</option>
+        ${[...new Set([...gw, m.gewerk].filter(Boolean))].map(n => `<option ${n === m.gewerk ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
+      <div><label>An (optional)</label><input value="${esc(m.an)}" placeholder="sonst E-Mail des Gewerks" onchange="updMail(${i},'an',this.value)"></div>
+    </div>
+    <div style="margin-top:10px"><label>Betreff</label><input value="${esc(m.betreff)}" onchange="updMail(${i},'betreff',this.value)"></div>
+    <div style="margin-top:10px"><label>Text</label><textarea style="min-height:200px;line-height:1.45" onchange="updMail(${i},'text',this.value)">${esc(m.text)}</textarea></div>
+    <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="danger sm" onclick="delMail(${i})">Vorlage löschen</button></div>
+  </div>`).join('')}
+  <div class="row"><button onclick="S().mailvorlagen.push({name:'Neue Vorlage',gewerk:'',an:'',betreff:'{projektnummer} {projekt}',text:'Guten Tag\\n\\n'});save();render()">+ Mailvorlage</button>
+    <button class="sec" onclick="if(confirm('Mailvorlagen auf die Standardvorlagen zurücksetzen?')){state.settings.mailvorlagen=MAIL_VORLAGEN.map(m=>({...m}));save();render()}">Standard laden</button></div>`;
+}
+function updMail(i, k, v) {
+  const m = S().mailvorlagen[i], alt = m.name;
+  m[k] = k === 'text' ? v : v.trim();
+  // Umbenennen: Verknüpfungen in Vorlage und Projekten mitziehen
+  if (k === 'name' && alt && alt !== m.name) {
+    const ers = t => t.split(`[mail: ${alt}]`).join(`[mail: ${m.name}]`);
+    state.settings.checklisteVorlage = ers(state.settings.checklisteVorlage);
+    state.projects.forEach(p => p.checkliste = ers(p.checkliste));
+    if (ui.ed) ui.ed.lines.forEach(z => { if (z.mail === alt) z.mail = m.name; });
+    [...state.settings.standardGewerke, ...state.projects.flatMap(p => p.gewerke)].forEach(g => { if (g.mailvorlage === alt) g.mailvorlage = m.name; });
+  }
+  save(); toast('Vorlage gespeichert.');
+}
+function delMail(i) {
+  if (!confirm(`Mailvorlage «${S().mailvorlagen[i].name}» löschen?`)) return;
+  S().mailvorlagen.splice(i, 1); save(); render();
+}
+
+// ---------- App installieren (PWA) ----------
+let installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; render(); });
+window.addEventListener('appinstalled', () => { installPrompt = null; toast('App installiert.'); render(); });
+async function installieren() {
+  if (!installPrompt) return;
+  installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; render();
+}
+function viewApp() {
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  return `<div class="card">
+    <h3>Als App installieren</h3>
+    ${standalone ? '<div class="note" style="background:#eef6e6;border-color:#cfe3b8;color:#3d5a12">Du verwendest die Seite bereits als installierte App.</div>' : ''}
+    ${installPrompt ? '<p><button onclick="installieren()">App jetzt installieren</button></p>' : ''}
+    <p class="muted" style="margin-top:0">Die Seite lässt sich wie eine App auf Handy und PC installieren: eigenes Symbol, ohne Browserleiste und auch offline nutzbar.
+      Die Daten bleiben auf dem jeweiligen Gerät (für ein anderes Gerät: Backup exportieren und dort importieren).</p>
+    <div class="grid" style="margin-top:8px">
+      <div><b>Android (Chrome)</b><div class="muted">Menü ⋮ → «App installieren» bzw. «Zum Startbildschirm hinzufügen».</div></div>
+      <div><b>iPhone / iPad (Safari)</b><div class="muted">Teilen-Symbol □↑ → «Zum Home-Bildschirm».</div></div>
+      <div><b>PC (Chrome / Edge)</b><div class="muted">Installieren-Symbol rechts in der Adressleiste oder Menü → «App installieren».</div></div>
+    </div>
+    <p class="muted" style="margin-bottom:0">Hinweis: Installation funktioniert, sobald die Seite über GitHub Pages (https) läuft – nicht beim direkten Öffnen der Datei.</p>
+  </div>`;
+}
+
+function viewStandard() {
+  const list = S().standardGewerke;
+  return `<div class="card">
+    <h3>Standard-Gewerke</h3>
+    <p class="muted" style="margin-top:0">Diese Gewerke sind in jedem neuen Projekt fix hinterlegt. Bei bestehenden Projekten kannst du fehlende Gewerke im Reiter «Gewerke» ergänzen.</p>
+    <div class="table-wrap"><table>
+      <tr><th style="width:50px">Farbe</th><th>Gewerk</th><th>Montage durch</th><th>Firma (bei extern / Sub)</th><th>Kontaktperson</th><th>E-Mail</th><th>Mailvorlage</th><th></th></tr>
+      ${list.map((g, i) => `<tr>
+        <td><input type="color" value="${g.farbe}" style="width:44px;height:32px" onchange="updStd(${i},'farbe',this.value)"></td>
+        <td><input value="${esc(g.name)}" onchange="updStd(${i},'name',this.value)"></td>
+        <td><select onchange="updStd(${i},'art',this.value)">${Object.entries(ARTEN).map(([k, l]) => `<option value="${k}" ${g.art === k ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
+        <td><input value="${esc(g.art === 'intern' ? S().firma : g.firma)}" ${g.art === 'intern' ? 'disabled' : ''} onchange="updStd(${i},'firma',this.value)"></td>
+        <td><input value="${esc(g.kontakt || '')}" onchange="updStd(${i},'kontakt',this.value)"></td>
+        <td><input type="email" value="${esc(g.email || '')}" onchange="updStd(${i},'email',this.value)"></td>
+        <td>${vorlageSelect(g, `onchange="updStd(${i},'mailvorlage',this.value)" style="min-width:150px"`)}</td>
+        <td><button class="danger sm" onclick="delStd(${i})">✕</button></td></tr>`).join('')}
+    </table></div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="addStd()">+ Gewerk</button>
+      <button class="sec" onclick="if(confirm('Standardliste auf die ursprünglichen Gewerke zurücksetzen?')){state.settings.standardGewerke=stdKopie();save();render()}">Zurücksetzen</button>
+    </div>
+  </div>`;
+}
+function updStd(i, k, v) {
+  const g = S().standardGewerke[i]; g[k] = v.trim ? v.trim() : v;
+  save(); if (k === 'art') render();
+}
+function addStd() {
+  const list = S().standardGewerke;
+  list.push({ name: 'Neues Gewerk', art: 'extern', firma: '', adresse: '', kontakt: '', farbe: freieFarbe(list.map(g => g.farbe)) });
+  save(); render();
+}
+function delStd(i) {
+  if (!confirm(`«${S().standardGewerke[i].name}» aus der Standardliste entfernen?`)) return;
+  S().standardGewerke.splice(i, 1); save(); render();
+}
+
+function viewFirma() {
+  const s = S();
+  return `<div class="card">
+    <h3>Projektleiter & Firma</h3>
+    <p class="muted" style="margin-top:0">Diese Angaben erscheinen auf jedem PDF und bei unserem Gewerk. Telefon und E-Mail werden nur gedruckt, wenn sie ausgefüllt sind.</p>
+    <div class="grid">
+      <div><label>Name Projektleiter *</label><input id="s-name" value="${esc(s.name)}"></div>
+      <div><label>Firma *</label><input id="s-firma" value="${esc(s.firma)}"></div>
+      <div><label>Strasse</label><input id="s-strasse" value="${esc(s.strasse)}"></div>
+      <div><label>PLZ / Ort</label><input id="s-ort" value="${esc(s.ort)}"></div>
+      <div><label>Telefon (optional)</label><input id="s-tel" type="tel" value="${esc(s.telefon)}" placeholder="+41 …"></div>
+      <div><label>E-Mail (optional)</label><input id="s-mail" type="email" value="${esc(s.email)}" placeholder="name@ckw.ch"></div>
+    </div>
+    <div class="row" style="margin-top:14px"><button onclick="speichereFirma()">Speichern</button></div>
+  </div>
+  <div class="card">
+    <h3>Logo</h3>
+    <p class="muted" style="margin-top:0">Erscheint oben rechts auf dem PDF und in der Leiste. Ohne eigenes Logo wird die CKW-Wortmarke verwendet. Am besten das offizielle Logo als PNG oder JPG hochladen.</p>
+    <div class="row" style="gap:14px">
+      <div style="padding:12px 16px;border:1px dashed var(--line);border-radius:12px;background:#fff">
+        ${s.logo ? `<img src="${s.logo}" alt="Logo" style="height:34px;display:block">` : '<div class="logo">CKW<i></i></div>'}</div>
+      <input type="file" accept="image/png,image/jpeg" onchange="logoUpload(this)" style="width:auto">
+      ${s.logo ? '<button class="sec sm" onclick="state.settings.logo=null;save();render()">Eigenes Logo entfernen</button>' : ''}
+    </div>
+  </div>`;
+}
+function logoUpload(input) {
+  const f = input.files[0]; if (!f) return;
+  if (f.size > 1.5e6) return toast('Logo bitte kleiner als 1.5 MB.');
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      Object.assign(state.settings, { logo: r.result, logoW: img.naturalWidth, logoH: img.naturalHeight });
+      save(); render(); toast('Logo gespeichert.');
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(f);
+}
+function speichereFirma() {
+  const d = { name: val('s-name'), firma: val('s-firma'), strasse: val('s-strasse'), ort: val('s-ort'), telefon: val('s-tel'), email: val('s-mail') };
+  if (!d.name || !d.firma) return toast('Name und Firma sind Pflicht.');
+  Object.assign(state.settings, d); save(); render(); toast('Einstellungen gespeichert.');
+}
+
+function viewBackup() {
+  const b = backup, s = S();
+  let auto;
+  if (b.status === 'unsupported') {
+    auto = `<div class="note">Dein Browser unterstützt keinen Zugriff auf Ordner. Für das automatische Backup bitte <b>Chrome</b> oder <b>Edge</b> verwenden.</div>`;
+  } else {
+    auto = `
+      ${b.status === 'prompt' ? `<div class="note">Der Browser braucht nach dem Neuladen deine Bestätigung für den Backup-Ordner. <button class="sm" onclick="regrant()">Zugriff erlauben</button></div>` : ''}
+      <div class="row" style="margin-bottom:14px">
+        <div style="flex:1;min-width:200px"><label>Backup-Ordner</label>
+          <input value="${b.dir ? esc(b.dir.name) : 'kein Ordner gewählt'}" disabled></div>
+        <div><label>&nbsp;</label><button class="sec" onclick="waehleOrdner()">${b.dir ? 'Ordner ändern' : 'Ordner wählen'}</button></div>
+      </div>
+      <label class="check" style="margin-bottom:8px"><input type="checkbox" ${s.autoBackup ? 'checked' : ''} ${b.dir ? '' : 'disabled'} onchange="setAuto('autoBackup',this.checked)"> Automatisch sichern bei jeder Änderung</label>
+      <label class="check" style="margin-bottom:14px"><input type="checkbox" ${s.tageskopien ? 'checked' : ''} onchange="setAuto('tageskopien',this.checked)"> Zusätzlich eine Kopie pro Tag behalten (projekte-backup-JJJJ-MM-TT.json)</label>
+      <div class="row">
+        <button class="sec" ${b.status === 'granted' ? '' : 'disabled'} onclick="runAutoBackup(true).then(()=>toast('Backup im Ordner gespeichert.'))">Jetzt in Ordner sichern</button>
+        <span class="muted">${b.last ? 'Letztes Backup: ' + new Date(b.last).toLocaleString('de-CH') : 'Noch kein automatisches Backup erstellt.'}</span>
+      </div>`;
+  }
+  return `
+  <div class="card">
+    <h3>Manuelles Backup</h3>
+    <p class="muted" style="margin-top:0">Lädt alle Projekte, Termine und Einstellungen als JSON-Datei herunter. Mit «Importieren» stellst du ein Backup wieder her (die aktuellen Daten werden ersetzt).</p>
+    <div class="row">
+      <button onclick="exportJson()">Backup herunterladen</button>
+      <button class="sec" onclick="$('importFile').click()">Backup importieren</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Automatisches Backup</h3>
+    <p class="muted" style="margin-top:0">Speichert die Datei <b>projekte-backup-aktuell.json</b> automatisch in einen Ordner deiner Wahl, z.B. OneDrive oder ein Netzlaufwerk.</p>
+    ${auto}
+  </div>
+  <div class="card">
+    <h3>Daten</h3>
+    <p class="muted" style="margin-top:0">Die Daten liegen im Speicher dieses Browsers. Auf einem anderen Gerät sind sie nur über ein Backup verfügbar.</p>
+    <div class="muted">${state.projects.length} Projekte · ${state.projects.reduce((n, p) => n + p.termine.length, 0)} Termine</div>
+  </div>`;
+}
+function setAuto(k, v) { state.settings[k] = v; save(); render(); }
+
+// ---------- Backup ----------
+const backupJson = () => JSON.stringify(state, null, 2);
+function exportJson() {
+  const blob = new Blob([backupJson()], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `projekte-backup-${todayIso()}.json`; a.click(); URL.revokeObjectURL(a.href);
+}
+function importJson(input) {
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!Array.isArray(d.projects)) throw 0;
+      if (confirm(`${d.projects.length} Projekte importieren? Die aktuellen Daten werden ersetzt.`)) {
+        state = migrate(d); save(); nav('projekte'); toast('Backup importiert.');
+      }
+    } catch (e) { toast('Ungültige Backup-Datei.'); }
+    input.value = '';
+  };
+  r.readAsText(f);
+}
+
+// Ordner-Handle wird in IndexedDB gemerkt (localStorage kann das nicht)
+const idb = {
+  open: () => new Promise((res, rej) => {
+    const r = indexedDB.open('ckw-projekte', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }),
+  async get(k) { const db = await this.open(); return new Promise((res, rej) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+  async set(k, v) { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
+};
+const backup = { dir: null, status: 'showDirectoryPicker' in window ? 'none' : 'unsupported', last: null };
+try { backup.last = localStorage.getItem(KEY + '-lastbackup'); } catch (e) {}
+
+async function initBackup() {
+  if (backup.status === 'unsupported') return;
+  try {
+    const dir = await idb.get('dir');
+    if (!dir) return;
+    backup.dir = dir;
+    backup.status = (await dir.queryPermission({ mode: 'readwrite' })) === 'granted' ? 'granted' : 'prompt';
+    if (backup.status === 'granted') runAutoBackup();
+  } catch (e) {}
+  render();
+}
+async function waehleOrdner() {
+  try {
+    const dir = await window.showDirectoryPicker({ id: 'ckw-backup', mode: 'readwrite' });
+    backup.dir = dir; backup.status = 'granted';
+    await idb.set('dir', dir);
+    state.settings.autoBackup = true; save();
+    await runAutoBackup(true);
+    render(); toast(`Backup-Ordner «${dir.name}» gewählt.`);
+  } catch (e) { if (e.name !== 'AbortError') toast('Ordner konnte nicht gewählt werden.'); }
+}
+async function regrant() {
+  try { backup.status = (await backup.dir.requestPermission({ mode: 'readwrite' })) === 'granted' ? 'granted' : 'prompt'; } catch (e) {}
+  if (backup.status === 'granted') await runAutoBackup();
+  render();
+}
+async function writeFile(dir, name, text) {
+  const fh = await dir.getFileHandle(name, { create: true });
+  const w = await fh.createWritable(); await w.write(text); await w.close();
+}
+let abTimer;
+function scheduleAutoBackup() { clearTimeout(abTimer); abTimer = setTimeout(() => runAutoBackup(), 1500); }
+async function runAutoBackup(force) {
+  if (!backup.dir || backup.status !== 'granted' || (!S().autoBackup && !force)) return;
+  try {
+    const json = backupJson();
+    await writeFile(backup.dir, 'projekte-backup-aktuell.json', json);
+    if (S().tageskopien) await writeFile(backup.dir, `projekte-backup-${todayIso()}.json`, json);
+    backup.last = new Date().toISOString();
+    try { localStorage.setItem(KEY + '-lastbackup', backup.last); } catch (e) {}
+  } catch (e) {
+    backup.status = 'prompt'; toast('Automatisches Backup fehlgeschlagen – bitte Ordnerzugriff prüfen.');
+  }
+  renderSide();
+}
+
+// ---------- PDF ----------
+const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const LIME = [191, 214, 47];
+
+// Logo rechtsbündig bei xr (oder mittig, wenn mitte): hochgeladenes Bild, sonst nachgebaute CKW-Wortmarke
+function pdfLogo(doc, xr, yTop, h, mitte = false) {
+  const s = S();
+  if (s.logo && s.logoW && s.logoH) {
+    const w = h * s.logoW / s.logoH;
+    try { doc.addImage(s.logo, mitte ? xr - w / 2 : xr - w, yTop, w, h); return true; } catch (e) { /* weiter mit Wortmarke */ }
+  }
+  if (!/ckw/i.test(s.firma)) return false;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(h / (0.72 * 0.3528)); doc.setTextColor(0);
+  const r = h * 0.12, tw = doc.getTextWidth('CKW');
+  if (mitte) xr += (tw + 2 * r + h * 0.05) / 2;
+  doc.text('CKW', xr - 2 * r - h * 0.05 - tw, yTop + h);
+  doc.setFillColor(...LIME); doc.circle(xr - r, yTop + h - r, r, 'F');
+  return true;
+}
+
+function pdf(pid) {
+  const p = findP(pid), s = S();
+  const termine = sortTermine(p);
+  if (!termine.length) return toast('Keine Termine vorhanden.');
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const W = 297, H = 210, M = 12, BRAND = [24, 24, 27];
+  const ax = zeitachse(termine);
+  const kontakt = [s.telefon && 'Tel. ' + s.telefon, s.email].filter(Boolean);
+
+  // Kopf
+  doc.setFillColor(...LIME); doc.rect(0, 0, W, 2.5, 'F');
+  doc.setTextColor(29, 39, 51);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text('Terminplan', M, 15);
+  doc.setFontSize(12); doc.text(`Projekt ${p.nummer} – ${p.name}`, M, 22);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+  let ly = 28;
+  if (p.ort) { doc.text(`Ort: ${p.ort}`, M, ly); ly += 5; }
+  doc.text(`Projektleiter: ${s.name}   ·   Stand: ${fmt(todayIso())}`, M, ly);
+
+  // Logo oben rechts, darunter Firmenadresse
+  const mitLogo = pdfLogo(doc, W - M, 7, 8.5);
+  const ry = mitLogo ? 21 : 13;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(24, 24, 27);
+  doc.text(s.firma, W - M, ry, { align: 'right' });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(90, 90, 98);
+  const right = [s.strasse, s.ort, `Projektleiter: ${s.name}`, ...kontakt].filter(Boolean);
+  doc.text(right, W - M, ry + 4.2, { align: 'right' });
+  doc.setTextColor(24, 24, 27);
+
+  let y = Math.max(ly + 6, ry + 4.2 + right.length * 3.8 + 2);
+  if (p.bemerkung) {
+    const lines = doc.splitTextToSize(p.bemerkung, W - 2 * M);
+    doc.setFontSize(9); doc.setTextColor(90); doc.text(lines, M, y); y += lines.length * 4 + 2;
+    doc.setTextColor(29, 39, 51);
+  }
+
+  // Terminplan-Tabelle im Gantt-Stil, gruppiert nach Gewerk
+  const rows = ganttGruppen(p, termine).flatMap(gr => [{ gr }, ...gr.items.map(t => ({ t, g: gr.g }))]);
+  const LW = [66, 17, 17, 17], GCOL = 4;
+  const gW = W - 2 * M - LW.reduce((a, b) => a + b, 0), dW = gW / ax.tage, tagMode = dW >= 2.4;
+  const s0 = isoOf(ax.start), tIdx = diffDays(s0, todayIso());
+  const mix = (hex, f) => hexRgb(hex).map(c => Math.round(c + (255 - c) * f));
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M, top: 14, bottom: 16 },
+    head: [['Gewerk / Aufgabe', 'Fortschritt', 'Start', 'Ende', '']],
+    body: rows.map(r => {
+      if (r.gr) {
+        const g = r.gr.g;
+        return [{ content: `${g.name}${g.firma ? '  –  ' + g.firma : ''}   (${ARTEN[artOf(g)]})`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: mix(g.farbe, 0.72) } }, ''];
+      }
+      const t = r.t, fill = { fillColor: mix(r.g.farbe, 0.9) };
+      return [
+        { content: '   ' + (t.meilenstein ? '[MS] ' : '') + t.titel + (t.bemerkung ? '\n   ' + t.bemerkung : '') + (t.pl ? `\n   Projektleiter vor Ort${t.plZeit ? ' ab ' + t.plZeit : ''}` : ''), styles: fill },
+        { content: t.meilenstein ? '' : (t.fortschritt || 0) + ' %', styles: { ...fill, halign: 'right' } },
+        { content: fmt(t.start), styles: fill }, { content: fmt(t.ende), styles: fill }, ''];
+    }),
+    styles: { fontSize: 8, cellPadding: 1.4, valign: 'middle', lineColor: [221, 227, 234], lineWidth: 0.1, minCellHeight: 6.5 },
+    headStyles: { fillColor: BRAND, textColor: 255, fontStyle: 'bold', minCellHeight: tagMode ? 10 : 7 },
+    columnStyles: { 0: { cellWidth: LW[0] }, 1: { cellWidth: LW[1] }, 2: { cellWidth: LW[2] }, 3: { cellWidth: LW[3] }, 4: { cellWidth: gW, fillColor: [255, 255, 255] } },
+    didDrawCell: d => {
+      if (d.column.index !== GCOL) return;
+      const { x, y: cy, width: w, height: h } = d.cell;
+      if (d.section === 'head') {
+        const wh = tagMode ? h * 0.5 : h, lang = 7 * dW > 24, step = Math.max(1, Math.ceil(10 / (7 * dW)));
+        doc.setFontSize(6.5); doc.setTextColor(255); doc.setDrawColor(110, 120, 132); doc.setLineWidth(0.1);
+        ax.wochen.forEach((wk, i) => {
+          const wx = x + i * 7 * dW;
+          if (i) doc.line(wx, cy, wx, cy + h);
+          if (i % step === 0) doc.text(lang ? `KW ${kw(wk)} · ${fmt(isoOf(wk)).slice(0, 6)}` : 'KW' + kw(wk), wx + 0.8, cy + wh / 2 + 1.1);
+        });
+        if (tagMode) {
+          doc.setFontSize(5.5);
+          for (let i = 0; i < ax.tage; i++) {
+            const wd = (addDays(ax.start, i).getUTCDay() + 6) % 7;
+            doc.setTextColor(wd > 4 ? 140 : 225); doc.text('MDMDFSS'[wd], x + (i + 0.5) * dW, cy + h * 0.8, { align: 'center' });
+          }
+        }
+        return;
+      }
+      // Raster: Wochenenden grau, Tages- und Wochenlinien, Heute-Linie
+      doc.setFillColor(241, 243, 246);
+      for (let i = 5; i < ax.tage; i += 7) doc.rect(x + i * dW, cy, 2 * dW, h, 'F');
+      doc.setLineWidth(0.1);
+      if (tagMode) { doc.setDrawColor(233, 237, 241); for (let i = 1; i < ax.tage; i++) doc.line(x + i * dW, cy, x + i * dW, cy + h); }
+      doc.setDrawColor(200, 207, 215); for (let i = 7; i < ax.tage; i += 7) doc.line(x + i * dW, cy, x + i * dW, cy + h);
+      if (tIdx >= 0 && tIdx < ax.tage) { doc.setDrawColor(192, 57, 43); doc.setLineWidth(0.35); doc.line(x + (tIdx + 0.5) * dW, cy, x + (tIdx + 0.5) * dW, cy + h); }
+      const r = rows[d.row.index];
+      if (r.gr) {
+        doc.setFillColor(...mix(r.gr.g.farbe, 0.35));
+        doc.rect(x + diffDays(s0, r.gr.start) * dW, cy + h / 2 - 0.9, (diffDays(r.gr.start, r.gr.ende) + 1) * dW, 1.8, 'F');
+        return;
+      }
+      const t = r.t, c = hexRgb(r.g.farbe);
+      const bx = x + diffDays(s0, t.start) * dW, bh = Math.min(4, h - 2), by = cy + (h - bh) / 2;
+      if (t.meilenstein) {
+        const cx = bx + dW / 2, rr = 2.2, my = cy + h / 2;
+        doc.setFillColor(...c);
+        doc.triangle(cx - rr, my, cx, my - rr, cx + rr, my, 'F');
+        doc.triangle(cx - rr, my, cx, my + rr, cx + rr, my, 'F');
+      } else {
+        const bw = Math.max(0.8, (diffDays(t.start, t.ende) + 1) * dW - (tagMode ? 0.3 : 0));
+        doc.setFillColor(...c); doc.rect(bx, by, bw, bh, 'F');
+        const f = (t.fortschritt || 0) / 100;
+        if (f > 0) { doc.setFillColor(...c.map(v => Math.round(v * 0.6))); doc.rect(bx, by, bw * f, bh, 'F'); }
+      }
+      if (t.pl) {
+        doc.setFillColor(192, 57, 43); doc.setDrawColor(255); doc.setLineWidth(0.4);
+        doc.circle(bx + 0.6, by - 0.2, 1.3, 'FD');
+      }
+    }
+  });
+  // Legende
+  {
+    const ly2 = doc.lastAutoTable.finalY + 4;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(107, 119, 133);
+    let lx = M;
+    doc.setFillColor(150, 160, 170); doc.rect(lx, ly2 - 2.2, 6, 2.6, 'F'); doc.setFillColor(90, 96, 102); doc.rect(lx, ly2 - 2.2, 3, 2.6, 'F');
+    doc.text('dunkel = erledigter Anteil', lx + 7.5, ly2); lx += 44;
+    doc.setDrawColor(192, 57, 43); doc.setLineWidth(0.35); doc.line(lx + 1, ly2 - 2.8, lx + 1, ly2 + 0.6);
+    doc.text('Heute', lx + 3, ly2); lx += 16;
+    if (termine.some(t => t.pl)) {
+      doc.setFillColor(192, 57, 43); doc.circle(lx + 1.3, ly2 - 1, 1.3, 'F');
+      doc.text(`Projektleiter ${s.name} am ersten Tag vor Ort`, lx + 4, ly2);
+    }
+  }
+
+  // Beteiligte
+  const used = p.gewerke.filter(g => termine.some(t => t.gewerkId === g.id)).map(g => gewerk(p, g.id))
+    .sort((a, b) => (b.eigen ? 1 : 0) - (a.eigen ? 1 : 0));
+  y = doc.lastAutoTable.finalY + 12;
+  // Tabelle nicht zerreissen: passt sie nicht mehr ganz, auf neuer Seite beginnen
+  if (y + 12 + used.length * 6.5 > H - 16) { doc.addPage(); y = 18; }
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(29, 39, 51);
+  doc.text('Beteiligte Unternehmen', M, y);
+  doc.autoTable({
+    startY: y + 3, margin: { left: M, right: M, top: 14, bottom: 16 },
+    head: [['Gewerk', 'Ausführung', 'Firma', 'Adresse', 'Kontakt']],
+    body: used.map(g => [g.name, ARTEN[artOf(g)], g.firma || '–', g.adresse || '',
+      g.eigen ? [g.kontakt, g.kontakt !== s.name && 'PL: ' + s.name, ...kontakt].filter(Boolean).join('\n') : (g.kontakt || '')]),
+    styles: { fontSize: 8, cellPadding: 1.6, lineColor: [221, 227, 234], lineWidth: 0.1 },
+    headStyles: { fillColor: [241, 240, 235], textColor: BRAND, fontStyle: 'bold' },
+    didParseCell: d => { if (d.section === 'body' && used[d.row.index].eigen) d.cell.styles.fontStyle = 'bold'; },
+    didDrawCell: d => {
+      if (d.section === 'body' && d.column.index === 0) {
+        doc.setFillColor(...hexRgb(used[d.row.index].farbe));
+        doc.rect(d.cell.x, d.cell.y, 1.2, d.cell.height, 'F');
+      }
+    }
+  });
+
+  // Fusszeile auf jeder Seite
+  const n = doc.getNumberOfPages();
+  const fuss = [s.firma, s.strasse, s.ort, 'Projektleiter: ' + s.name, ...kontakt].filter(Boolean).join(' · ');
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(...LIME); doc.setLineWidth(0.6); doc.line(M, H - 11, W - M, H - 11);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(107, 119, 133);
+    doc.text(fuss, M, H - 7);
+    doc.text(`Projekt ${p.nummer} · Stand ${fmt(todayIso())} · Seite ${i} / ${n}`, W - M, H - 7, { align: 'right' });
+  }
+
+  doc.save(`Terminplan_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
+}
+
+render();
+initBackup();
+// Offline-Unterstützung und Installierbarkeit (nur über http/https, nicht als lokale Datei)
+if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
