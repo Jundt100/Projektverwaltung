@@ -317,6 +317,22 @@
   .side-user button { margin-top: 6px; }
   .collapsed .side-user { padding: 10px 0; text-align: center; }
   .collapsed .side-user .side-txt { display: none; }
+  /* Gewerk-Suche und Gewerk-Dialog */
+  .gw-wahl { position: relative; }
+  .gw-liste { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); max-height: 340px; overflow-y: auto; background: #fff;
+    border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 40px rgba(20, 20, 10, .14); padding: 6px; min-width: 300px; }
+  .gw-gruppe { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 8px 10px 4px; }
+  .gw-opt { display: flex; gap: 10px; align-items: flex-start; padding: 7px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+  .gw-opt .swatch { margin-top: 3px; }
+  .gw-opt .klein { font-size: 12px; margin-top: 1px; }
+  .gw-opt.aktiv { background: #f1f0eb; }
+  .gw-opt.gewaehlt b { color: var(--ok); }
+  .gw-opt mark { background: #eef5c4; color: inherit; border-radius: 3px; padding: 0 1px; }
+  .gw-neu { color: var(--text); font-weight: 600; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; margin-top: 4px; padding-top: 10px; }
+  .seg-breit { display: flex; width: 100%; }
+  .seg-breit button { flex: 1; padding: 8px 6px; }
+  .frage { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: #f6f8ea; border: 1px solid #e1eab5; }
+  @media (prefers-reduced-motion: no-preference) { .gw-liste:not([hidden]) { animation: aufgehen .18s cubic-bezier(.2, .8, .2, 1); } }
   .zeitfeld { display: flex; align-items: center; gap: 6px; }
   .zeitfeld input { min-width: 0; }
   .wk-zeit { display: block; font-size: 11px; color: var(--text); }
@@ -1005,7 +1021,9 @@ function morphHtml(el, html) {
   neu.innerHTML = html;
   morphKinder(el, neu);
 }
-const gleichArt = (a, b) => a.nodeType === b.nodeType && (a.nodeType !== 1 || (a.tagName === b.tagName && (a.id || '') === (b.id || '')));
+// data-form: wechselt der Wert, wird das Formular neu aufgebaut (z.B. nach dem Speichern leeren)
+const gleichArt = (a, b) => a.nodeType === b.nodeType && (a.nodeType !== 1 || (a.tagName === b.tagName && (a.id || '') === (b.id || '')
+  && a.getAttribute('data-form') === b.getAttribute('data-form')));
 function morphKinder(alt, neu) {
   const kinder = [...neu.childNodes];
   kinder.forEach((nk, i) => {
@@ -1020,16 +1038,19 @@ function morphKinder(alt, neu) {
 function morphElement(alt, neu) {
   const tag = alt.tagName, fokus = document.activeElement === alt;
   // Formularwerte vor dem Abgleich der Kinder merken (Optionen werden dabei verschoben)
+  // Eingaben des Nutzers bleiben erhalten, solange sich der gespeicherte Wert nicht geändert hat
+  const selAlt = tag === 'SELECT' ? [...alt.options].findIndex(o => o.hasAttribute('selected')) : -1;
   const selIdx = tag === 'SELECT' ? [...neu.options].findIndex(o => o.hasAttribute('selected')) : -1;
-  const taWert = tag === 'TEXTAREA' ? neu.textContent : null;
+  const taAlt = tag === 'TEXTAREA' ? alt.textContent : null, taWert = tag === 'TEXTAREA' ? neu.textContent : null;
+  const wertAlt = alt.getAttribute('value'), wertNeu = neu.getAttribute('value');
   for (const a of [...alt.attributes]) if (!neu.hasAttribute(a.name)) alt.removeAttribute(a.name);
   for (const a of [...neu.attributes]) if (alt.getAttribute(a.name) !== a.value) alt.setAttribute(a.name, a.value);
-  if (tag === 'TEXTAREA') { if (!fokus && alt.value !== taWert) alt.value = taWert; return; }
+  if (tag === 'TEXTAREA') { if (!fokus && taAlt !== taWert) { alt.textContent = taWert; alt.value = taWert; } return; }
   morphKinder(alt, neu);
   if (tag === 'INPUT') {
     if (alt.type === 'checkbox' || alt.type === 'radio') alt.checked = neu.hasAttribute('checked');
-    else if (alt.type !== 'file' && !fokus) { const v = neu.getAttribute('value') ?? ''; if (alt.value !== v) alt.value = v; }
-  } else if (tag === 'SELECT' && !fokus) alt.selectedIndex = selIdx >= 0 ? selIdx : 0;
+    else if (alt.type !== 'file' && !fokus && wertAlt !== wertNeu) alt.value = wertNeu ?? '';
+  } else if (tag === 'SELECT' && !fokus && selAlt !== selIdx) alt.selectedIndex = selIdx >= 0 ? selIdx : 0;
 }
 // Zahlen beim Öffnen einer Ansicht hochzählen
 function zaehlerStarten(wurzel) {
@@ -1492,11 +1513,11 @@ function vorlageSelect(g, attr) {
   return `<select ${attr}><option value="keine" ${akt ? '' : 'selected'}>– keine –</option>
     ${[...new Set([...namen, akt].filter(Boolean))].map(n => `<option value="${esc(n)}" ${n === akt ? 'selected' : ''}>✉ ${esc(n)}</option>`).join('')}</select>`;
 }
-function mailFuellen(p, v) {
+function mailFuellen(p, v, gid) {
   const s = S(), sp = span(p);
-  // zuerst das Gewerk, an dem die Vorlage direkt verknüpft ist, sonst über den Gewerk-Namen der Vorlage
+  // gewähltes Gewerk, sonst das mit der Vorlage verknüpfte, sonst über den Gewerk-Namen der Vorlage
   const alle = p.gewerke.map(x => gewerk(p, x.id));
-  const g = alle.find(x => (x.mailvorlage || '').toLowerCase() === v.name.toLowerCase()) || alle.find(x => effektiveVorlage(x) === v.name) || null;
+  const g = (gid && alle.find(x => x.id === gid)) || alle.find(x => (x.mailvorlage || '').toLowerCase() === v.name.toLowerCase()) || alle.find(x => effektiveVorlage(x) === v.name) || null;
   const gt = g ? sortTermine(p).filter(t => t.gewerkId === g.id) : [];
   const von = t => (t.start === t.ende ? fmtLong(t.start) : `${fmtLong(t.start)} – ${fmtLong(t.ende)}`) + (zeitTxt(t) ? ', ' + zeitTxt(t) : '');
   const vars = {
@@ -1505,31 +1526,40 @@ function mailFuellen(p, v) {
     termin: gt[0] ? von(gt[0]) : '', termine: gt.map(t => `- ${t.titel}: ${von(t)}`).join('\n'),
     baustart_datum: sp ? fmt(sp.start) : '', bauende_datum: sp ? fmt(sp.ende) : '', ibn_datum: ibnDatum(p),
     elektriker_extern: (() => { const e = alle.find(x => /elektr/i.test(x.name) && artOf(x) !== 'intern'); return e ? [e.firma, e.kontakt].filter(Boolean).join(', ') : ''; })(),
-    gewerk: g?.name || '', gewerk_firma: g?.firma || '', gewerk_kontakt: g?.kontakt || '',
+    gewerk: g?.name || '', gewerk_firma: g?.firma || '', gewerk_kontakt: g?.kontakt || '', gewerk_telefon: g?.telefon || '',
     pl: s.name, pl_telefon: s.telefon, pl_mail: s.email, firma: s.firma,
     signatur: [s.name, 'Projektleiter', s.firma, s.strasse, s.ort, s.telefon && 'Tel. ' + s.telefon, s.email].filter(Boolean).join('\n')
   };
   const fill = t => String(t || '').replace(/\{(\w+)\}/g, (m, k) => k in vars ? vars[k] : m).replace(/[ \t]+$/gm, '');
-  return { an: fill(v.an) || g?.email || '', betreff: fill(v.betreff), text: fill(v.text), g, gt, sp };
+  // Kontakt des Gewerks kommt automatisch ins «An», z.B. "Herr Müller <info@mueller.ch>"
+  const anGewerk = g?.email ? (g.kontakt ? `${g.kontakt} <${g.email}>` : g.email) : '';
+  return { an: fill(v.an) || anGewerk, betreff: fill(v.betreff), text: fill(v.text), g, gt, sp };
 }
 let mailPunkt = null; // { pid, node } des Checklisten-Punkts, zu dem der Mail-Dialog offen ist
-function mailDialog(pid, i) {
-  const p = findP(pid), node = chkKeys[i], name = node.mail;
+function mailDialog(pid, i) { mailOeffnen(pid, chkKeys[i].mail, chkKeys[i]); }
+// Mail direkt aus einem Gewerk (ohne Checklisten-Punkt)
+function gewerkMail(pid, gid) {
+  const p = findP(pid), name = effektiveVorlage(gewerk(p, gid));
+  if (!name) return toast('Für dieses Gewerk ist keine Mailvorlage gewählt – unter «Bearbeiten» eine wählen oder neu anlegen.');
+  mailOeffnen(pid, name, null, gid);
+}
+function mailOeffnen(pid, name, node, gid) {
+  const p = findP(pid);
   const v = S().mailvorlagen.find(m => m.name.toLowerCase() === name.toLowerCase());
   if (!v) return toast(`Mailvorlage «${name}» nicht gefunden – unter Einstellungen → Mailvorlagen anlegen.`);
-  const punkt = mailPunkt = { pid, node };
-  const m = mailFuellen(p, v), d = $('dlg');
+  const punkt = mailPunkt = node ? { pid, node } : null;
+  const m = mailFuellen(p, v, gid), d = $('dlg');
   const hinweis = [
     v.gewerk && !m.g ? `Das Gewerk «${esc(v.gewerk)}» ist in diesem Projekt nicht vorhanden.` : '',
     m.g && !m.gt.length ? `«${esc(m.g.name)}» hat noch keinen Termin im Terminplan – Termin bitte selbst eintragen.` : '',
     !m.sp && /\{baustart\}/.test(v.text) ? 'Der Baustart ist noch nicht im Terminplan.' : '',
     !m.an ? 'Keine E-Mail-Adresse hinterlegt (beim Gewerk eintragen).' : ''
   ].filter(Boolean);
-  const erledigt = chkDone(p, node);
+  const erledigt = node && chkDone(p, node);
   d.style.width = 'min(680px, calc(100vw - 32px))';
   d.innerHTML = `<h2>✉ ${esc(v.name)}</h2>
-    <p class="muted" style="margin-top:0">Aus dem Terminplan von ${esc(p.nummer)} ${esc(p.name)} ausgefüllt. Text anpassen, kopieren und im Mail einfügen.
-      Beim Kopieren wird «${esc(node.label)}» in der Checkliste abgehakt${erledigt ? ' (ist bereits erledigt)' : ''}.</p>
+    <p class="muted" style="margin-top:0">Aus dem Terminplan von ${esc(p.nummer)} ${esc(p.name)} ausgefüllt${m.g ? ` · an <b>${esc(gwLabel(m.g))}</b>` : ''}. Text anpassen, kopieren und im Mail einfügen.
+      ${node ? `Beim Kopieren wird «${esc(node.label)}» in der Checkliste abgehakt${erledigt ? ' (ist bereits erledigt)' : ''}.` : ''}</p>
     ${hinweis.length ? `<div class="note">${hinweis.join('<br>')}</div>` : ''}
     <label>An</label><div class="copyrow"><input id="m-an" value="${esc(m.an)}" placeholder="E-Mail-Adresse (beim Gewerk hinterlegen)"><button class="sec sm" onclick="kopiere($('m-an').value)">Kopieren</button></div>
     <label>Betreff</label><div class="copyrow"><input id="m-betreff" value="${esc(m.betreff)}"><button class="sec sm" onclick="kopiere($('m-betreff').value)">Kopieren</button></div>
@@ -1540,7 +1570,7 @@ function mailDialog(pid, i) {
     </div>`;
   d.onkeydown = null;
   d.showModal();
-  d.addEventListener('close', () => { d.style.width = ''; if (mailPunkt === punkt) mailPunkt = null; }, { once: true });
+  d.addEventListener('close', () => { d.style.width = ''; if (punkt && mailPunkt === punkt) mailPunkt = null; }, { once: true });
 }
 // Checklisten-Punkt abhaken, sobald die Mail kopiert bzw. geöffnet wurde
 function mailVersendet() {
@@ -1915,12 +1945,18 @@ function chkEditor(pid) {
 function viewTermine(p) {
   const t = ui.editTermin ? p.termine.find(x => x.id === ui.editTermin) : null;
   const termine = sortTermine(p);
+  const gwSel = t && p.gewerke.some(g => g.id === t.gewerkId) ? gewerk(p, t.gewerkId) : null;
   return `
-  <div class="card">
+  <div class="card" data-form="termin:${ui.editTermin || 'neu'}:${ui.formNr || 0}">
     <h3>${t ? 'Termin bearbeiten' : 'Termin hinzufügen'}</h3>
     <div class="grid">
-      <div><label>Gewerk *</label><select id="t-gw">${p.gewerke.map(g0 => { const g = gewerk(p, g0.id);
-        return `<option value="${g.id}" ${t && t.gewerkId === g.id ? 'selected' : ''}>${esc(g.name)} (${artKurz(g)})${!g.eigen && g.firma ? ' – ' + esc(g.firma) : ''}</option>`; }).join('')}</select></div>
+      <div><label>Gewerk *</label>
+        <div class="gw-wahl">
+          <input type="hidden" id="t-gw" value="${gwSel ? gwSel.id : ''}">
+          <input id="t-gw-suche" autocomplete="off" value="${esc(gwSel ? gwLabel(gwSel) : '')}" placeholder="Gewerk, Firma oder Kontakt suchen …"
+            onfocus="this.select();gwListe(true)" oninput="$('t-gw').value='';gwListe(true)" onkeydown="gwTaste(event)" onblur="setTimeout(()=>gwListe(false),180)">
+          <div class="gw-liste" id="gw-liste" hidden></div>
+        </div></div>
       <div><label>Tätigkeit *</label><input id="t-titel" value="${esc(t?.titel)}" placeholder="z.B. Rohinstallation EG"></div>
       <div><label>Start *</label><input type="date" id="t-start" value="${t?.start || ''}"></div>
       <div><label>Ende *</label><input type="date" id="t-ende" value="${t?.ende || ''}"></div>
@@ -1984,6 +2020,71 @@ function monatsAbschnitte(ax) {
   }
   return out;
 }
+// ---------- Gewerk-Suche im Terminformular ----------
+const gwLabel = g => [g.name, g.firma, g.kontakt].filter(Boolean).join(' · ');
+let gwTreffer = [], gwAktiv = 0;
+function gwListe(offen) {
+  const L = $('gw-liste'), inp = $('t-gw-suche');
+  if (!L || !inp) return;
+  if (!offen) { L.hidden = true; return; }
+  const p = findP(route().id), gewaehlt = $('t-gw').value;
+  // ist ein Gewerk gewählt und der Text unverändert, alle zeigen
+  const sel = gewaehlt && p.gewerke.some(g => g.id === gewaehlt) ? gewerk(p, gewaehlt) : null;
+  const q = sel && inp.value === gwLabel(sel) ? '' : inp.value.trim().toLowerCase();
+  const woerter = q.split(/\s+/).filter(Boolean);
+  const passt = g => { const t = [g.name, g.firma, g.kontakt, g.telefon, g.email, g.adresse, ARTEN[artOf(g)]].join(' ').toLowerCase(); return woerter.every(w => t.includes(w)); };
+  const hl = s => { let h = esc(s || ''); woerter.forEach(w => { h = h.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>'); }); return h; };
+  gwTreffer = [];
+  let html = '';
+  GW_ARTEN.forEach(([art, titel]) => {
+    const liste = p.gewerke.map(g => gewerk(p, g.id)).filter(g => artOf(g) === art && passt(g));
+    if (!liste.length) return;
+    html += `<div class="gw-gruppe">${titel}</div>` + liste.map(g => {
+      const i = gwTreffer.push(g.id) - 1;
+      return `<div class="gw-opt ${g.id === gewaehlt ? 'gewaehlt' : ''}" data-i="${i}" onmousedown="event.preventDefault();gwWaehlen('${g.id}')">
+        <span class="swatch" style="background:${g.farbe}"></span>
+        <div style="min-width:0"><b>${hl(g.name)}</b>${g.firma ? ` <span class="muted">· ${hl(g.firma)}</span>` : ''}
+          ${g.kontakt || g.telefon || g.email ? `<div class="muted klein">${[g.kontakt && '👤 ' + hl(g.kontakt), g.telefon && '☎ ' + hl(g.telefon), g.email && hl(g.email)].filter(Boolean).join(' · ')}</div>` : ''}</div></div>`;
+    }).join('');
+  });
+  const neuIdx = gwTreffer.push('__neu') - 1;
+  html += `<div class="gw-opt gw-neu" data-i="${neuIdx}" onmousedown="event.preventDefault();gwNeu()">＋ Neues Gewerk${q ? ` «${esc(inp.value.trim())}»` : ''} anlegen</div>`;
+  if (gwTreffer.length === 1) html = `<div class="muted" style="padding:10px 12px">Kein Gewerk gefunden.</div>` + html;
+  L.innerHTML = html;
+  gwAktiv = Math.min(gwAktiv, gwTreffer.length - 1);
+  if (q) gwAktiv = 0;
+  gwMarkieren();
+  L.hidden = false;
+}
+function gwMarkieren() {
+  document.querySelectorAll('#gw-liste .gw-opt').forEach(el => el.classList.toggle('aktiv', +el.dataset.i === gwAktiv));
+  document.querySelector('#gw-liste .gw-opt.aktiv')?.scrollIntoView({ block: 'nearest' });
+}
+function gwTaste(e) {
+  const L = $('gw-liste');
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (L.hidden) return gwListe(true);
+    gwAktiv = (gwAktiv + (e.key === 'ArrowDown' ? 1 : -1) + gwTreffer.length) % gwTreffer.length;
+    gwMarkieren();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const id = gwTreffer[gwAktiv];
+    if (id === '__neu') gwNeu(); else if (id) gwWaehlen(id);
+  } else if (e.key === 'Escape') L.hidden = true;
+}
+function gwWaehlen(id) {
+  const p = findP(route().id), g = p && p.gewerke.some(x => x.id === id) && gewerk(p, id);
+  if (!g || !$('t-gw')) return;
+  $('t-gw').value = id; $('t-gw-suche').value = gwLabel(g);
+  $('gw-liste').hidden = true;
+  $('t-titel').focus();
+}
+function gwNeu() {
+  $('gw-liste').hidden = true;
+  gewerkDialog(route().id, null, { name: $('t-gw-suche').value.trim(), ausSuche: true });
+}
+
 // Termine nach Gewerk gruppiert, Gruppen in der Reihenfolge ihres ersten Termins
 function ganttGruppen(p, termine) {
   const map = new Map();
@@ -2041,12 +2142,14 @@ function speichereTermin(pid) {
   if (d.meilenstein && d.start && !d.ende) d.ende = d.start;
   // mit Abhängigkeit genügt die Dauer: fehlender Start wird berechnet
   if (d.nach && !d.start) { d.start = d.ende || todayIso(); if (!d.ende) d.ende = d.start; }
-  if (!d.gewerkId || !d.titel || !d.start || !d.ende) return toast('Bitte Gewerk, Tätigkeit, Start und Ende ausfüllen.');
+  if (!d.gewerkId) { toast('Bitte ein Gewerk aus der Liste wählen oder neu anlegen.'); return $('t-gw-suche').focus(); }
+  if (!d.titel || !d.start || !d.ende) return toast('Bitte Tätigkeit, Start und Ende ausfüllen.');
   if (d.ende < d.start) return toast('Das Ende liegt vor dem Start.');
   if (ui.editTermin) Object.assign(p.termine.find(x => x.id === ui.editTermin), d);
   else p.termine.push({ id: uid(), ...d });
   const n = verschiebeAbhaengige(p);
-  ui.editTermin = null; save(); render(); toast(n ? `Termin gespeichert · ${n} abhängige Termine angepasst.` : 'Termin gespeichert.');
+  ui.editTermin = null; ui.formNr = (ui.formNr || 0) + 1; // Formular danach leeren
+  save(); render(); toast(n ? `Termin gespeichert · ${n} abhängige Termine angepasst.` : 'Termin gespeichert.');
 }
 function loescheTermin(pid, tid) {
   if (!confirm('Termin löschen?')) return;
@@ -2090,66 +2193,123 @@ function verschiebeAbhaengige(p) {
 }
 
 // ---------- Gewerke ----------
+const GW_ARTEN = [['intern', 'CKW (intern)'], ['sub', 'Subunternehmer'], ['extern', 'Extern']];
 function viewGewerke(p) {
-  const raw = ui.editGewerk ? p.gewerke.find(x => x.id === ui.editGewerk) : null;
-  const g = raw && gewerk(p, raw.id), own = !!raw?.eigen, art = raw ? artOf(raw) : 'extern';
-  const dis = own ? 'disabled' : '';
   const fehlend = S().standardGewerke.filter(s => !p.gewerke.some(x => x.std === s.sid));
   return `
   <div class="card">
-    <h3>${g ? 'Gewerk bearbeiten' : 'Gewerk hinzufügen'}</h3>
-    <div class="grid">
-      <div><label>Gewerk *</label><input id="g-name" value="${esc(g?.name)}" placeholder="z.B. Fensterbau"></div>
-      <div><label>Montage durch</label><select id="g-seite" onchange="toggleSeite()">
-        <option value="extern" ${art === 'extern' ? 'selected' : ''}>Extern (andere Firma)</option>
-        <option value="sub" ${art === 'sub' ? 'selected' : ''}>Subunternehmer (in unserem Auftrag)</option>
-        <option value="intern" ${art === 'intern' ? 'selected' : ''}>Intern (${esc(S().firma)})</option></select></div>
-      <div><label id="g-firma-l">${art === 'sub' ? 'Firma Subunternehmer' : 'Firma'}</label><input id="g-firma" value="${esc(own ? S().firma : g?.firma)}" data-ext="${esc(own ? '' : g?.firma)}" ${dis}></div>
-      <div><label>Adresse</label><input id="g-adr" value="${esc(g?.adresse)}" data-ext="${esc(own ? '' : g?.adresse)}" ${dis}></div>
-      <div><label id="g-kontakt-l">${own ? 'Verantwortlich / Chefmonteur' : 'Kontaktperson / Telefon'}</label><input id="g-kontakt" value="${esc(g?.kontakt)}"></div>
-      <div><label>E-Mail (für Mailvorlagen)</label><input id="g-mail" type="email" value="${esc(g?.email || '')}"></div>
-      <div><label>Mailvorlage</label>${vorlageSelect(g || { name: '', mailvorlage: 'keine' }, 'id="g-vorlage"')}</div>
-      <div><label>Farbe ${g ? '' : '(freie Farbe vorgeschlagen)'}</label><input type="color" id="g-farbe" value="${g?.farbe || freieFarbe(p.gewerke.map(x => x.farbe))}"></div>
-    </div>
-    <div class="muted" id="g-hint" style="margin-top:8px;${own ? '' : 'display:none'}">Firma und Adresse kommen bei internen Gewerken aus den Einstellungen.</div>
-    <div class="row" style="margin-top:12px">
-      <button onclick="speichereGewerk('${p.id}')">${g ? 'Änderungen speichern' : 'Hinzufügen'}</button>
-      ${g ? `<button class="sec" onclick="ui.editGewerk=null;render()">Abbrechen</button>` : ''}
+    <div class="ck-head">
+      <div><h3 style="margin:0">Gewerke</h3><span class="muted">${p.gewerke.length} Gewerke · Standard-Gewerke sind mit ★ markiert</span></div>
+      <button onclick="gewerkDialog('${p.id}')">＋ Gewerk hinzufügen</button>
     </div>
   </div>
   ${fehlend.length ? `<div class="note">${fehlend.length} Standard-Gewerke fehlen in diesem Projekt (${fehlend.map(s => esc(s.name) + ' ' + artKurz(s)).join(', ')}).
     <button class="sm" onclick="ergaenzeStandard('${p.id}')">Ergänzen</button></div>` : ''}
-  <div class="card"><div class="table-wrap"><table>
-    <tr><th>Gewerk</th><th>Firma</th><th>Adresse</th><th>Kontakt</th><th>Termine</th><th></th></tr>
-    ${p.gewerke.map(r => { const x = gewerk(p, r.id); return `<tr>
-      <td><span class="swatch" style="background:${x.farbe}"></span>${esc(x.name)}${seiteTag(x)}</td>
-      <td>${esc(x.firma)}</td><td class="muted">${esc(x.adresse)}</td><td class="muted">${esc(x.kontakt)}${x.email ? '<br>' + esc(x.email) : ''}${effektiveVorlage(x) ? `<br><span class="tag-wichtig" style="margin:0">✉ ${esc(effektiveVorlage(x))}</span>` : ''}</td>
-      <td>${p.termine.filter(t => t.gewerkId === x.id).length}</td>
-      <td style="white-space:nowrap"><button class="sec sm" onclick="ui.editGewerk='${x.id}';render();scrollTo(0,0)">Bearbeiten</button>
-        ${x.fix ? '' : `<button class="danger sm" onclick="loescheGewerk('${p.id}','${x.id}')">✕</button>`}</td></tr>`; }).join('')}
-  </table></div></div>`;
+  ${GW_ARTEN.map(([art, titel]) => {
+    const liste = p.gewerke.map(r => gewerk(p, r.id)).filter(x => artOf(x) === art);
+    if (!liste.length) return '';
+    return `<div class="card"><h3>${titel} <span class="muted" style="font-weight:400">· ${liste.length}</span></h3><div class="table-wrap"><table>
+      <tr><th>Gewerk</th><th>Firma</th><th>Kontaktperson</th><th>Telefon / E-Mail</th><th>Ort</th><th>Termine</th><th></th></tr>
+      ${liste.map(x => `<tr class="click" onclick="gewerkDialog('${p.id}','${x.id}')">
+        <td><span class="swatch" style="background:${x.farbe}"></span>${x.std ? '<span title="Standard-Gewerk" style="color:var(--bar)">★</span> ' : ''}${esc(x.name)}
+          ${effektiveVorlage(x) ? `<div><span class="tag-wichtig" style="margin:0">✉ ${esc(effektiveVorlage(x))}</span></div>` : ''}</td>
+        <td>${esc(x.firma)}</td><td>${esc(x.kontakt)}</td>
+        <td class="muted">${x.telefon ? `<a href="tel:${esc(x.telefon)}" onclick="event.stopPropagation()">${esc(x.telefon)}</a>` : ''}${x.telefon && x.email ? '<br>' : ''}${x.email ? `<a href="mailto:${esc(x.email)}" onclick="event.stopPropagation()">${esc(x.email)}</a>` : ''}</td>
+        <td class="muted">${esc(x.adresse)}</td>
+        <td>${p.termine.filter(t => t.gewerkId === x.id).length}</td>
+        <td style="white-space:nowrap" onclick="event.stopPropagation()">
+          ${effektiveVorlage(x) ? `<button class="sec sm" title="Mail an dieses Gewerk" onclick="gewerkMail('${p.id}','${x.id}')">✉</button>` : ''}
+          <button class="sec sm" onclick="gewerkDialog('${p.id}','${x.id}')">Bearbeiten</button>
+          ${x.fix ? '' : `<button class="danger sm" onclick="loescheGewerk('${p.id}','${x.id}')">✕</button>`}</td></tr>`).join('')}
+    </table></div></div>`;
+  }).join('')}`;
 }
 function ergaenzeStandard() { stdAbgleich(state); save(); render(); toast('Standard-Gewerke ergänzt.'); }
-function toggleSeite() {
-  const intern = $('g-seite').value === 'intern';
-  $('g-firma-l').textContent = $('g-seite').value === 'sub' ? 'Firma Subunternehmer' : 'Firma';
-  ['g-firma', 'g-adr'].forEach(id => { const el = $(id); el.disabled = intern; });
-  $('g-firma').value = intern ? S().firma : $('g-firma').dataset.ext;
-  $('g-adr').value = intern ? [S().strasse, S().ort].filter(Boolean).join(', ') : $('g-adr').dataset.ext;
-  $('g-kontakt-l').textContent = intern ? 'Verantwortlich / Chefmonteur' : 'Kontaktperson / Telefon';
-  $('g-hint').style.display = intern ? '' : 'none';
+
+// ---------- Gewerk-Dialog (aus dem Reiter Gewerke und direkt aus der Terminplanung) ----------
+function gewerkDialog(pid, gid, opt = {}) {
+  const p = findP(pid), raw = gid ? p.gewerke.find(x => x.id === gid) : null, g = raw ? gewerk(p, gid) : null, d = $('dlg');
+  const art = raw ? artOf(raw) : 'extern';
+  const name = raw ? raw.name : (opt.name || '');
+  ui.gwDlg = { pid, gid, art, ausSuche: !!opt.ausSuche };
+  const namen = S().mailvorlagen.map(m => m.name), akt = g ? effektiveVorlage(g) : '';
+  d.style.width = 'min(760px, calc(100vw - 24px))';
+  d.innerHTML = `<h2>${raw ? 'Gewerk bearbeiten' : 'Neues Gewerk'}</h2>
+    <div class="grid">
+      <div><label>Gewerk *</label><input id="g-name" value="${esc(name)}" placeholder="z.B. Kernbohrer"></div>
+      <div><label>Firma</label><div class="seg seg-breit" id="g-art">${[['intern', 'CKW'], ['extern', 'Extern'], ['sub', 'Subunternehmer']].map(([k, l]) =>
+        `<button type="button" data-art="${k}" class="${art === k ? 'on' : ''}" onclick="gwArt('${k}')">${l}</button>`).join('')}</div></div>
+      <div><label id="g-firma-l">Firmenname</label><input id="g-firma" value="${esc(raw?.firma || '')}" placeholder="z.B. Müller AG"></div>
+      <div><label>Kontaktperson</label><input id="g-kontakt" value="${esc(raw?.kontakt || '')}" placeholder="z.B. Herr Müller"></div>
+      <div><label>Telefon (optional)</label><input id="g-tel" type="tel" value="${esc(raw?.telefon || '')}" placeholder="+41 …"></div>
+      <div><label>E-Mail</label><input id="g-mail" type="email" value="${esc(raw?.email || '')}" placeholder="name@firma.ch"></div>
+      <div><label>Ort / Adresse</label><input id="g-adr" value="${esc(raw?.adresse || '')}" placeholder="Strasse, PLZ Ort"></div>
+      <div><label>Mailvorlage</label><select id="g-vorlage">
+        <option value="keine" ${akt ? '' : 'selected'}>– keine –</option>
+        ${namen.map(n => `<option value="${esc(n)}" ${n === akt ? 'selected' : ''}>✉ ${esc(n)}</option>`).join('')}
+        <option value="__neu">＋ Neue Vorlage für dieses Gewerk</option></select></div>
+      <div><label>Farbe</label><input type="color" id="g-farbe" value="${raw?.farbe || freieFarbe(p.gewerke.map(x => x.farbe))}"></div>
+    </div>
+    <div class="muted" id="g-hint" style="margin-top:8px"></div>
+    ${raw?.std ? '<div class="muted" style="margin-top:10px">★ Standard-Gewerk – Änderungen hier gelten nur für dieses Projekt.</div>' : `
+    <div class="frage">
+      <b>Soll dieses Gewerk in die Standard-Gewerke übernommen werden?</b>
+      <div class="row" style="margin-top:8px">
+        <label class="check"><input type="radio" name="g-std" value="nein" checked> Nein, nur in diesem Projekt</label>
+        <label class="check"><input type="radio" name="g-std" value="ja"> Ja, für alle Projekte</label>
+      </div>
+    </div>`}
+    <div class="row" style="margin-top:16px;justify-content:flex-end">
+      <button class="sec" onclick="$('dlg').close()">Abbrechen</button>
+      <button onclick="gewerkSpeichern()">${raw ? 'Speichern' : 'Hinzufügen'}</button>
+    </div>`;
+  d.onkeydown = e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); gewerkSpeichern(); } };
+  if (!d.open) d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; }, { once: true });
+  gwArt(art);
+  setTimeout(() => $(name ? 'g-firma' : 'g-name')?.focus(), 30);
 }
-function speichereGewerk(pid) {
-  const p = findP(pid);
-  const raw = ui.editGewerk && p.gewerke.find(x => x.id === ui.editGewerk);
-  const art = $('g-seite').value, intern = art === 'intern';
-  const d = intern
-    ? { name: val('g-name'), kontakt: val('g-kontakt'), email: val('g-mail'), mailvorlage: val('g-vorlage'), farbe: $('g-farbe').value, art, eigen: true, firma: '', adresse: '' }
-    : { name: val('g-name'), firma: val('g-firma'), adresse: val('g-adr'), kontakt: val('g-kontakt'), email: val('g-mail'), mailvorlage: val('g-vorlage'), farbe: $('g-farbe').value, art, eigen: false };
-  if (!d.name) return toast('Bitte einen Gewerk-Namen eingeben.');
-  if (raw) Object.assign(raw, d);
-  else p.gewerke.push({ id: uid(), ...d });
-  ui.editGewerk = null; save(); render(); toast('Gewerk gespeichert.');
+// CKW: Firma und Adresse kommen aus den Einstellungen
+function gwArt(art) {
+  ui.gwDlg.art = art;
+  document.querySelectorAll('#g-art button').forEach(b => b.classList.toggle('on', b.dataset.art === art));
+  const intern = art === 'intern', f = $('g-firma'), a = $('g-adr');
+  if (intern) { f.dataset.alt = f.disabled ? f.dataset.alt : f.value; a.dataset.alt = a.disabled ? a.dataset.alt : a.value; f.value = S().firma; a.value = [S().strasse, S().ort].filter(Boolean).join(', '); }
+  else if (f.disabled) { f.value = f.dataset.alt || ''; a.value = a.dataset.alt || ''; }
+  f.disabled = a.disabled = intern;
+  $('g-firma-l').textContent = art === 'sub' ? 'Firma Subunternehmer' : 'Firmenname';
+  $('g-hint').textContent = intern ? 'Montage durch uns – Firma und Adresse kommen aus den Einstellungen. Als Kontaktperson z.B. den Chefmonteur eintragen.' : '';
+}
+// legt eine Mailvorlage für ein Gewerk an und gibt ihren Namen zurück
+function neueVorlageFuer(gewerkName) {
+  const L = S().mailvorlagen;
+  let name = `${gewerkName} anfragen`, n = 2;
+  while (L.some(m => m.name.toLowerCase() === name.toLowerCase())) name = `${gewerkName} anfragen ${n++}`;
+  L.push({ name, gewerk: gewerkName, an: '', betreff: `${gewerkName} {projektnummer} {projekt}, {ort}`,
+    text: `Guten Tag {gewerk_kontakt}\n\nFür unser Projekt {projektnummer} {projekt} in {ort} benötigen wir Sie für folgende Arbeiten:\n\n{termine}\n\nBitte bestätigen Sie mir die Termine kurz.\n` });
+  return name;
+}
+function gewerkSpeichern() {
+  const { pid, gid, art, ausSuche } = ui.gwDlg, p = findP(pid), intern = art === 'intern';
+  const name = val('g-name');
+  if (!name) { toast('Bitte einen Gewerk-Namen eingeben.'); return $('g-name').focus(); }
+  let vorlage = $('g-vorlage').value, neueVorlage = false;
+  if (vorlage === '__neu') { vorlage = neueVorlageFuer(name); neueVorlage = true; }
+  const daten = { name, art, eigen: intern, firma: intern ? '' : val('g-firma'), adresse: intern ? '' : val('g-adr'), kontakt: val('g-kontakt'),
+    telefon: val('g-tel'), email: val('g-mail'), farbe: $('g-farbe').value, mailvorlage: vorlage };
+  let g = gid && p.gewerke.find(x => x.id === gid);
+  if (g) Object.assign(g, daten); else { g = { id: uid(), ...daten }; p.gewerke.push(g); }
+  let meldung = gid ? 'Gewerk gespeichert' : 'Gewerk hinzugefügt';
+  if (document.querySelector('input[name=g-std]:checked')?.value === 'ja' && !g.std) {
+    const { id, std, fix, ...rest } = g, sid = uid();
+    S().standardGewerke.push({ ...rest, sid });
+    g.std = sid; g.fix = true;
+    const n = stdAbgleich(state);
+    meldung += ` · als Standard-Gewerk übernommen${n ? ' (' + inProjekten(n) + ')' : ''}`;
+  }
+  if (neueVorlage) meldung += ` · Mailvorlage «${vorlage}» angelegt`;
+  save(); $('dlg').close(); render(); toast(meldung + '.');
+  if (ausSuche) gwWaehlen(g.id);
 }
 function loescheGewerk(pid, gid) {
   const p = findP(pid);
@@ -2349,7 +2509,7 @@ function viewMails() {
     <h3>Mailvorlagen</h3>
     <p class="muted" style="margin-top:0">In der Checkliste erscheint bei verknüpften Punkten ein <b>✉ Mail</b>-Knopf. Die Platzhalter werden mit den Projektdaten gefüllt:
       <code>{projektnummer}</code> <code>{projekt}</code> <code>{ort}</code> <code>{baustart}</code> <code>{bauende}</code> <code>{termin}</code> <code>{termine}</code>
-      <code>{gewerk}</code> <code>{gewerk_firma}</code> <code>{gewerk_kontakt}</code> <code>{pl}</code> <code>{pl_telefon}</code> <code>{pl_mail}</code> <code>{firma}</code> <code>{signatur}</code> <code>{baustart_datum}</code> <code>{bauende_datum}</code> <code>{ibn_datum}</code> <code>{elektriker_extern}</code>.
+      <code>{gewerk}</code> <code>{gewerk_firma}</code> <code>{gewerk_kontakt}</code> <code>{gewerk_telefon}</code> <code>{pl}</code> <code>{pl_telefon}</code> <code>{pl_mail}</code> <code>{firma}</code> <code>{signatur}</code> <code>{baustart_datum}</code> <code>{bauende_datum}</code> <code>{ibn_datum}</code> <code>{elektriker_extern}</code>.
       <b>{termin}</b> / <b>{termine}</b> sind die Termine des verknüpften Gewerks im Terminplan. Ist «An» leer, wird die E-Mail des Gewerks verwendet.</p>
   </div>
   ${L.map((m, i) => `<div class="card">
@@ -2415,14 +2575,16 @@ function viewStandard() {
     <h3>Standard-Gewerke</h3>
     <p class="muted" style="margin-top:0">Diese Gewerke sind in jedem Projekt fix hinterlegt. Neue Gewerke und Änderungen werden automatisch in alle bestehenden Projekte übernommen – Felder, die du in einem Projekt angepasst hast (z.B. die Firma), bleiben dort erhalten.</p>
     <div class="table-wrap"><table>
-      <tr><th style="width:50px">Farbe</th><th>Gewerk</th><th>Montage durch</th><th>Firma (bei extern / Sub)</th><th>Kontaktperson</th><th>E-Mail</th><th>Mailvorlage</th><th></th></tr>
+      <tr><th style="width:50px">Farbe</th><th>Gewerk</th><th>Montage durch</th><th>Firma (bei extern / Sub)</th><th>Kontaktperson</th><th>Telefon</th><th>E-Mail</th><th>Ort / Adresse</th><th>Mailvorlage</th><th></th></tr>
       ${list.map((g, i) => `<tr>
         <td><input type="color" value="${g.farbe}" style="width:44px;height:32px" onchange="updStd(${i},'farbe',this.value)"></td>
         <td><input value="${esc(g.name)}" onchange="updStd(${i},'name',this.value)"></td>
         <td><select onchange="updStd(${i},'art',this.value)">${Object.entries(ARTEN).map(([k, l]) => `<option value="${k}" ${g.art === k ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
         <td><input value="${esc(g.art === 'intern' ? S().firma : g.firma)}" ${g.art === 'intern' ? 'disabled' : ''} onchange="updStd(${i},'firma',this.value)"></td>
         <td><input value="${esc(g.kontakt || '')}" onchange="updStd(${i},'kontakt',this.value)"></td>
+        <td><input type="tel" value="${esc(g.telefon || '')}" onchange="updStd(${i},'telefon',this.value)"></td>
         <td><input type="email" value="${esc(g.email || '')}" onchange="updStd(${i},'email',this.value)"></td>
+        <td><input value="${esc(g.art === 'intern' ? '' : g.adresse || '')}" ${g.art === 'intern' ? 'disabled placeholder="CKW"' : ''} onchange="updStd(${i},'adresse',this.value)"></td>
         <td>${vorlageSelect(g, `onchange="updStd(${i},'mailvorlage',this.value)" style="min-width:150px"`)}</td>
         <td><button class="danger sm" onclick="delStd(${i})">✕</button></td></tr>`).join('')}
     </table></div>
@@ -2836,7 +2998,8 @@ function pdfTerminplan(p, termine, f) {
   doc.setFont('helvetica', 'bold'); doc.setFontSize(13 * Math.max(f, 0.7)); doc.setTextColor(29, 39, 51);
   doc.text('Beteiligte Unternehmen', M, y);
   const zeile = g => [g.name, ARTEN[artOf(g)], g.firma || '–', g.adresse || '',
-    g.eigen ? [g.kontakt, g.kontakt !== s.name && 'PL: ' + s.name, ...kontakt].filter(Boolean).join(', ') : (g.kontakt || '')];
+    g.eigen ? [g.kontakt, g.telefon && 'Tel. ' + g.telefon, g.kontakt !== s.name && 'PL: ' + s.name, ...kontakt].filter(Boolean).join(', ')
+      : [g.kontakt, g.telefon && 'Tel. ' + g.telefon, g.email].filter(Boolean).join(', ')];
   // bei vollen Plänen zweispaltig (zwei Unternehmen pro Zeile), damit alles auf das eine A3-Blatt passt
   const zweispaltig = f < 0.75 && used.length > 3;
   const kopf = ['Gewerk', 'Ausführung', 'Firma', 'Adresse', 'Kontakt'];
