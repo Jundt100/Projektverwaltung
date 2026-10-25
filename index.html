@@ -317,6 +317,31 @@
   .side-user button { margin-top: 6px; }
   .collapsed .side-user { padding: 10px 0; text-align: center; }
   .collapsed .side-user .side-txt { display: none; }
+  /* Kontakte und Projekt-Übersicht */
+  .avatar { width: 38px; height: 38px; border-radius: 50%; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; letter-spacing: .02em; }
+  .avatar.klein { width: 26px; height: 26px; font-size: 10.5px; }
+  .ueb-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; }
+  .ueb-grid > .card { margin-bottom: 18px; }
+  .ueb-kunde { margin-bottom: 8px; }
+  .personen { display: grid; gap: 2px; }
+  .person { display: flex; gap: 12px; align-items: center; padding: 9px 8px; border-radius: 12px; }
+  .person:hover { background: #f8f8f4; }
+  .p-info { flex: 1; min-width: 0; }
+  .p-info .muted { font-size: 12.5px; }
+  .p-kontakt { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; margin-top: 2px; }
+  .p-kontakt a, .table-wrap a { color: var(--text); text-decoration: none; border-bottom: 1px dotted #b9b8b0; }
+  .p-kontakt a:hover, .table-wrap a:hover { border-bottom-color: var(--text); }
+  .p-aktion { display: flex; gap: 2px; }
+  .plan-vorschau { cursor: pointer; border-radius: 16px; transition: box-shadow .2s, transform .2s; }
+  .plan-vorschau:hover { box-shadow: 0 0 0 3px #e6eebb; }
+  .plan-vorschau .xg { pointer-events: none; }
+  .crm-zeile { margin-bottom: 14px; }
+  .crm-link { padding: 10px 12px; background: #eef5fb; border: 1px solid #cfe0ef; border-radius: 12px; font-size: 13.5px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .klein { font-size: 12px; }
+  table.std-tab { min-width: 1250px; }
+  table.std-tab td { padding: 5px 4px; }
+  table.std-tab input:not([type=color]), table.std-tab select { min-width: 120px; }
+  @media (max-width: 900px) { .ueb-grid { grid-template-columns: 1fr; } }
   /* Gewerk-Suche und Gewerk-Dialog */
   .gw-wahl { position: relative; }
   .gw-liste { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); max-height: 340px; overflow-y: auto; background: #fff;
@@ -852,6 +877,7 @@ function migrate(d) {
     delete p.bauherr;
     p.gewerke.forEach(g => { if (!g.art) g.art = g.eigen ? 'intern' : 'extern'; g.eigen = g.art === 'intern'; });
   });
+  crmAufbauen(d);
   // Standard-Gewerke gelten immer für alle Projekte (fehlende werden ergänzt)
   stdAbgleich(d);
   // Version 6: Punkte, die nach Projektstart in die Vorlage kamen, in bestehenden Projekten ergänzen
@@ -862,6 +888,24 @@ function migrate(d) {
   return d;
 }
 function neueId() { return Math.random().toString(36).slice(2, 10); }
+// CRM einmalig aus den bisherigen Kontaktdaten der Gewerke aufbauen und verknüpfen
+function crmAufbauen(d) {
+  if (!Array.isArray(d.settings.kontakte)) d.settings.kontakte = [];
+  d.projects.forEach(p => { if (!Array.isArray(p.personen)) p.personen = []; });
+  if ((d.settings.crmVersion || 0) >= 1) return;
+  const K = d.settings.kontakte, kl = s => (s || '').trim().toLowerCase();
+  const anlegen = g => {
+    const intern = g.eigen || g.art === 'intern';
+    const daten = { name: g.kontakt || '', firma: intern ? '' : (g.firma || ''), telefon: g.telefon || '', email: g.email || '', adresse: intern ? '' : (g.adresse || '') };
+    if (!(daten.name || daten.firma || daten.email || daten.telefon)) return undefined;
+    let c = K.find(k => kl(k.name) === kl(daten.name) && kl(k.firma) === kl(daten.firma) && kl(k.email) === kl(daten.email));
+    if (!c) { c = { id: neueId(), art: g.art || (intern ? 'intern' : 'extern'), gewerk: g.name, notiz: '', ...daten }; K.push(c); }
+    return c.id;
+  };
+  d.settings.standardGewerke.forEach(s => { if (!s.crm) s.crm = anlegen(s); });
+  d.projects.forEach(p => p.gewerke.forEach(g => { if (!g.crm) g.crm = anlegen(g); }));
+  d.settings.crmVersion = 1;
+}
 function gwSchluessel(g) { return (g.name + '|' + (g.art || (g.eigen ? 'intern' : 'extern'))).toLowerCase(); }
 // verknüpft Projekt-Gewerke mit ihrem Standard-Gewerk (g.std = sid) und ergänzt fehlende in jedem Projekt
 function stdAbgleich(d) {
@@ -945,9 +989,13 @@ function zeitachse(termine) {
 // ---------- Projekt-Helfer ----------
 const sortTermine = p => [...p.termine].sort((a, b) => a.start.localeCompare(b.start) || a.ende.localeCompare(b.ende));
 function gewerk(p, id) {
-  const g = p.gewerke.find(g => g.id === id) || { name: '–', farbe: '#999', firma: '' };
+  let g = p.gewerke.find(g => g.id === id) || { name: '–', farbe: '#999', firma: '' };
+  // mit einem CRM-Kontakt verknüpft: Kontaktdaten kommen immer aktuell aus dem CRM
+  const c = g.crm && kontaktById(g.crm);
+  if (c) g = { ...g, kontakt: c.name, telefon: c.telefon, email: c.email, ...(g.eigen ? {} : { firma: c.firma, adresse: c.adresse }) };
   return g.eigen ? { ...g, firma: S().firma, adresse: [S().strasse, S().ort].filter(Boolean).join(', '), kontakt: g.kontakt || S().name } : g;
 }
+const kontaktById = id => (id && (S().kontakte || []).find(c => c.id === id)) || null;
 // eigen = Montage durch uns (intern); art unterscheidet zusätzlich Subunternehmer
 const artOf = g => g.art || (g.eigen ? 'intern' : 'extern');
 // optionale Uhrzeit eines Termins, z.B. "07:00–10:00" oder "ab 07:00"
@@ -1007,11 +1055,12 @@ const ICONS = {
   einstellungen: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
 };
 ICONS.woche = '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 14h3M13 14h3M8 17h3"/>';
-const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
+ICONS.kontakte = '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2c3 .2 5.5 2.2 5.5 5.3"/>';
+const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['kontakte', 'Kontakte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
 
 function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
 function nav(h) { if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
-function openProjekt(id) { ui.tab = 'termine'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
+function openProjekt(id) { ui.tab = 'uebersicht'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
 window.addEventListener('hashchange', () => render({ nachOben: true }));
 
 const wenigBewegung = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1086,10 +1135,11 @@ function render(opt = {}) {
     r.page === 'projekte' ? viewProjekte() :
     r.page === 'termine' ? viewKalender() :
     r.page === 'woche' ? viewWoche() :
+    r.page === 'kontakte' ? viewKontakte() :
     r.page === 'einstellungen' ? viewEinstellungen() : viewDashboard();
   ui.pop = null;
   // neue Ansicht: weich überblenden; gleiche Ansicht: nur Geändertes abgleichen
-  const ansicht = [location.hash, ui.tab, ui.setTab, ui.zoom, ui.month, ui.woche].join('|');
+  const ansicht = [location.hash, ui.tab, ui.setTab, ui.zoom, ui.month, ui.woche, ui.kart].join('|');
   const wechsel = ansicht !== ui.ansicht, erstes = !ui.ansicht;
   ui.ansicht = ansicht;
   const nr = ++renderNr;
@@ -1358,7 +1408,7 @@ function neuesProjekt() {
   const p = {
     id: uid(), nummer, name, ort: val('np-ort'), farbe: $('np-farbe').value, bemerkung: '', erstellt: todayIso(),
     gewerke: S().standardGewerke.map(({ sid, ...g }) => ({ ...g, id: uid(), std: sid, fix: true, eigen: g.art === 'intern' })), termine: [],
-    checkliste: S().checklisteVorlage, chk: {}
+    checkliste: S().checklisteVorlage, chk: {}, personen: [], kundeId: ''
   };
   state.projects.push(p); save(); $('dlg').close(); openProjekt(p.id);
 }
@@ -1377,10 +1427,69 @@ function viewProjekt(p) {
   </div>
   ${freigabeHinweis(p)}
   <div class="tabs">
-    ${[['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
+    ${[['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
       `<button class="${ui.tab === k ? 'active' : ''}" onclick="ui.tab='${k}';ui.ganttScroll=true;render()">${l}</button>`).join('')}
   </div>
-  ${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'gewerke' ? viewGewerke(p) : viewInfo(p)}`;
+  ${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'gewerke' ? viewGewerke(p) : ui.tab === 'info' ? viewInfo(p) : viewUebersicht(p)}`;
+}
+
+// ---------- Projekt-Übersicht: offene Punkte bis Baustart, Leute im Projekt, Terminplan ----------
+function personKarte(x) {
+  const tel = x.tel ? `<a href="tel:${esc(x.tel.replace(/\s/g, ''))}">☎ ${esc(x.tel)}</a>` : '';
+  const mail = x.mail ? `<a href="mailto:${esc(x.mail)}">✉ ${esc(x.mail)}</a>` : '';
+  return `<div class="person">
+    <span class="avatar" style="background:${x.farbe}">${initialen(x.name)}</span>
+    <div class="p-info"><b>${esc(x.name)}</b><div class="muted">${esc([x.rolle, x.firma].filter(Boolean).join(' · '))}</div>
+      ${tel || mail ? `<div class="p-kontakt">${tel}${mail}</div>` : '<div class="muted klein">keine Kontaktdaten</div>'}</div>
+    <div class="p-aktion">${x.aktion || ''}</div></div>`;
+}
+function viewUebersicht(p) {
+  const f = freigabe(p), sp = span(p), termine = sortTermine(p), s = S();
+  // offene Punkte bis Baustart
+  const offen = f.offen.map(({ n, pfad }) => {
+    const i = chkKeys.push(n) - 1;
+    return `<div class="of-item ${f.kritisch ? 'rot' : ''}"><input type="checkbox" onchange="chkSet('${p.id}',${i},true,this)" title="als erledigt markieren">
+      <span>${esc(n.text)}<span class="muted"> · ${esc(pfad.slice(1).join(' › ') || pfad[0])}</span></span>
+      ${n.mail ? `<button class="sec sm" onclick="mailDialog('${p.id}',${i})">✉ Mail</button>` : ''}</div>`;
+  }).join('');
+  const wann = !sp ? 'Baustart noch nicht geplant' : f.tage < 0 ? `Bau läuft seit ${fmt(sp.start)}` : f.tage === 0 ? 'Baustart ist heute' : `Baustart ${fmtLong(sp.start)} · ${relTage(sp.start)}`;
+  // Leute im Projekt: Projektleiter, Kunde, Gewerke mit Terminen, zusätzlich zugeordnete Personen
+  const kunde = kontaktById(p.kundeId);
+  const leute = [{ name: s.name, rolle: 'Projektleiter', firma: s.firma, tel: s.telefon, mail: s.email, farbe: 'var(--ink)' }];
+  const gezeigt = new Set();
+  p.gewerke.map(x => gewerk(p, x.id)).filter(g => termine.some(t => t.gewerkId === g.id) && (g.kontakt || g.firma || g.email || g.telefon)).forEach(g => {
+    if (g.crm) gezeigt.add(g.crm);
+    leute.push({ name: g.kontakt || g.firma, rolle: g.name, firma: g.kontakt ? g.firma : '', tel: g.telefon, mail: g.email, farbe: g.farbe,
+      aktion: effektiveVorlage(g) ? `<button class="sec sm" title="Mail an ${esc(g.name)}" onclick="gewerkMail('${p.id}','${g.id}')">✉</button>` : '' });
+  });
+  p.personen.map(kontaktById).filter(c => c && !gezeigt.has(c.id)).forEach(c => leute.push({ name: kontaktName(c), rolle: c.gewerk || (c.art === 'kunde' ? 'Kunde' : ARTEN[c.art]),
+    firma: c.name ? kontaktFirma(c) : '', tel: c.telefon, mail: c.email, farbe: avatarFarbe(c),
+    aktion: `<button class="ck-btn" title="Kontakt bearbeiten" onclick="kontaktDialog('${c.id}')">✎</button><button class="ck-btn" title="aus dem Projekt entfernen" onclick="personEntfernen('${p.id}','${c.id}')">✕</button>` }));
+  return `
+  <div class="ueb-grid">
+    <div class="card">
+      <div class="ck-head"><h3 style="margin:0">Bis Baustart offen</h3>
+        ${f.offen.length ? `<span class="${f.kritisch ? 'tag-warn' : 'tag-sub'}">${f.kritisch ? 'Baustart gefährdet · ' : ''}${f.offen.length} offen</span>` : sp ? '<span class="tag-ok">✓ Baufreigabe</span>' : ''}</div>
+      <div class="muted" style="margin-bottom:6px">${wann}</div>
+      ${offen || '<div class="empty" style="padding:14px">Alle Punkte bis Baustart sind erledigt. 🎉</div>'}
+      <div style="margin-top:10px"><a href="#" onclick="event.preventDefault();ui.tab='checkliste';render()">Zur ganzen Checkliste →</a></div>
+    </div>
+    <div class="card">
+      <div class="ck-head"><h3 style="margin:0">Leute im Projekt</h3><span class="muted">${leute.length}</span></div>
+      <div class="ueb-kunde">${kunde
+        ? personKarte({ name: kontaktName(kunde), rolle: 'Kunde', firma: kunde.name ? kunde.firma : '', tel: kunde.telefon, mail: kunde.email, farbe: avatarFarbe(kunde),
+            aktion: `<button class="ck-btn" title="Kunde bearbeiten" onclick="kontaktDialog('${kunde.id}')">✎</button><button class="ck-btn" title="anderen Kunden wählen" onclick="findP('${p.id}').kundeId='';save();render()">✕</button>` })
+        : `<label>Kunde</label>${kontaktPicker('kundeSetzen', { filter: 'kunde', platzhalter: 'Kunde aus Kontakten wählen oder neu anlegen …' })}`}</div>
+      <div class="personen">${leute.map(personKarte).join('')}</div>
+      <div style="margin-top:10px"><label>Person hinzufügen</label>${kontaktPicker('personHinzu', { platzhalter: 'Aus Kontakten (CRM) suchen …' })}</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ck-head"><h3 style="margin:0">Terminplan</h3>
+      <div class="row"><button class="sec sm" onclick="pdf('${p.id}')">PDF (A3)</button><button class="sm" onclick="ui.tab='termine';ui.ganttScroll=true;render()">Zum Terminplan →</button></div></div>
+    ${termine.length ? `<div class="plan-vorschau" onclick="ui.tab='termine';ui.ganttScroll=true;render()" title="Zum Terminplan">${gantt(p, termine, { zoom: 'woche', vorschau: true })}</div>`
+      : `<div class="empty">Noch keine Termine. <a href="#" onclick="event.preventDefault();ui.tab='termine';render()">Termine erfassen →</a></div>`}
+  </div>`;
 }
 
 // ---------- Checkliste ----------
@@ -1608,7 +1717,8 @@ function ibnDefaults(p) {
   let termin = t ? t.start : '';
   if (!termin) Object.entries(p.chk).forEach(([k, st]) => { if (!termin && /ibn/.test(k) && /termin/.test(k) && st.datum) termin = st.datum; });
   return {
-    termin, zeit: t?.plZeit || '', titel: 'IBN PV-Anlage', kunde: '', objekt: [p.name, p.ort].filter(Boolean).join('\n'), arbeiten: '', bemerkungen: '',
+    termin, zeit: t?.plZeit || '', titel: 'IBN PV-Anlage',
+    kunde: (k => k ? [k.name, k.firma, k.adresse, k.telefon].filter(Boolean).join('\n') : '')(kontaktById(p.kundeId)), objekt: [p.name, p.ort].filter(Boolean).join('\n'), arbeiten: '', bemerkungen: '',
     monteure: [{ name: g?.kontakt || '', kw: termin ? String(kw(toDate(termin))) : '', h: leer7(), art: 'MONT', preis: '' }, { name: '', kw: '', h: leer7(), art: '', preis: '' }],
     material: Array.from({ length: 5 }, () => ({ text: '', art: '', menge: '', preis: '' })),
     keinMaterial: false, zusatzblatt: false, fertig: '', datum: todayIso(), von: S().name, unterschrift: ''
@@ -1786,7 +1896,7 @@ const BLITZ_AUFGABEN = [['beratung', 'Beratung für die Planung'], ['besichtigun
 const BLITZ_UNTERLAGEN = [['grundriss', 'Grundrisspläne'], ['blitz', 'Pläne der Blitzschutzanlage'], ['pv', 'Pläne der Photovoltaikanlage'], ['feuerwehr', 'Feuerwehrplan der Photovoltaikanlage'], ['mpp', 'MPP und SINA des Gebäude']];
 function blitzDefaults(p) {
   return {
-    kunde: (p.ibn?.kunde || '').split('\n').map(s => s.trim()).filter(Boolean).join(', '),
+    kunde: (p.ibn?.kunde || (k => k ? [k.name, k.firma, k.adresse].filter(Boolean).join('\n') : '')(kontaktById(p.kundeId))).split('\n').map(s => s.trim()).filter(Boolean).join(', '),
     projekt: [p.name, p.ort].filter(Boolean).join(', '),
     pl: [S().name, S().telefon, S().email].filter(Boolean).join(', '),
     klasse: '', ohm: '',
@@ -2047,6 +2157,17 @@ function gwListe(offen) {
           ${g.kontakt || g.telefon || g.email ? `<div class="muted klein">${[g.kontakt && '👤 ' + hl(g.kontakt), g.telefon && '☎ ' + hl(g.telefon), g.email && hl(g.email)].filter(Boolean).join(' · ')}</div>` : ''}</div></div>`;
     }).join('');
   });
+  // Kontakte aus dem CRM, die in diesem Projekt noch kein Gewerk sind
+  if (woerter.length) {
+    const crm = S().kontakte.filter(c => c.art !== 'kunde' && !p.gewerke.some(g => g.crm === c.id) && woerter.every(w => kontaktText(c).includes(w))).sort(nachName).slice(0, 12);
+    if (crm.length) html += `<div class="gw-gruppe">Aus Kontakten (CRM) hinzufügen</div>` + crm.map(c => {
+      const i = gwTreffer.push('crm:' + c.id) - 1;
+      return `<div class="gw-opt" data-i="${i}" onmousedown="event.preventDefault();gwAusKontakt('${c.id}')">
+        <span class="avatar klein" style="background:${avatarFarbe(c)}">${initialen(kontaktName(c))}</span>
+        <div style="min-width:0"><b>${hl(c.gewerk || c.firma || c.name)}</b> <span class="muted">· ${hl([c.firma, c.name].filter(Boolean).join(' · '))}</span>
+          <div class="muted klein">${[c.telefon && '☎ ' + hl(c.telefon), c.email && hl(c.email)].filter(Boolean).join(' · ')}</div></div></div>`;
+    }).join('');
+  }
   const neuIdx = gwTreffer.push('__neu') - 1;
   html += `<div class="gw-opt gw-neu" data-i="${neuIdx}" onmousedown="event.preventDefault();gwNeu()">＋ Neues Gewerk${q ? ` «${esc(inp.value.trim())}»` : ''} anlegen</div>`;
   if (gwTreffer.length === 1) html = `<div class="muted" style="padding:10px 12px">Kein Gewerk gefunden.</div>` + html;
@@ -2070,7 +2191,7 @@ function gwTaste(e) {
   } else if (e.key === 'Enter') {
     e.preventDefault();
     const id = gwTreffer[gwAktiv];
-    if (id === '__neu') gwNeu(); else if (id) gwWaehlen(id);
+    if (id === '__neu') gwNeu(); else if (id && id.startsWith('crm:')) gwAusKontakt(id.slice(4)); else if (id) gwWaehlen(id);
   } else if (e.key === 'Escape') L.hidden = true;
 }
 function gwWaehlen(id) {
@@ -2079,6 +2200,15 @@ function gwWaehlen(id) {
   $('t-gw').value = id; $('t-gw-suche').value = gwLabel(g);
   $('gw-liste').hidden = true;
   $('t-titel').focus();
+}
+// CRM-Kontakt als Gewerk ins Projekt übernehmen und gleich auswählen
+function gwAusKontakt(cid) {
+  const p = findP(route().id), c = kontaktById(cid);
+  const g = { id: uid(), name: c.gewerk || c.firma || c.name, art: c.art, eigen: c.art === 'intern', crm: cid,
+    firma: '', adresse: '', kontakt: '', telefon: '', email: '', farbe: freieFarbe(p.gewerke.map(x => x.farbe)) };
+  p.gewerke.push(g);
+  save(); render(); gwWaehlen(g.id);
+  toast(`«${g.name}» aus den Kontakten ins Projekt übernommen.`);
 }
 function gwNeu() {
   $('gw-liste').hidden = true;
@@ -2091,8 +2221,9 @@ function ganttGruppen(p, termine) {
   termine.forEach(t => { if (!map.has(t.gewerkId)) map.set(t.gewerkId, []); map.get(t.gewerkId).push(t); });
   return [...map].map(([gid, items]) => ({ g: gewerk(p, gid), items, start: items[0].start, ende: items.reduce((m, t) => t.ende > m ? t.ende : m, '0000') }));
 }
-function gantt(p, termine) {
-  const ax = zeitachse(termine), tagMode = ui.zoom !== 'woche', w = tagMode ? 24 : 8, TW = ax.tage * w;
+// opt.zoom: 'tag' | 'woche' (sonst Auswahl im Terminplan), opt.vorschau: nur anzeigen (Projekt-Übersicht)
+function gantt(p, termine, opt = {}) {
+  const ax = zeitachse(termine), tagMode = (opt.zoom || ui.zoom) !== 'woche', w = tagMode ? 24 : (opt.vorschau ? 10 : 8), TW = ax.tage * w;
   const s0 = isoOf(ax.start), idx = iso => diffDays(s0, iso);
   const raster = `background-image:repeating-linear-gradient(to right, transparent 0 ${5 * w}px, rgba(0,0,0,.045) ${5 * w}px ${7 * w}px),` +
     `repeating-linear-gradient(to right, ${tagMode ? `#e6eaef 0 1px, transparent 1px ${w}px` : `#d5dbe2 0 1px, transparent 1px ${7 * w}px`})`;
@@ -2126,7 +2257,7 @@ function gantt(p, termine) {
       return row('task', `<div title="${esc(t.titel)}${vor ? ' – startet nach: ' + esc(vor.titel) : ''}">${vor ? '<span class="muted">↳ </span>' : ''}${t.meilenstein ? '◆ ' : ''}${esc(t.titel)}${zeitTxt(t) ? `<span class="muted"> · ${zeitTxt(t)}</span>` : ''}</div>
           <div>${t.meilenstein ? '' : `<span class="prog"><div style="width:${f}%"></div></span><small>${f}%</small>`}</div>
           <div>${fmt(t.start)}</div><div>${fmt(t.ende)}</div>`,
-        bar + pl, tint(g.farbe, '14'), `onclick="ui.editTermin='${t.id}';render();scrollTo(0,0)" title="Klicken zum Bearbeiten"`);
+        bar + pl, tint(g.farbe, '14'), opt.vorschau ? '' : `onclick="ui.editTermin='${t.id}';render();scrollTo(0,0)" title="Klicken zum Bearbeiten"`);
     }).join('');
   }).join('');
 
@@ -2231,19 +2362,21 @@ function gewerkDialog(pid, gid, opt = {}) {
   const p = findP(pid), raw = gid ? p.gewerke.find(x => x.id === gid) : null, g = raw ? gewerk(p, gid) : null, d = $('dlg');
   const art = raw ? artOf(raw) : 'extern';
   const name = raw ? raw.name : (opt.name || '');
-  ui.gwDlg = { pid, gid, art, ausSuche: !!opt.ausSuche };
+  ui.gwDlg = { pid, gid, art, ausSuche: !!opt.ausSuche, crm: raw?.crm && kontaktById(raw.crm) ? raw.crm : '' };
+  const q = raw ? (ui.gwDlg.crm ? { ...raw, ...gewerk(p, gid), firma: kontaktById(raw.crm).firma, adresse: kontaktById(raw.crm).adresse } : raw) : {};
   const namen = S().mailvorlagen.map(m => m.name), akt = g ? effektiveVorlage(g) : '';
   d.style.width = 'min(760px, calc(100vw - 24px))';
   d.innerHTML = `<h2>${raw ? 'Gewerk bearbeiten' : 'Neues Gewerk'}</h2>
+    <div class="crm-zeile" id="g-crm-zeile">${gwCrmZeile()}</div>
     <div class="grid">
       <div><label>Gewerk *</label><input id="g-name" value="${esc(name)}" placeholder="z.B. Kernbohrer"></div>
       <div><label>Firma</label><div class="seg seg-breit" id="g-art">${[['intern', 'CKW'], ['extern', 'Extern'], ['sub', 'Subunternehmer']].map(([k, l]) =>
         `<button type="button" data-art="${k}" class="${art === k ? 'on' : ''}" onclick="gwArt('${k}')">${l}</button>`).join('')}</div></div>
-      <div><label id="g-firma-l">Firmenname</label><input id="g-firma" value="${esc(raw?.firma || '')}" placeholder="z.B. Müller AG"></div>
-      <div><label>Kontaktperson</label><input id="g-kontakt" value="${esc(raw?.kontakt || '')}" placeholder="z.B. Herr Müller"></div>
-      <div><label>Telefon (optional)</label><input id="g-tel" type="tel" value="${esc(raw?.telefon || '')}" placeholder="+41 …"></div>
-      <div><label>E-Mail</label><input id="g-mail" type="email" value="${esc(raw?.email || '')}" placeholder="name@firma.ch"></div>
-      <div><label>Ort / Adresse</label><input id="g-adr" value="${esc(raw?.adresse || '')}" placeholder="Strasse, PLZ Ort"></div>
+      <div><label id="g-firma-l">Firmenname</label><input id="g-firma" value="${esc(q.firma || '')}" placeholder="z.B. Müller AG"></div>
+      <div><label>Kontaktperson</label><input id="g-kontakt" value="${esc(q.kontakt || '')}" placeholder="z.B. Herr Müller"></div>
+      <div><label>Telefon (optional)</label><input id="g-tel" type="tel" value="${esc(q.telefon || '')}" placeholder="+41 …"></div>
+      <div><label>E-Mail</label><input id="g-mail" type="email" value="${esc(q.email || '')}" placeholder="name@firma.ch"></div>
+      <div><label>Ort / Adresse</label><input id="g-adr" value="${esc(q.adresse || '')}" placeholder="Strasse, PLZ Ort"></div>
       <div><label>Mailvorlage</label><select id="g-vorlage">
         <option value="keine" ${akt ? '' : 'selected'}>– keine –</option>
         ${namen.map(n => `<option value="${esc(n)}" ${n === akt ? 'selected' : ''}>✉ ${esc(n)}</option>`).join('')}
@@ -2251,6 +2384,7 @@ function gewerkDialog(pid, gid, opt = {}) {
       <div><label>Farbe</label><input type="color" id="g-farbe" value="${raw?.farbe || freieFarbe(p.gewerke.map(x => x.farbe))}"></div>
     </div>
     <div class="muted" id="g-hint" style="margin-top:8px"></div>
+    <label class="check" id="g-crm-neu-z" style="margin-top:12px;${ui.gwDlg.crm ? 'display:none' : ''}"><input type="checkbox" id="g-crm-neu" checked> Als Kontakt im CRM speichern (in allen Projekten auffindbar)</label>
     ${raw?.std ? '<div class="muted" style="margin-top:10px">★ Standard-Gewerk – Änderungen hier gelten nur für dieses Projekt.</div>' : `
     <div class="frage">
       <b>Soll dieses Gewerk in die Standard-Gewerke übernommen werden?</b>
@@ -2269,6 +2403,24 @@ function gewerkDialog(pid, gid, opt = {}) {
   gwArt(art);
   setTimeout(() => $(name ? 'g-firma' : 'g-name')?.focus(), 30);
 }
+// Kopfzeile im Gewerk-Dialog: verknüpfter CRM-Kontakt oder Suchfeld
+function gwCrmZeile() {
+  const c = kontaktById(ui.gwDlg.crm);
+  return c
+    ? `<div class="crm-link">🔗 Verknüpft mit Kontakt <b>${esc(kontaktName(c))}</b>${kontaktFirma(c) && c.name ? ' · ' + esc(kontaktFirma(c)) : ''} – Änderungen an den Kontaktdaten gelten in allen Projekten.
+        <button class="sec sm" onclick="gwKontaktLoesen()">Lösen</button></div>`
+    : `<label>Aus Kontakten (CRM) übernehmen</label>${kontaktPicker('gwDlgKontakt', { filter: 'intern,sub,extern', ohneNeu: true, platzhalter: 'Firma, Person oder Gewerk suchen …' })}`;
+}
+function gwDlgKontakt(cid) {
+  const c = kontaktById(cid);
+  ui.gwDlg.crm = cid;
+  if (!val('g-name')) $('g-name').value = c.gewerk || c.firma || c.name;
+  gwArt(c.art === 'kunde' ? 'extern' : c.art);
+  [['g-kontakt', c.name], ['g-tel', c.telefon], ['g-mail', c.email]].forEach(([id, v]) => $(id).value = v || '');
+  if (c.art !== 'intern') { $('g-firma').value = c.firma || ''; $('g-adr').value = c.adresse || ''; }
+  $('g-crm-zeile').innerHTML = gwCrmZeile(); $('g-crm-neu-z').style.display = 'none';
+}
+function gwKontaktLoesen() { ui.gwDlg.crm = ''; $('g-crm-zeile').innerHTML = gwCrmZeile(); $('g-crm-neu-z').style.display = ''; $('g-crm-neu').checked = false; }
 // CKW: Firma und Adresse kommen aus den Einstellungen
 function gwArt(art) {
   ui.gwDlg.art = art;
@@ -2297,9 +2449,17 @@ function gewerkSpeichern() {
   if (vorlage === '__neu') { vorlage = neueVorlageFuer(name); neueVorlage = true; }
   const daten = { name, art, eigen: intern, firma: intern ? '' : val('g-firma'), adresse: intern ? '' : val('g-adr'), kontakt: val('g-kontakt'),
     telefon: val('g-tel'), email: val('g-mail'), farbe: $('g-farbe').value, mailvorlage: vorlage };
+  let meldung = gid ? 'Gewerk gespeichert' : 'Gewerk hinzugefügt';
+  // Kontaktdaten zentral im CRM halten: verknüpften Kontakt aktualisieren oder neu anlegen
+  let crm = ui.gwDlg.crm && kontaktById(ui.gwDlg.crm) ? ui.gwDlg.crm : '';
+  const kd = { art, name: daten.kontakt, firma: daten.firma, telefon: daten.telefon, email: daten.email, adresse: daten.adresse };
+  if (crm) { const c = kontaktById(crm); Object.assign(c, kd, { gewerk: c.gewerk || name }); }
+  else if ($('g-crm-neu')?.checked && (kd.name || kd.firma || kd.email || kd.telefon)) {
+    crm = uid(); S().kontakte.push({ id: crm, gewerk: name, notiz: '', ...kd }); meldung += ' · im CRM gespeichert';
+  }
+  daten.crm = crm || undefined;
   let g = gid && p.gewerke.find(x => x.id === gid);
   if (g) Object.assign(g, daten); else { g = { id: uid(), ...daten }; p.gewerke.push(g); }
-  let meldung = gid ? 'Gewerk gespeichert' : 'Gewerk hinzugefügt';
   if (document.querySelector('input[name=g-std]:checked')?.value === 'ja' && !g.std) {
     const { id, std, fix, ...rest } = g, sid = uid();
     S().standardGewerke.push({ ...rest, sid });
@@ -2391,6 +2551,175 @@ function viewWoche() {
     </table></div>` : '<div class="empty">In dieser Woche sind keine Arbeiten geplant.</div>'}
   </div>`;
 }
+
+// ---------- Kontakte (CRM) ----------
+const KONTAKT_ARTEN = [['kunde', 'Kunden'], ['intern', 'CKW (intern)'], ['sub', 'Subunternehmer'], ['extern', 'Extern']];
+const kontaktName = c => c.name || c.firma || '–';
+const kontaktFirma = c => c.art === 'intern' ? S().firma : (c.firma || '');
+const nachName = (a, b) => kontaktName(a).localeCompare(kontaktName(b), 'de');
+const kontaktProjekte = cid => state.projects.filter(p => p.kundeId === cid || p.personen.includes(cid) || p.gewerke.some(g => g.crm === cid));
+const kontaktText = c => [c.name, c.firma, c.gewerk, c.telefon, c.email, c.adresse, c.notiz].join(' ').toLowerCase();
+function markiere(s, woerter) {
+  let h = esc(s || '');
+  woerter.forEach(w => { h = h.replace(new RegExp('(' + esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>'); });
+  return h;
+}
+function viewKontakte() {
+  const K = S().kontakte, q = (ui.kq || '').trim().toLowerCase(), woerter = q.split(/\s+/).filter(Boolean);
+  const liste = K.filter(c => (!ui.kart || c.art === ui.kart) && woerter.every(w => kontaktText(c).includes(w)));
+  const telLink = t => t ? `<a href="tel:${esc(t.replace(/\s/g, ''))}" onclick="event.stopPropagation()">${markiere(t, woerter)}</a>` : '';
+  const mailLink = m => m ? `<a href="mailto:${esc(m)}" onclick="event.stopPropagation()">${markiere(m, woerter)}</a>` : '';
+  return `
+  <div class="page-head">
+    <div><h1>Kontakte</h1><div class="muted" style="margin-top:4px">${K.length} Kontakte · Kunden, Firmen und Personen für alle Projekte</div></div>
+    <div class="row">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="k-suche" placeholder="Name, Firma, Gewerk, Telefon …" value="${esc(ui.kq || '')}" oninput="ui.kq=this.value;render()"></div>
+      <button onclick="kontaktDialog(null,{art:'${ui.kart || 'extern'}'})">＋ Kontakt</button>
+    </div>
+  </div>
+  <div class="tabs" style="margin-bottom:16px">
+    ${[['', 'Alle'], ...KONTAKT_ARTEN].map(([k, l]) => `<button class="${(ui.kart || '') === k ? 'active' : ''}" onclick="ui.kart='${k}';render()">${l} <span class="muted">${k ? K.filter(c => c.art === k).length : K.length}</span></button>`).join('')}
+  </div>
+  ${!K.length ? '<div class="card empty">Noch keine Kontakte. Lege mit <b>＋ Kontakt</b> deinen ersten Kunden oder Partner an.</div>' : ''}
+  ${K.length && !liste.length ? '<div class="card empty">Kein Kontakt gefunden.</div>' : ''}
+  ${KONTAKT_ARTEN.map(([art, titel]) => {
+    const l = liste.filter(c => c.art === art).sort(nachName);
+    if (!l.length) return '';
+    return `<div class="card"><h3>${titel} <span class="muted" style="font-weight:400">· ${l.length}</span></h3><div class="table-wrap"><table>
+      <tr><th>Name</th><th>Firma</th><th>${art === 'kunde' ? 'Info' : 'Gewerk / Rolle'}</th><th>Telefon</th><th>E-Mail</th><th>Ort / Adresse</th><th>Projekte</th></tr>
+      ${l.map(c => {
+        const pr = kontaktProjekte(c.id);
+        return `<tr class="click" onclick="kontaktDialog('${c.id}')">
+          <td><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="avatar klein" style="background:${avatarFarbe(c)}">${initialen(kontaktName(c))}</span><b>${markiere(kontaktName(c), woerter)}</b></div></td>
+          <td>${markiere(kontaktFirma(c), woerter)}</td><td class="muted">${markiere(c.gewerk || c.notiz || '', woerter)}</td>
+          <td style="white-space:nowrap">${telLink(c.telefon)}</td><td>${mailLink(c.email)}</td><td class="muted">${markiere(c.adresse, woerter)}</td>
+          <td>${pr.map(x => `<span class="pnum" style="cursor:pointer;margin:1px" onclick="event.stopPropagation();openProjekt('${x.id}')" title="${esc(x.name)}">${esc(x.nummer)}</span>`).join('') || '<span class="muted">–</span>'}</td></tr>`;
+      }).join('')}
+    </table></div></div>`;
+  }).join('')}`;
+}
+const initialen = s => String(s || '?').split(/[\s\-]+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
+const avatarFarbe = c => ({ kunde: '#8e44ad', intern: '#00558c', sub: '#e67e22', extern: '#16a085' })[c.art] || '#7f8c8d';
+
+function kontaktDialog(cid, opt = {}) {
+  const c = cid ? kontaktById(cid) : null, d = $('dlg');
+  const art = c ? c.art : (opt.art || 'extern');
+  ui.kDlg = { cid, art, danach: opt.danach || '' };
+  const pr = c ? kontaktProjekte(c.id) : [];
+  d.style.width = 'min(720px, calc(100vw - 24px))';
+  d.innerHTML = `<h2>${c ? 'Kontakt bearbeiten' : 'Neuer Kontakt'}</h2>
+    <div style="margin-bottom:12px"><label>Kategorie</label><div class="seg seg-breit" id="k-art">${KONTAKT_ARTEN.map(([k, l]) =>
+      `<button type="button" data-art="${k}" class="${art === k ? 'on' : ''}" onclick="kArt('${k}')">${l.replace('Kunden', 'Kunde')}</button>`).join('')}</div></div>
+    <div class="grid">
+      <div><label>Name (Person)</label><input id="k-name" value="${esc(c?.name || opt.name || '')}" placeholder="z.B. Herr Müller"></div>
+      <div><label>Firma</label><input id="k-firma" value="${esc(c?.firma || '')}" placeholder="z.B. Müller AG"></div>
+      <div><label id="k-gewerk-l">Gewerk / Rolle</label><input id="k-gewerk" value="${esc(c?.gewerk || opt.gewerk || '')}" placeholder="z.B. Gerüstbauer"></div>
+      <div><label>Telefon</label><input id="k-tel" type="tel" value="${esc(c?.telefon || '')}" placeholder="+41 …"></div>
+      <div><label>E-Mail</label><input id="k-mail" type="email" value="${esc(c?.email || '')}" placeholder="name@firma.ch"></div>
+      <div><label>Ort / Adresse</label><input id="k-adr" value="${esc(c?.adresse || '')}" placeholder="Strasse, PLZ Ort"></div>
+    </div>
+    <div style="margin-top:12px"><label>Notiz</label><textarea id="k-notiz" rows="2">${esc(c?.notiz || '')}</textarea></div>
+    ${pr.length ? `<div class="muted" style="margin-top:10px">Verknüpft mit ${pr.length} Projekt${pr.length > 1 ? 'en' : ''}: ${pr.map(x => esc(x.nummer + ' ' + x.name)).join(', ')} – Änderungen gelten dort sofort.</div>` : ''}
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <div>${c ? `<button class="danger sm" onclick="kontaktLoeschen('${c.id}')">Löschen</button>` : ''}</div>
+      <div class="row"><button class="sec" onclick="$('dlg').close()">Abbrechen</button><button onclick="kontaktSpeichern()">${c ? 'Speichern' : 'Anlegen'}</button></div>
+    </div>`;
+  d.onkeydown = e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); kontaktSpeichern(); } };
+  if (!d.open) d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; }, { once: true });
+  kArt(art);
+  setTimeout(() => $('k-name')?.focus(), 30);
+}
+function kArt(art) {
+  ui.kDlg.art = art;
+  document.querySelectorAll('#k-art button').forEach(b => b.classList.toggle('on', b.dataset.art === art));
+  $('k-gewerk-l').textContent = art === 'kunde' ? 'Info (z.B. Bauherr, Verwaltung)' : 'Gewerk / Rolle';
+  $('k-firma').placeholder = art === 'intern' ? S().firma : 'z.B. Müller AG';
+}
+function kontaktSpeichern() {
+  const { cid, art, danach } = ui.kDlg;
+  const daten = { art, name: val('k-name'), firma: val('k-firma'), gewerk: val('k-gewerk'), telefon: val('k-tel'), email: val('k-mail'), adresse: val('k-adr'), notiz: $('k-notiz').value.trim() };
+  if (!daten.name && !daten.firma) { toast('Bitte Name oder Firma eintragen.'); return $('k-name').focus(); }
+  let c = cid && kontaktById(cid);
+  if (c) Object.assign(c, daten); else { c = { id: uid(), ...daten }; S().kontakte.push(c); }
+  save(); $('dlg').close();
+  if (danach && window[danach]) window[danach](c.id); else render();
+  toast(cid ? 'Kontakt gespeichert.' : `Kontakt «${kontaktName(c)}» angelegt.`);
+}
+// beim Löschen bleiben die Daten in den Gewerken erhalten, nur die Verknüpfung fällt weg
+function kontaktLoeschen(cid) {
+  const c = kontaktById(cid), pr = kontaktProjekte(cid);
+  if (!confirm(`Kontakt «${kontaktName(c)}» löschen?${pr.length ? ` Er ist mit ${pr.length} Projekt(en) verknüpft; die Angaben bleiben dort erhalten.` : ''}`)) return;
+  const kopie = g => { if (g.crm !== cid) return; Object.assign(g, { kontakt: c.name, telefon: c.telefon, email: c.email, ...(g.eigen ? {} : { firma: c.firma, adresse: c.adresse }) }); delete g.crm; };
+  S().standardGewerke.forEach(kopie);
+  state.projects.forEach(p => { p.gewerke.forEach(kopie); p.personen = p.personen.filter(x => x !== cid); if (p.kundeId === cid) p.kundeId = ''; });
+  S().kontakte = S().kontakte.filter(x => x.id !== cid);
+  save(); $('dlg').close(); render(); toast('Kontakt gelöscht.');
+}
+
+// Suchfeld für CRM-Kontakte; bei Auswahl wird window[aktion](kontaktId) aufgerufen
+function kontaktPicker(aktion, opt = {}) {
+  return `<div class="gw-wahl"><input id="kp-${aktion}" autocomplete="off" placeholder="${opt.platzhalter || 'Kontakt suchen …'}" data-filter="${opt.filter || ''}" data-neu="${opt.ohneNeu ? '' : '1'}"
+    onfocus="kpListe('${aktion}')" oninput="kpListe('${aktion}')" onkeydown="kpTaste(event,'${aktion}')" onblur="setTimeout(()=>{const l=$('kpl-${aktion}');if(l)l.hidden=true},180)">
+    <div class="gw-liste" id="kpl-${aktion}" hidden></div></div>`;
+}
+let kpTreffer = [], kpAktiv = 0;
+function kpListe(aktion) {
+  const inp = $('kp-' + aktion), L = $('kpl-' + aktion);
+  if (!inp) return;
+  const filter = inp.dataset.filter ? inp.dataset.filter.split(',') : null;
+  const woerter = inp.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const liste = S().kontakte.filter(c => (!filter || filter.includes(c.art)) && woerter.every(w => kontaktText(c).includes(w)));
+  kpTreffer = []; kpAktiv = 0;
+  let html = '';
+  KONTAKT_ARTEN.forEach(([art, titel]) => {
+    const l = liste.filter(c => c.art === art).sort(nachName).slice(0, 30);
+    if (!l.length) return;
+    html += `<div class="gw-gruppe">${titel}</div>` + l.map(c => {
+      const i = kpTreffer.push(c.id) - 1;
+      return `<div class="gw-opt" data-i="${i}" onmousedown="event.preventDefault();kpWaehlen('${aktion}','${c.id}')">
+        <span class="avatar klein" style="background:${avatarFarbe(c)}">${initialen(kontaktName(c))}</span>
+        <div style="min-width:0"><b>${markiere(kontaktName(c), woerter)}</b>${kontaktFirma(c) && c.name ? ` <span class="muted">· ${markiere(kontaktFirma(c), woerter)}</span>` : ''}
+          <div class="muted klein">${[c.gewerk && markiere(c.gewerk, woerter), c.telefon && '☎ ' + markiere(c.telefon, woerter), c.email && markiere(c.email, woerter)].filter(Boolean).join(' · ')}</div></div></div>`;
+    }).join('');
+  });
+  if (inp.dataset.neu) {
+    const i = kpTreffer.push('__neu') - 1;
+    html += `<div class="gw-opt gw-neu" data-i="${i}" onmousedown="event.preventDefault();kpNeu('${aktion}')">＋ Neuer Kontakt${inp.value.trim() ? ` «${esc(inp.value.trim())}»` : ''}</div>`;
+  }
+  if (!liste.length) html = '<div class="muted" style="padding:10px 12px">Kein Kontakt gefunden.</div>' + html;
+  L.innerHTML = html; L.hidden = false; kpMarkieren(aktion);
+}
+function kpMarkieren(aktion) {
+  document.querySelectorAll(`#kpl-${aktion} .gw-opt`).forEach(el => el.classList.toggle('aktiv', +el.dataset.i === kpAktiv));
+  document.querySelector(`#kpl-${aktion} .gw-opt.aktiv`)?.scrollIntoView({ block: 'nearest' });
+}
+function kpTaste(e, aktion) {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    kpAktiv = (kpAktiv + (e.key === 'ArrowDown' ? 1 : -1) + kpTreffer.length) % Math.max(1, kpTreffer.length);
+    kpMarkieren(aktion);
+  } else if (e.key === 'Enter') {
+    e.preventDefault(); e.stopPropagation();
+    const id = kpTreffer[kpAktiv];
+    if (id === '__neu') kpNeu(aktion); else if (id) kpWaehlen(aktion, id);
+  } else if (e.key === 'Escape') $('kpl-' + aktion).hidden = true;
+}
+function kpWaehlen(aktion, cid) { $('kpl-' + aktion).hidden = true; $('kp-' + aktion).value = ''; window[aktion](cid); }
+function kpNeu(aktion) {
+  const inp = $('kp-' + aktion), f = inp.dataset.filter;
+  $('kpl-' + aktion).hidden = true;
+  kontaktDialog(null, { name: inp.value.trim(), art: f ? f.split(',')[0] : 'extern', danach: aktion });
+}
+// Aktionen der Suchfelder in der Projekt-Übersicht
+function personHinzu(cid) {
+  const p = findP(route().id);
+  if (!p.personen.includes(cid)) p.personen.push(cid);
+  save(); render(); toast(`«${kontaktName(kontaktById(cid))}» zum Projekt hinzugefügt.`);
+}
+function personEntfernen(pid, cid) { const p = findP(pid); p.personen = p.personen.filter(x => x !== cid); save(); render(); }
+function kundeSetzen(cid) { const p = findP(route().id); p.kundeId = cid; save(); render(); toast('Kunde gesetzt.'); }
 
 // ---------- Alle Termine (Kalender) ----------
 function viewKalender() {
@@ -2571,28 +2900,37 @@ function viewApp() {
 
 function viewStandard() {
   const list = S().standardGewerke;
-  return `<div class="card">
-    <h3>Standard-Gewerke</h3>
-    <p class="muted" style="margin-top:0">Diese Gewerke sind in jedem Projekt fix hinterlegt. Neue Gewerke und Änderungen werden automatisch in alle bestehenden Projekte übernommen – Felder, die du in einem Projekt angepasst hast (z.B. die Firma), bleiben dort erhalten.</p>
-    <div class="table-wrap"><table>
-      <tr><th style="width:50px">Farbe</th><th>Gewerk</th><th>Montage durch</th><th>Firma (bei extern / Sub)</th><th>Kontaktperson</th><th>Telefon</th><th>E-Mail</th><th>Ort / Adresse</th><th>Mailvorlage</th><th></th></tr>
-      ${list.map((g, i) => `<tr>
-        <td><input type="color" value="${g.farbe}" style="width:44px;height:32px" onchange="updStd(${i},'farbe',this.value)"></td>
-        <td><input value="${esc(g.name)}" onchange="updStd(${i},'name',this.value)"></td>
-        <td><select onchange="updStd(${i},'art',this.value)">${Object.entries(ARTEN).map(([k, l]) => `<option value="${k}" ${g.art === k ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
-        <td><input value="${esc(g.art === 'intern' ? S().firma : g.firma)}" ${g.art === 'intern' ? 'disabled' : ''} onchange="updStd(${i},'firma',this.value)"></td>
-        <td><input value="${esc(g.kontakt || '')}" onchange="updStd(${i},'kontakt',this.value)"></td>
-        <td><input type="tel" value="${esc(g.telefon || '')}" onchange="updStd(${i},'telefon',this.value)"></td>
-        <td><input type="email" value="${esc(g.email || '')}" onchange="updStd(${i},'email',this.value)"></td>
-        <td><input value="${esc(g.art === 'intern' ? '' : g.adresse || '')}" ${g.art === 'intern' ? 'disabled placeholder="CKW"' : ''} onchange="updStd(${i},'adresse',this.value)"></td>
-        <td>${vorlageSelect(g, `onchange="updStd(${i},'mailvorlage',this.value)" style="min-width:150px"`)}</td>
-        <td><button class="danger sm" onclick="delStd(${i})">✕</button></td></tr>`).join('')}
-    </table></div>
-    <div class="row" style="margin-top:12px">
-      <button onclick="addStd()">+ Gewerk</button>
-      <button class="sec" onclick="stdZuruecksetzen()">Zurücksetzen</button>
-    </div>
-  </div>`;
+  const crmListe = S().kontakte.filter(c => c.art !== 'kunde').sort(nachName);
+  const kopf = `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Standard-Gewerke</h3><button class="sec sm" onclick="stdZuruecksetzen()">Zurücksetzen</button></div>
+    <p class="muted" style="margin:4px 0 0">Diese Gewerke sind in jedem Projekt fix hinterlegt, gruppiert und alphabetisch sortiert. Neue Gewerke und Änderungen gelten automatisch in allen Projekten.
+      Die Kontaktdaten pflegst du am besten in den <a href="#/kontakte">Kontakten (CRM)</a> und verknüpfst sie hier – dann sind sie überall aktuell.</p></div>`;
+  return kopf + GW_ARTEN.map(([art, titel]) => {
+    const zeilen = list.map((g, i) => ({ g, i })).filter(x => (x.g.art || 'extern') === art).sort((a, b) => a.g.name.localeCompare(b.g.name, 'de'));
+    return `<div class="card">
+      <div class="ck-head"><h3 style="margin:0">${titel} <span class="muted" style="font-weight:400">· ${zeilen.length}</span></h3>
+        <button class="sm" onclick="addStd('${art}')">＋ Gewerk</button></div>
+      ${zeilen.length ? `<div class="table-wrap"><table class="std-tab">
+        <tr><th style="width:50px">Farbe</th><th>Gewerk</th><th>Kontakt (CRM)</th><th>Firma</th><th>Kontaktperson</th><th>Telefon</th><th>E-Mail</th><th>Mailvorlage</th><th>Gruppe</th><th></th></tr>
+        ${zeilen.map(({ g, i }) => {
+          const c = kontaktById(g.crm), gesperrt = c ? 'disabled title="kommt aus dem CRM"' : '';
+          const wert = (f, cf) => esc(c ? (cf ?? c[f] ?? '') : (g[f] || ''));
+          return `<tr>
+          <td><input type="color" value="${g.farbe}" style="width:44px;height:32px" onchange="updStd(${i},'farbe',this.value)"></td>
+          <td><input value="${esc(g.name)}" onchange="updStd(${i},'name',this.value)" style="min-width:140px"></td>
+          <td><select onchange="updStd(${i},'crm',this.value)" style="min-width:160px"><option value="">– kein Kontakt –</option>
+            ${crmListe.map(k => `<option value="${k.id}" ${k.id === g.crm ? 'selected' : ''}>${esc([kontaktName(k), k.name && kontaktFirma(k)].filter(Boolean).join(' · '))}</option>`).join('')}</select></td>
+          <td><input value="${art === 'intern' ? esc(S().firma) : wert('firma')}" ${art === 'intern' ? 'disabled' : gesperrt} onchange="updStd(${i},'firma',this.value)"></td>
+          <td><input value="${wert('kontakt', c?.name)}" ${gesperrt} onchange="updStd(${i},'kontakt',this.value)"></td>
+          <td><input type="tel" value="${wert('telefon')}" ${gesperrt} onchange="updStd(${i},'telefon',this.value)"></td>
+          <td><input type="email" value="${wert('email')}" ${gesperrt} onchange="updStd(${i},'email',this.value)"></td>
+          <td>${vorlageSelect(g, `onchange="updStd(${i},'mailvorlage',this.value)" style="min-width:150px"`)}</td>
+          <td><select onchange="updStd(${i},'art',this.value)">${GW_ARTEN.map(([k, l]) => `<option value="${k}" ${art === k ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
+          <td><button class="danger sm" onclick="delStd(${i})">✕</button></td></tr>`;
+        }).join('')}
+      </table></div>` : '<div class="muted">Noch keine Gewerke in dieser Gruppe.</div>'}
+    </div>`;
+  }).join('');
 }
 const inProjekten = n => `in ${n} Projekt${n === 1 ? '' : 'en'}`;
 // Änderung in alle Projekte übernehmen, ausser das Feld wurde dort angepasst
@@ -2608,9 +2946,9 @@ function updStd(i, k, v) {
   save(); render();
   if (n) toast(`Gespeichert · ${inProjekten(n)} übernommen.`);
 }
-function addStd() {
+function addStd(art = 'extern') {
   const list = S().standardGewerke;
-  list.push({ name: 'Neues Gewerk', art: 'extern', firma: '', adresse: '', kontakt: '', email: '', farbe: freieFarbe(list.map(g => g.farbe)), sid: uid() });
+  list.push({ name: 'Neues Gewerk', art, eigen: art === 'intern', firma: '', adresse: '', kontakt: '', email: '', farbe: freieFarbe(list.map(g => g.farbe)), sid: uid() });
   const n = stdAbgleich(state);
   save(); render();
   toast(`Gewerk hinzugefügt${n ? ' · ' + inProjekten(n) + ' ergänzt' : ''}. Jetzt Namen eintragen.`);
