@@ -943,6 +943,17 @@ function migrate(d) {
     delete p.bauherr;
     p.gewerke.forEach(g => { if (!g.art) g.art = g.eigen ? 'intern' : 'extern'; g.eigen = g.art === 'intern'; });
   });
+  // Rapport-Version 1: noch nicht unterschriebene Rapporte ohne vorausgefüllten Monteur, Datum und «Ausgefüllt von»
+  if ((d.settings.rapVersion || 0) < 1) {
+    d.projects.forEach(p => {
+      const r = p.ibn;
+      if (!r || r.unterschrift) return;
+      if (r.von === d.settings.name) r.von = '';
+      r.datum = '';
+      if (r.monteure && r.monteure[0] && /melih/i.test(r.monteure[0].name || '')) r.monteure[0].name = '';
+    });
+    d.settings.rapVersion = 1;
+  }
   crmAufbauen(d);
   // Standard-Gewerke gelten immer für alle Projekte (fehlende werden ergänzt)
   stdAbgleich(d);
@@ -1830,13 +1841,14 @@ function ibnDefaults(p) {
   const t = g ? sortTermine(p).find(x => x.gewerkId === g.id) : null;
   // ohne Termin im Terminplan: Datum aus der Checkliste ("Termin von Melih")
   let termin = t ? t.start : '';
-  if (!termin) Object.entries(p.chk).forEach(([k, st]) => { if (!termin && /ibn/.test(k) && /termin/.test(k) && st.datum) termin = st.datum; });
+  if (!termin) Object.entries(p.chk).forEach(([k, st]) => { if (!termin && /ibn|service/.test(k) && /termin/.test(k) && st.datum) termin = st.datum; });
+  // Monteur, Datum und «Ausgefüllt von» trägt der Monteur selbst ein
   return {
     termin, zeit: t?.plZeit || '', titel: projektArt(p) === 'service' ? 'Service PV-Anlage' : 'IBN PV-Anlage',
     kunde: (k => k ? [k.name, k.firma, k.adresse, k.telefon].filter(Boolean).join('\n') : '')(kontaktById(p.kundeId)), objekt: [p.name, p.ort].filter(Boolean).join('\n'), arbeiten: '', bemerkungen: '',
-    monteure: [{ name: g?.kontakt || '', kw: termin ? String(kw(toDate(termin))) : '', h: leer7(), art: 'MONT', preis: '' }, { name: '', kw: '', h: leer7(), art: '', preis: '' }],
+    monteure: [{ name: '', kw: termin ? String(kw(toDate(termin))) : '', h: leer7(), art: 'MONT', preis: '' }, { name: '', kw: '', h: leer7(), art: '', preis: '' }],
     material: Array.from({ length: 5 }, () => ({ text: '', art: '', menge: '', preis: '' })),
-    keinMaterial: false, zusatzblatt: false, fertig: '', datum: todayIso(), von: S().name, unterschrift: ''
+    keinMaterial: false, zusatzblatt: false, fertig: '', datum: '', von: '', unterschrift: ''
   };
 }
 function ibnSummen(r) {
