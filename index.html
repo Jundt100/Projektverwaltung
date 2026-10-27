@@ -278,7 +278,9 @@
   .of-head .link:hover { text-decoration: underline; }
   /* IBN-Rapport */
   .rap { font-size: 14px; }
-  .rap-logo { text-align: center; margin: 4px 0 14px; }
+  .rap-logo { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 4px 0 14px; padding-bottom: 10px; border-bottom: 3px solid var(--lime); }
+  .rap-logo b { display: block; font-size: 20px; }
+  .rap-logo span { font-size: 12px; color: var(--muted); }
   .rap-logo img { height: 38px; }
   .rap-bar { background: #969696; color: #fff; font-weight: 700; font-size: 13px; padding: 4px 8px; margin: 10px 0 4px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
   .rap-kopf { justify-content: space-between; }
@@ -356,6 +358,19 @@
   .gw-neu { color: var(--text); font-weight: 600; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; margin-top: 4px; padding-top: 10px; }
   .seg-breit { display: flex; width: 100%; }
   .seg-breit button { flex: 1; padding: 8px 6px; }
+  /* Art beim Erstellen: PV-Projekt, Batterienachrüstung, Service-Auftrag */
+  .art-wahl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+  .art-wahl button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 6px; background: #fff; color: var(--text);
+    border: 1.5px solid #e3e2dc; border-radius: 12px; transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .art-wahl button:hover { border-color: #b9b8b0; transform: translateY(-1px); }
+  .art-wahl button.on { border-color: var(--ink); box-shadow: 0 0 0 3px var(--lime); }
+  .art-wahl .art-ic { font-size: 22px; line-height: 1.2; }
+  .art-wahl b { font-size: 13px; }
+  .art-wahl small { font-size: 11px; color: var(--muted); }
+  .art-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: #eef4fb; color: #00558c; }
+  .art-tag.art-service { background: #fdf1e3; color: #b35c00; }
+  .sv-row:last-child { border-bottom: none; }
+  .sv-row.sv-alt { box-shadow: inset 3px 0 0 var(--danger); padding-left: 10px; }
   .frage { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: #f6f8ea; border: 1px solid #e1eab5; }
   @media (prefers-reduced-motion: no-preference) { .gw-liste:not([hidden]) { animation: aufgehen .18s cubic-bezier(.2, .8, .2, 1); } }
   .zeitfeld { display: flex; align-items: center; gap: 6px; }
@@ -633,6 +648,49 @@ Projektdoku versendet
 Schlussrechnung
 Garantie`;
 
+// Batterienachrüstung: wie PV-Projekt, aber ohne Statik, Gerüst, K2, Layout, Stringplan und Ballast; Abnahme und Abschluss gleich
+const CHECKLISTE_BATTERIE = `# Planung & Bewilligung [!]
+Begehung vor Ort
+  Begehung am [datum]
+  Fotos erstellt und abgelegt
+  Batteriestandort geprüft
+Elektroschema
+  Ticket für TAG / IA erstellt [mail: TAG / IA einreichen]
+TAG / IA [!]
+  TAG bewilligt
+  IA bewilligt
+Pläne [!]
+  Situationsplan / Batteriestandort
+
+# Beschaffung & Baustellenlogistik [!]
+Material bestellt [!] [mail: Material bestellen]
+  Solarmarkt / Krannich
+  EPOS
+  Verrimetall WR-Gehäuse
+Kran [oder] [!]
+  Bauseits
+  Bestellt [mail: Kran bestellen]
+TioTio [oder] [!]
+  Bauseits
+  Bestellt
+Transport organisiert [!] [mail: Transport organisieren]
+
+` + CHECKLISTE_VORLAGE.slice(CHECKLISTE_VORLAGE.indexOf('# Abnahme'));
+
+const CHECKLISTE_SERVICE = `# Service-Auftrag
+Termin mit Melih vereinbart [datum]
+Service-Rapport erstellt [dok: ibn]`;
+
+// Projektart bestimmt die Checkliste; jede Art hat ihre eigene Vorlage in den Einstellungen
+const PROJEKT_ARTEN = { pv: 'PV-Projekt', batterie: 'Batterienachrüstung', service: 'Service-Auftrag' };
+const MEHRZAHL = { pv: 'PV-Projekte', batterie: 'Batterienachrüstungen', service: 'Service-Aufträge' };
+const CHK_FELD = { pv: 'checklisteVorlage', batterie: 'checklisteBatterie', service: 'checklisteService' };
+const CHK_STANDARD = { pv: CHECKLISTE_VORLAGE, batterie: CHECKLISTE_BATTERIE, service: CHECKLISTE_SERVICE };
+const projektArt = p => PROJEKT_ARTEN[p.art] ? p.art : 'pv';
+const vorlageFuer = art => S()[CHK_FELD[art] || CHK_FELD.pv];
+// gleiches Formular, beim Service-Auftrag heisst es Service-Rapport
+const rapportName = p => projektArt(p) === 'service' ? 'Service-Rapport' : 'IBN-Rapport';
+
 // Anfrage ans Meldewesen (TAG / IA und IBN)
 const MELDEWESEN_TEXT = `Welche Aufgaben möchte ich beim Meldewesen beantragen?
 Elektroschema kontrollieren & TAG / IA (AC/DC) einreichen, IB Datum und Planung festlegen
@@ -844,7 +902,8 @@ function migrate(d) {
   d.projects = d.projects || [];
   d.settings = Object.assign({}, DEFAULT_SETTINGS, d.settings || {});
   if (!Array.isArray(d.settings.standardGewerke)) d.settings.standardGewerke = stdKopie();
-  if (typeof d.settings.checklisteVorlage !== 'string') d.settings.checklisteVorlage = CHECKLISTE_VORLAGE;
+  Object.entries(CHK_FELD).forEach(([art, f]) => { if (typeof d.settings[f] !== 'string') d.settings[f] = CHK_STANDARD[art]; });
+  d.settings.checklisteService = d.settings.checklisteService.replace(/^IBN-Rapport erstellt/m, 'Service-Rapport erstellt');
   if (!Array.isArray(d.settings.mailvorlagen)) d.settings.mailvorlagen = MAIL_VORLAGEN.map(m => ({ ...m }));
   // Version 3: ältere Checklisten bekommen Mail-/Dokument-Verknüpfungen und "vor Baustart"-Markierungen der Standardvorlage,
   // Mailvorlagen enden ohne Gruss und Signatur
@@ -872,6 +931,13 @@ function migrate(d) {
   }
   d.projects.forEach((p, i) => {
     if (!p.farbe) p.farbe = PALETTE[i % PALETTE.length];
+    if (!PROJEKT_ARTEN[p.art]) p.art = 'pv';
+    if (p.art === 'service' && typeof p.checkliste === 'string' && p.chk) {
+      p.checkliste = p.checkliste.replace(/^IBN-Rapport erstellt/m, 'Service-Rapport erstellt');
+      const alt = 'service-auftrag › ibn-rapport erstellt';
+      if (p.chk[alt]) { p.chk['service-auftrag › service-rapport erstellt'] = p.chk[alt]; delete p.chk[alt]; }
+      if (p.ibn && p.ibn.titel === 'IBN PV-Anlage') p.ibn.titel = 'Service PV-Anlage';
+    }
     if (typeof p.checkliste !== 'string') p.checkliste = d.settings.checklisteVorlage;
     if (!p.chk) p.chk = {};
     delete p.bauherr;
@@ -1045,6 +1111,7 @@ function icsDownload(pairs) {
   a.click(); URL.revokeObjectURL(a.href);
 }
 const badge = p => { const s = status(p); return `<span class="badge b-${s.key}">${s.label}</span>`; };
+const artBadge = p => projektArt(p) === 'pv' ? '' : `<span class="art-tag art-${p.art}">${PROJEKT_ARTEN[p.art]}</span>`;
 const findP = id => state.projects.find(p => p.id === id);
 
 // ---------- Navigation ----------
@@ -1163,7 +1230,8 @@ function render(opt = {}) {
   // Sicherung: läuft die Überblendung nicht an, wird trotzdem umgeschaltet
   let erledigt = false;
   const einmal = () => { if (!erledigt) { erledigt = true; anwenden(); } };
-  try { document.startViewTransition(einmal); } catch (e) { einmal(); }
+  // schnell aufeinanderfolgende Wechsel überspringen die Überblendung; das ist kein Fehler
+  try { const t = document.startViewTransition(einmal); [t.ready, t.finished, t.updateCallbackDone].forEach(pr => pr.catch(() => {})); } catch (e) { einmal(); }
   setTimeout(einmal, 400);
 }
 let renderNr = 0;
@@ -1238,8 +1306,39 @@ function freigabeHinweis(p) {
   return `<div class="frei rot" onclick="ui.tab='checkliste';render()">⚠ ${f.tage < 0 ? `Bau läuft seit ${fmt(f.s.start)}` : f.tage === 0 ? 'Baustart ist heute' : `Baustart in ${f.tage} Tagen (${fmtLong(f.s.start)})`}
     – ${f.offen.length} Punkt${f.offen.length > 1 ? 'e' : ''} vor Baustart noch offen. Der Bau darf erst starten, wenn alles erledigt ist.</div>`;
 }
+// Service-Aufträge: Status aus der Checkliste (Datumspunkt = Termin, [dok: ibn] = Rapport), Termin sonst aus dem Terminplan
+function serviceStatus(p) {
+  const st = chkStats(p), alle = [];
+  const walk = n => { alle.push(n); n.children.forEach(walk); };
+  st.ph.forEach(ph => ph.items.forEach(walk));
+  const tn = alle.find(n => n.datum && (p.chk[n.key] || {}).datum), rap = alle.filter(n => n.dok === 'ibn');
+  const termin = tn ? p.chk[tn.key].datum : span(p)?.start || '';
+  const rapportFertig = rap.length > 0 && rap.every(n => chkDone(p, n));
+  // Rapport begonnen (Formular geöffnet) oder abgehakt, aber Auftrag noch nicht ganz erledigt
+  const key = st.total && st.done === st.total ? 'erledigt' : rapportFertig || p.ibn ? 'rapport' : termin ? 'termin' : 'offen';
+  return { key, termin, rapportFertig, tage: p.erstellt ? diffDays(p.erstellt, todayIso()) : null, st };
+}
+const SERVICE_ALARM = 14; // so viele Tage ohne Termin: Auftrag wird hervorgehoben
+function viewService(today) {
+  const list = state.projects.filter(p => projektArt(p) === 'service').map(p => ({ p, ...serviceStatus(p) })).filter(x => x.key !== 'erledigt')
+    .sort((a, b) => (a.termin || '9999').localeCompare(b.termin || '9999') || (b.tage || 0) - (a.tage || 0));
+  const tag = x => x.key === 'rapport' ? (x.rapportFertig ? '<span class="tag-ok">Rapport fertig</span>' : '<span class="tag-sub">Rapport in Arbeit</span>')
+    : x.key === 'termin' ? `<span class="tag-sub">Termin fix · ${fmt(x.termin)}${x.termin >= today ? ' · ' + relTage(x.termin) : ''}</span>`
+    : `<span class="${x.tage > SERVICE_ALARM ? 'tag-warn' : 'tag-sub'}">offen</span>`;
+  return `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Offene Service-Aufträge${list.length ? ` <span class="muted" style="font-weight:400">· ${list.length}</span>` : ''}</h3>
+      <button class="sec sm" onclick="neuesProjektDialog();npArt('service')">+ Service-Auftrag</button></div>
+    ${list.length ? list.map(x => `<div class="li sv-row ${x.key === 'offen' && x.tage > SERVICE_ALARM ? 'sv-alt' : ''}" onclick="ui.tab='checkliste';nav('projekt/${x.p.id}')" title="Auftrag öffnen">
+      <span class="swatch" style="background:${x.p.farbe}"></span>
+      <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)} ${esc(x.p.name)}</b>
+        <div class="muted">${x.p.ort ? esc(x.p.ort) + ' · ' : ''}${x.tage === null ? '' : x.tage === 0 ? 'heute eröffnet' : `seit ${x.tage} Tag${x.tage > 1 ? 'en' : ''} offen`} · Checkliste ${x.st.done}/${x.st.total}</div></div>
+      ${tag(x)}
+      <button class="sec sm" onclick="event.stopPropagation();ibnDialog('${x.p.id}')">📄 Rapport</button>
+    </div>`).join('') : '<div class="empty">Keine offenen Service-Aufträge.</div>'}
+  </div>`;
+}
 function viewOffen(today) {
-  const list = state.projects.map(p => ({ p, ...freigabe(p) }))
+  const list = state.projects.filter(p => projektArt(p) !== 'service').map(p => ({ p, ...freigabe(p) }))
     .filter(x => !x.s || x.s.ende >= today)
     .sort((a, b) => (a.s ? a.s.start : '9999').localeCompare(b.s ? b.s.start : '9999'))
     .filter(x => x.offen.length || (x.s && x.s.start >= today && diffDays(today, x.s.start) <= 30));
@@ -1267,10 +1366,13 @@ function viewOffen(today) {
 }
 function viewDashboard() {
   const today = todayIso();
-  const mit = state.projects.map(p => ({ p, s: span(p) })).filter(x => x.s);
+  // Bauprojekte (PV, Batterie) und Service-Aufträge werden getrennt gezählt
+  const bau = state.projects.filter(p => projektArt(p) !== 'service');
+  const serviceOffen = state.projects.filter(p => projektArt(p) === 'service' && serviceStatus(p).key !== 'erledigt').length;
+  const mit = bau.map(p => ({ p, s: span(p) })).filter(x => x.s);
   const geplant = mit.filter(x => x.s.start > today).sort((a, b) => a.s.start.localeCompare(b.s.start));
   const laufend = mit.filter(x => x.s.start <= today && x.s.ende >= today).sort((a, b) => a.s.ende.localeCompare(b.s.ende));
-  const ohne = state.projects.length - mit.length;
+  const ohne = bau.length - mit.length;
   const next = geplant[0];
   const einsaetze = meineEinsaetze().filter(e => e.t.start >= today);
   const proTag = {};
@@ -1315,12 +1417,14 @@ function viewDashboard() {
   </div>
   ${nextCard}
   ${viewOffen(today)}
+  ${viewService(today)}
   <div class="kpis">
-    <div class="kpi" onclick="nav('projekte')"><b data-zahl="${state.projects.length}">${state.projects.length}</b><span>Projekte total</span></div>
+    <div class="kpi" onclick="nav('projekte')"><b data-zahl="${bau.length}">${bau.length}</b><span>Projekte total</span></div>
     <div class="kpi" onclick="nav('projekte')"><b style="color:var(--ok)" data-zahl="${laufend.length}">${laufend.length}</b><span>laufend</span></div>
     <div class="kpi" onclick="nav('projekte')"><b style="color:var(--brand)" data-zahl="${geplant.length}">${geplant.length}</b><span>geplant</span></div>
     <div class="kpi" onclick="nav('projekte')"><b style="color:var(--warn)" data-zahl="${ohne}">${ohne}</b><span>ohne Termine</span></div>
     <div class="kpi" onclick="nav('woche')"><b style="color:var(--danger)" data-zahl="${in30}">${in30}</b><span>meine Einsätze (30 Tage)</span></div>
+    <div class="kpi" onclick="ui.q='service-auftrag';nav('projekte')"><b style="color:#b35c00" data-zahl="${serviceOffen}">${serviceOffen}</b><span>Service offen</span></div>
   </div>
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:6px">
@@ -1368,9 +1472,9 @@ function viewProjekte() {
     </div>
   </div>
   ${list.length ? `<div class="projects">${list.map(p => { const s = span(p), ck = chkStats(p); return `
-    <div class="pcard" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '')).toLowerCase())}" onclick="openProjekt('${p.id}')">
+    <div class="pcard" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
       <div class="row" style="justify-content:space-between"><span class="pnum">${esc(p.nummer)}</span>
-        <div class="row" style="gap:4px">${freigabe(p).kritisch ? '<span class="tag-warn" style="margin:0">Freigabe fehlt</span>' : ''}${badge(p)}</div></div>
+        <div class="row" style="gap:4px">${freigabe(p).kritisch ? '<span class="tag-warn" style="margin:0">Freigabe fehlt</span>' : ''}${artBadge(p)}${badge(p)}</div></div>
       <h3 style="margin:8px 0 4px">${esc(p.name)}</h3>
       <div class="muted">${esc(p.ort || '–')}</div>
       <div class="muted" style="margin-top:6px">${s ? fmt(s.start) + ' – ' + fmt(s.ende) : 'noch keine Termine'} · ${p.termine.length} Termine</div>
@@ -1387,28 +1491,39 @@ function filterProjekte(q) {
 function neuesProjektDialog() {
   const d = $('dlg');
   d.innerHTML = `
-    <h2>Neues Projekt</h2>
-    <div class="grid" style="grid-template-columns:1fr">
-      <div><label>Projektnummer *</label><input id="np-nr" placeholder="z.B. 2026-0142"></div>
+    <h2>Neu erstellen</h2>
+    <label>Was möchtest du erstellen?</label>
+    <div class="art-wahl" id="np-art">${[['pv', '☀', 'PV-Anlage'], ['batterie', '🔋', 'Batterie nachrüsten'], ['service', '🔧', 'IBN / Service']].map(([k, ic, sub], i) =>
+      `<button type="button" data-art="${k}" class="${i ? '' : 'on'}" onclick="npArt('${k}')"><span class="art-ic">${ic}</span><b>${PROJEKT_ARTEN[k]}</b><small>${sub}</small></button>`).join('')}</div>
+    <div class="grid" style="grid-template-columns:1fr;margin-top:14px">
+      <div><label id="np-nr-l">Projektnummer *</label><input id="np-nr" placeholder="z.B. 2026-0142"></div>
       <div><label>Projektname *</label><input id="np-name" placeholder="z.B. MFH Sonnenhof"></div>
       <div><label>Ort / Adresse</label><input id="np-ort"></div>
       <div><label>Farbe im Kalender</label><input type="color" id="np-farbe" value="${freieFarbe(state.projects.map(p => p.farbe))}"></div>
     </div>
     <div class="row" style="margin-top:16px;justify-content:flex-end">
       <button class="sec" onclick="$('dlg').close()">Abbrechen</button>
-      <button onclick="neuesProjekt()">Projekt erstellen</button>
+      <button id="np-ok" onclick="neuesProjekt()">Projekt erstellen</button>
     </div>`;
+  ui.npArt = 'pv';
   d.showModal(); $('np-nr').focus();
   d.onkeydown = e => { if (e.key === 'Enter') neuesProjekt(); };
 }
+function npArt(art) {
+  ui.npArt = art;
+  document.querySelectorAll('#np-art button').forEach(b => b.classList.toggle('on', b.dataset.art === art));
+  const s = art === 'service';
+  $('np-nr-l').textContent = s ? 'Auftragsnummer *' : 'Projektnummer *';
+  $('np-ok').textContent = s ? 'Service-Auftrag erstellen' : 'Projekt erstellen';
+}
 function neuesProjekt() {
-  const nummer = val('np-nr'), name = val('np-name');
-  if (!nummer || !name) return toast('Projektnummer und Name sind Pflicht.');
+  const nummer = val('np-nr'), name = val('np-name'), art = ui.npArt || 'pv';
+  if (!nummer || !name) return toast(art === 'service' ? 'Auftragsnummer und Name sind Pflicht.' : 'Projektnummer und Name sind Pflicht.');
   if (state.projects.some(p => p.nummer === nummer)) return toast('Diese Projektnummer existiert bereits.');
   const p = {
-    id: uid(), nummer, name, ort: val('np-ort'), farbe: $('np-farbe').value, bemerkung: '', erstellt: todayIso(),
+    id: uid(), art, nummer, name, ort: val('np-ort'), farbe: $('np-farbe').value, bemerkung: '', erstellt: todayIso(),
     gewerke: S().standardGewerke.map(({ sid, ...g }) => ({ ...g, id: uid(), std: sid, fix: true, eigen: g.art === 'intern' })), termine: [],
-    checkliste: S().checklisteVorlage, chk: {}, personen: [], kundeId: ''
+    checkliste: vorlageFuer(art), chk: {}, personen: [], kundeId: ''
   };
   state.projects.push(p); save(); $('dlg').close(); openProjekt(p.id);
 }
@@ -1421,7 +1536,7 @@ function viewProjekt(p) {
     <button onclick="pdf('${p.id}')">Terminplan als PDF</button>
   </div>
   <div class="card" style="border-left:5px solid ${p.farbe}">
-    <div class="row"><span class="pnum">${esc(p.nummer)}</span>${badge(p)}</div>
+    <div class="row"><span class="pnum">${esc(p.nummer)}</span>${artBadge(p)}${badge(p)}</div>
     <h2 style="margin:8px 0 2px">${esc(p.name)}</h2>
     <div class="muted">${p.ort ? esc(p.ort) + ' · ' : ''}Projektleiter: ${esc(S().name)}</div>
   </div>
@@ -1527,7 +1642,7 @@ function viewCheckliste(p) {
       ${pfeil}<input type="checkbox" ${ok ? 'checked' : ''} ${auto ? 'disabled title="Automatisch erledigt (Unterpunkte)"' : ''} onchange="chkSet('${p.id}',${i},this.checked,this)">
       <div class="ck-txt"><span>${esc(n.text)}</span>${sub}${rot ? '<span class="tag-warn">Baustart gefährdet</span>' : n.wichtig ? '<span class="tag-wichtig">vor Baustart</span>' : ''}
         ${n.mail ? `<button class="sec sm" onclick="mailDialog('${p.id}',${i})">✉ Mail</button>` : ''}
-        ${DOKS[n.dok] ? `<button class="sec sm" onclick="${DOKS[n.dok].fn}('${p.id}')">📄 ${DOKS[n.dok].label}${DOKS[n.dok].hat(p) ? ' bearbeiten' : ' ausfüllen'}</button>` : ''}
+        ${DOKS[n.dok] ? `<button class="sec sm" onclick="${DOKS[n.dok].fn}('${p.id}')">📄 ${n.dok === 'ibn' ? rapportName(p) : DOKS[n.dok].label}${DOKS[n.dok].hat(p) ? ' bearbeiten' : ' ausfüllen'}</button>` : ''}
         ${n.datum ? `<input type="date" value="${st.datum || ''}" onchange="chkDatum('${p.id}',${i},this.value)">` : ''}${baustart}
         ${st.ok && st.am ? `<span class="ck-am">✓ ${fmt(st.am)}</span>` : ''}
         ${st.notiz ? `<div class="ck-notiz">${esc(st.notiz)}</div>` : ''}
@@ -1717,7 +1832,7 @@ function ibnDefaults(p) {
   let termin = t ? t.start : '';
   if (!termin) Object.entries(p.chk).forEach(([k, st]) => { if (!termin && /ibn/.test(k) && /termin/.test(k) && st.datum) termin = st.datum; });
   return {
-    termin, zeit: t?.plZeit || '', titel: 'IBN PV-Anlage',
+    termin, zeit: t?.plZeit || '', titel: projektArt(p) === 'service' ? 'Service PV-Anlage' : 'IBN PV-Anlage',
     kunde: (k => k ? [k.name, k.firma, k.adresse, k.telefon].filter(Boolean).join('\n') : '')(kontaktById(p.kundeId)), objekt: [p.name, p.ort].filter(Boolean).join('\n'), arbeiten: '', bemerkungen: '',
     monteure: [{ name: g?.kontakt || '', kw: termin ? String(kw(toDate(termin))) : '', h: leer7(), art: 'MONT', preis: '' }, { name: '', kw: '', h: leer7(), art: '', preis: '' }],
     material: Array.from({ length: 5 }, () => ({ text: '', art: '', menge: '', preis: '' })),
@@ -1738,7 +1853,8 @@ function ibnDialog(pid) {
   const f = (pfad, val, attr = '') => `data-f="${pfad}" value="${esc(val)}" oninput="ibnSet(this)" ${attr}`;
   d.style.width = 'min(920px, calc(100vw - 24px))';
   d.innerHTML = `<div class="rap">
-    <div class="rap-logo">${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:38px">CKW<i style="width:11px;height:11px"></i></div>'}</div>
+    <div class="rap-logo"><div><b>${rapportName(p)}</b><span>${esc([S().firma, S().strasse, S().ort].filter(Boolean).join(' · '))}</span></div>
+      ${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:38px">CKW<i style="width:11px;height:11px"></i></div>'}</div>
     <div class="rap-bar rap-kopf"><span>Projekt-Nr.: <b>${esc(p.nummer)}</b></span>
       <span>Termin: <input type="date" ${f('termin', r.termin)}></span><span>Zeit: <input type="time" ${f('zeit', r.zeit)}></span></div>
     <input class="rap-titel" ${f('titel', r.titel)}>
@@ -1831,7 +1947,12 @@ function ibnPdf(pid) {
   };
   const neueSeite = (y, h) => { if (y + h > 285) { doc.addPage(); return 15; } return y; };
 
-  pdfLogo(doc, W / 2, 9, 10, true);
+  // Kopf: Titel und Firma links, CKW-Logo rechts, darunter eine Linie in CKW-Grün
+  pdfLogo(doc, W - M, 8, 12);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(20); doc.text(rapportName(p), M, 14);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(90, 90, 98);
+  doc.text([S().firma, S().strasse, S().ort].filter(Boolean).join('  ·  '), M, 19.5);
+  doc.setFillColor(...LIME); doc.rect(M, 22.5, B, 1.2, 'F');
   let y = 27;
   bar(M, y, B, '');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255);
@@ -1878,8 +1999,8 @@ function ibnPdf(pid) {
   doc.text('Unterschrift Monteur:', M + 100, y);
   if (r.unterschrift) try { doc.addImage(r.unterschrift, 'PNG', M + 100, y - 13.5, 36, 10.1); } catch (e) { /* ohne Unterschrift weiter */ }
   doc.text(`Total Arbeit:  ${sum.total ? fmtH(sum.total) + ' h' : ''}`, M + 146, y);
-  doc.save(`IBN-Rapport_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
-  toast('IBN-Rapport als PDF gespeichert.');
+  doc.save(`${rapportName(p)}_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
+  toast(`${rapportName(p)} als PDF gespeichert.`);
 }
 
 // ---------- Checkliste Blitzschutz & Photovoltaik (Original-PDF der LASOLTEC GmbH wird ausgefüllt) ----------
@@ -1989,7 +2110,7 @@ async function blitzPdf(pid) {
 }
 // Dokumente, die an Checklisten-Punkten hängen können ([dok: …])
 const DOKS = {
-  ibn: { label: 'IBN-Rapport', fn: 'ibnDialog', hat: p => !!p.ibn },
+  ibn: { label: 'IBN- / Service-Rapport', fn: 'ibnDialog', hat: p => !!p.ibn },
   blitz: { label: 'Checkliste Blitzschutz', fn: 'blitzDialog', hat: p => !!p.blitz }
 };
 
@@ -2043,7 +2164,7 @@ function chkEditor(pid) {
     <p class="muted" style="margin-top:4px">Abgehakte Punkte bleiben erhalten, solange der Text gleich bleibt.</p>
     <div id="ed" style="max-height:60vh;overflow:auto">${edHtml()}</div>
     <div class="row" style="margin-top:14px;justify-content:space-between">
-      <button class="sec" onclick="edStart('${pid}',S().checklisteVorlage);edRender()">Standard-Vorlage laden</button>
+      <button class="sec" onclick="edStart('${pid}',vorlageFuer(projektArt(findP('${pid}'))));edRender()">Standard-Vorlage laden</button>
       <div class="row"><button class="sec" onclick="$('dlg').close()">Abbrechen</button>
       <button onclick="findP('${pid}').checkliste=textAusZeilen(ui.ed.lines);save();$('dlg').close();render();toast('Checkliste gespeichert.')">Speichern</button></div>
     </div>`;
@@ -2487,6 +2608,7 @@ function viewInfo(p) {
       <div><label>Projektname *</label><input id="i-name" value="${esc(p.name)}"></div>
       <div><label>Ort / Adresse</label><input id="i-ort" value="${esc(p.ort)}"></div>
       <div><label>Farbe im Kalender</label><input type="color" id="i-farbe" value="${p.farbe}"></div>
+      <div><label>Art</label><select id="i-art">${Object.entries(PROJEKT_ARTEN).map(([k, l]) => `<option value="${k}" ${projektArt(p) === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
     </div>
     <div style="margin-top:12px"><label>Bemerkung (erscheint auf dem PDF)</label><textarea id="i-bem">${esc(p.bemerkung)}</textarea></div>
     <div class="row" style="margin-top:12px;justify-content:space-between">
@@ -2500,7 +2622,10 @@ function speichereInfo(pid) {
   const nummer = val('i-nr'), name = val('i-name');
   if (!nummer || !name) return toast('Projektnummer und Name sind Pflicht.');
   if (state.projects.some(x => x.nummer === nummer && x.id !== pid)) return toast('Diese Projektnummer existiert bereits.');
-  Object.assign(p, { nummer, name, ort: val('i-ort'), farbe: $('i-farbe').value, bemerkung: val('i-bem') });
+  const art = $('i-art').value, neueArt = art !== projektArt(p);
+  if (neueArt && !confirm(`Art auf «${PROJEKT_ARTEN[art]}» ändern? Die Checkliste wird durch diese Vorlage ersetzt; abgehakte Punkte mit gleichem Text bleiben erhalten.`)) return;
+  Object.assign(p, { art, nummer, name, ort: val('i-ort'), farbe: $('i-farbe').value, bemerkung: val('i-bem') });
+  if (neueArt) p.checkliste = vorlageFuer(art);
   save(); render(); toast('Projektdaten gespeichert.');
 }
 function loescheProjekt(pid) {
@@ -2798,38 +2923,51 @@ function viewEinstellungen() {
 }
 
 function viewChkVorlage() {
-  if (!ui.ed || ui.ed.target !== 'vorlage') edStart('vorlage', S().checklisteVorlage);
-  return `<div class="card">
-    <div class="ck-head"><h3 style="margin:0">Checkliste – Vorlage</h3>
+  const art = PROJEKT_ARTEN[ui.chkArt] ? ui.chkArt : 'pv', n = state.projects.filter(p => projektArt(p) === art).length;
+  if (!ui.ed || ui.ed.target !== 'vorlage:' + art) edStart('vorlage:' + art, vorlageFuer(art));
+  return `<div class="seg seg-breit" style="margin-bottom:14px">${Object.entries(PROJEKT_ARTEN).map(([k, l]) =>
+      `<button class="${art === k ? 'on' : ''}" onclick="chkArtWechseln('${k}')">${l}</button>`).join('')}</div>
+  <div class="card">
+    <div class="ck-head"><h3 style="margin:0">Checkliste – ${PROJEKT_ARTEN[art]}</h3>
       <button class="sec sm" onclick="edToggleText()">${ui.edText ? 'Zurück zur Liste' : 'Als Text bearbeiten'}</button></div>
-    <p class="muted" style="margin-top:4px">Jedes neue Projekt bekommt diese Checkliste.
+    <p class="muted" style="margin-top:4px">Neue ${MEHRZAHL[art]} bekommen diese Checkliste${n ? `; Änderungen werden in ${n === 1 ? 'das bestehende' : `die ${n} bestehenden`} übernommen` : ''}.
       <b>›</b> macht einen Unterpunkt · <b>vor Baustart</b> = erscheint im Dashboard, bis erledigt · <b>Datum</b> = Datumsfeld ·
       <b>oder</b> = einer der Unterpunkte genügt · <b>✉</b> = Mailvorlage zum Kopieren.</p>
     <div id="ed">${edHtml()}</div>
     <div class="row" style="margin-top:16px;justify-content:space-between">
       <div class="row">
         <button onclick="vorlageSpeichern()">Speichern</button>
-        <button class="sec" onclick="if(confirm('Vorlage auf das Original zurücksetzen?')){edStart('vorlage',CHECKLISTE_VORLAGE);edRender()}">Standard laden</button>
+        <button class="sec" onclick="if(confirm('Vorlage auf das Original zurücksetzen?')){edStart('vorlage:${art}',CHK_STANDARD.${art});edRender()}">Standard laden</button>
       </div>
-      <button class="sec" onclick="vorlageAnAlle()">Alle Projekte komplett auf die Vorlage zurücksetzen</button>
+      <button class="sec" onclick="vorlageAnAlle()">Alle ${MEHRZAHL[art]} komplett auf die Vorlage zurücksetzen</button>
     </div>
   </div>`;
 }
-// Speichern überträgt die Änderungen automatisch in alle bestehenden Projekte
+function chkArtWechseln(art) {
+  const v = ui.ed && ui.ed.target.split(':')[1];
+  if (v && v !== art) {
+    if (ui.edText && $('ed-text')) ui.ed.lines = zeilenAusText($('ed-text').value);
+    if (textAusZeilen(ui.ed.lines) !== vorlageFuer(v) && confirm(`Änderungen an der Checkliste «${PROJEKT_ARTEN[v]}» speichern?`)) vorlageSpeichern();
+  }
+  ui.chkArt = art; ui.ed = null; render();
+}
+// Speichern überträgt die Änderungen automatisch in alle bestehenden Projekte derselben Art
 function vorlageSpeichern(still) {
   if (ui.edText && $('ed-text')) ui.ed.lines = zeilenAusText($('ed-text').value);
-  const alt = state.settings.checklisteVorlage, neu = textAusZeilen(ui.ed.lines);
-  state.settings.checklisteVorlage = neu;
+  const art = ui.ed.target.split(':')[1] || 'pv', feld = CHK_FELD[art];
+  const alt = state.settings[feld], neu = textAusZeilen(ui.ed.lines);
+  state.settings[feld] = neu;
   let n = 0;
-  state.projects.forEach(p => { const t = vorlageUebertragen(p.checkliste, alt, neu); if (t !== p.checkliste) { p.checkliste = t; n++; } });
+  state.projects.filter(p => projektArt(p) === art).forEach(p => { const t = vorlageUebertragen(p.checkliste, alt, neu); if (t !== p.checkliste) { p.checkliste = t; n++; } });
   save();
   if (!still) toast(n ? `Vorlage gespeichert · in ${n} Projekt${n > 1 ? 'en' : ''} übernommen.` : 'Vorlage gespeichert.');
 }
 function vorlageAnAlle() {
-  if (!confirm('Die Checkliste ALLER Projekte durch diese Vorlage ersetzen? Eigene Punkte in Projekten gehen verloren; abgehakte Punkte mit gleichem Text bleiben erhalten.')) return;
+  const art = ui.ed.target.split(':')[1] || 'pv';
+  if (!confirm(`Die Checkliste ALLER Projekte der Art «${PROJEKT_ARTEN[art]}» durch diese Vorlage ersetzen? Eigene Punkte in Projekten gehen verloren; abgehakte Punkte mit gleichem Text bleiben erhalten.`)) return;
   vorlageSpeichern(true);
-  state.projects.forEach(p => p.checkliste = state.settings.checklisteVorlage);
-  save(); toast('Alle Projekte auf die Vorlage zurückgesetzt.');
+  state.projects.filter(p => projektArt(p) === art).forEach(p => p.checkliste = vorlageFuer(art));
+  save(); toast('Projekte auf die Vorlage zurückgesetzt.');
 }
 
 function viewMails() {
@@ -2861,7 +2999,7 @@ function updMail(i, k, v) {
   // Umbenennen: Verknüpfungen in Vorlage und Projekten mitziehen
   if (k === 'name' && alt && alt !== m.name) {
     const ers = t => t.split(`[mail: ${alt}]`).join(`[mail: ${m.name}]`);
-    state.settings.checklisteVorlage = ers(state.settings.checklisteVorlage);
+    Object.values(CHK_FELD).forEach(f => state.settings[f] = ers(state.settings[f]));
     state.projects.forEach(p => p.checkliste = ers(p.checkliste));
     if (ui.ed) ui.ed.lines.forEach(z => { if (z.mail === alt) z.mail = m.name; });
     [...state.settings.standardGewerke, ...state.projects.flatMap(p => p.gewerke)].forEach(g => { if (g.mailvorlage === alt) g.mailvorlage = m.name; });
