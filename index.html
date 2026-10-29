@@ -276,29 +276,74 @@
   .of-proj.kritisch .of-head b { color: #8e2318; }
   .of-item.rot > span { color: #8e2318; }
   .of-head .link:hover { text-decoration: underline; }
-  /* IBN-Rapport */
-  .rap { font-size: 14px; }
-  .rap-logo { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 4px 0 14px; padding-bottom: 10px; border-bottom: 3px solid var(--lime); }
-  .rap-logo b { display: block; font-size: 20px; }
-  .rap-logo span { font-size: 12px; color: var(--muted); }
-  .rap-logo img { height: 38px; }
-  .rap-bar { background: #969696; color: #fff; font-weight: 700; font-size: 13px; padding: 4px 8px; margin: 10px 0 4px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .rap-kopf { justify-content: space-between; }
-  .rap-kopf input { width: auto; padding: 2px 6px; border-radius: 6px; background: #fff; margin-left: 4px; }
-  .rap-titel { margin: 6px 0; font-size: 15px; border: none; border-bottom: 1px solid var(--line); border-radius: 0; background: none; padding: 4px 2px; }
-  .rap-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .rap textarea { min-height: 0; }
-  .rap-tab { margin-top: 10px; min-width: 760px; }
-  .rap-tab th { background: #969696; color: #fff; font-weight: 700; font-size: 12px; padding: 5px 4px; text-align: center; }
-  .rap-tab td { padding: 2px; border-bottom: 1px solid #e4e4e4; }
-  .rap-tab td input { padding: 4px 5px; border-radius: 6px; font-size: 13px; }
-  .rap-out { text-align: right; font-weight: 600; padding-right: 6px !important; white-space: nowrap; }
-  .rap-cb { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 0 12px; color: inherit; font-size: 12.5px; font-weight: 700; }
-  .rap-cb input { width: auto; }
-  .rap-fuss { justify-content: space-between; }
-  .rap-unter { display: grid; grid-template-columns: 1fr 1fr 1.4fr 0.7fr; gap: 12px; align-items: end; margin-top: 10px; }
-  #r-sig { width: 100%; max-width: 320px; height: 90px; border: 1px dashed #bbb; border-radius: 10px; background: #fff; touch-action: none; cursor: crosshair; }
-  @media (max-width: 700px) { .rap-2, .rap-unter { grid-template-columns: 1fr; } }
+  /* Arbeitsauftrag (IBN- / Service-Rapport) */
+  .aa { font-size: 14px; color: #1d1d1f; }
+  .aa-logo { text-align: center; margin: 2px 0 10px; }
+  .aa-logo img { height: 40px; }
+  .aa-logo .logo { display: inline-block; }
+  .aa-linie { height: 4px; border-radius: 2px; background: linear-gradient(90deg, #00558c, #0096c8 35%, #78be3c 70%, #e6c828); margin-bottom: 12px; }
+  .aa-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: #37474f; color: #fff; border-radius: 10px; padding: 8px 14px; }
+  .aa-bar-r { display: flex; gap: 16px; flex-wrap: wrap; }
+  .aa-bar label { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: #fff; font-size: 13px; }
+  .aa-bar input { width: auto; padding: 3px 6px; border-radius: 6px; border: none; background: #fff; }
+  .aa-titel { display: flex; align-items: baseline; gap: 8px; margin: 16px 0 14px; font-size: 24px; font-weight: 700; }
+  .aa-titel span { white-space: nowrap; }
+  .aa-titel input { font: inherit; border: none; border-bottom: 1.5px dashed #d0d0d0; border-radius: 0; background: none; padding: 0 2px; min-width: 0; }
+  .aa-3 { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 6px; }
+  .aa-3 > div { padding: 0 14px; border-left: 1px solid #ddd; }
+  .aa-3 > div:first-child { padding-left: 0; border-left: none; }
+  .aa h4 { display: flex; align-items: center; gap: 7px; margin: 0 0 6px; font-size: 15px; }
+  .aa h4 svg { width: 19px; height: 19px; fill: #37474f; flex: none; }
+  .aa textarea { min-height: 0; resize: vertical; }
+  .aa-h { margin-top: 18px !important; flex-wrap: wrap; }
+  .aa-h .muted { font-weight: 400; font-size: 12.5px; }
+  .aa-std { display: inline-flex; align-items: center; gap: 8px; margin: 14px 0 0; font-weight: 500; color: inherit; }
+  .aa-std input { width: auto; }
+  .aa-stunden { margin-top: 8px; border-collapse: collapse; width: 100%; font-size: 12px; }
+  .aa-stunden th { background: #37474f; color: #fff; padding: 5px; font-weight: 600; }
+  .aa-stunden td { border: 1px solid #ddd; height: 24px; }
+  .aa-gruppen { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .aa-box { background: #fff; border: 1px solid #e6e6e6; border-radius: 12px; padding: 10px 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, .07); display: flex; flex-direction: column; gap: 3px; }
+  .aa-box.aa-pl { border-color: #cfe0b4; background: #fbfdf6; }
+  .aa-box-kopf { display: flex; gap: 6px; align-items: center; }
+  .aa-gtitel { font-weight: 700; border: none; background: none; padding: 3px 2px; }
+  .aa-wer { margin: 2px 0 5px; align-self: flex-start; }
+  .aa-wer button { font-size: 11.5px; padding: 3px 8px; }
+  .aa-pkt { display: flex; gap: 6px; align-items: center; }
+  .aa-pkt input:not([type=checkbox]) { padding: 3px 6px; font-size: 13px; border-color: transparent; background: none; }
+  .aa-pkt input:not([type=checkbox]):hover, .aa-pkt input:not([type=checkbox]):focus { background: #f6f6f3; }
+  .aa-pkt input[type=checkbox] { width: 15px; height: 15px; flex: none; margin: 0; }
+  .aa-leer { display: inline-block; width: 13px; height: 13px; flex: none; border: 1.5px solid #9a9a9a; border-radius: 3px; vertical-align: -2px; }
+  .aa-box > .sec.sm { align-self: flex-start; margin-top: 4px; }
+  .aa-neu { border: 1.5px dashed #c8c8c0; background: none; color: var(--muted); border-radius: 12px; min-height: 80px; }
+  .aa-neu:hover { border-color: #9a9a92; color: var(--text); }
+  .aa-fuss { margin-top: 18px; padding-top: 10px; border-top: 1px solid #e6e6e6; }
+  .aa-fuss-kopf { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+  .aa-linien { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  .aa-linien span { border-bottom: 1px solid #888; font-size: 12px; color: #555; padding-bottom: 2px; }
+  /* Abnahmeprotokoll */
+  .ab-2 { display: grid; grid-template-columns: 1.25fr 1fr; gap: 24px; }
+  .ab-liste { display: flex; flex-direction: column; gap: 3px; }
+  .ab-liste > .sec.sm { align-self: flex-start; margin-top: 4px; }
+  .ab-pkt { display: flex; gap: 6px; align-items: center; }
+  .ab-pkt input:not([type=checkbox]) { padding: 4px 7px; font-size: 13px; }
+  .ab-pkt input[type=checkbox] { width: 15px; height: 15px; flex: none; margin: 0; }
+  .ab-text { flex: 1; min-width: 0; font-weight: 600; }
+  .ab-detail { flex: 1.1; min-width: 0; }
+  .ab-maengel { margin-top: 18px; border: 1px solid #d9d9d9; border-radius: 12px; padding: 12px 14px; }
+  .ab-tab td:first-child { text-align: center; color: #777; }
+  .ab-unter { grid-template-columns: 1fr 1fr 1fr; margin-top: 26px; }
+  /* Dokumente im Projekt */
+  .dok-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .dok-karte { display: flex; gap: 12px; align-items: flex-start; margin: 0; }
+  .dok-ic { font-size: 26px; line-height: 1; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: #f1f1ec; flex: none; }
+  .dok-knoepfe { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  @media (max-width: 700px) {
+    .ab-2, .ab-unter { grid-template-columns: 1fr; }
+    .aa-3, .aa-linien { grid-template-columns: 1fr; }
+    .aa-3 > div { padding: 10px 0 0; border-left: none; }
+    .aa-titel { font-size: 19px; flex-wrap: wrap; }
+  }
   /* Checkliste Blitzschutz (LASOLTEC) */
   .bz-kopf { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 3px solid #f6c400; padding-bottom: 8px; margin-bottom: 10px; }
   .bz-kopf h2 { margin: 4px 0 0; color: #1f3864; font-weight: 400; font-size: 24px; }
@@ -630,7 +675,7 @@ Unabhängige Kontrolle [mail: Unabhängige Kontrolle anmelden]
   Sicherheitsnachweis (SiNa) erhalten
 Blitzschutzattest [mail: Blitzschutzattest anfragen] [dok: blitz]
   Philipp Lägeler
-Abnahmeprotokoll
+Abnahmeprotokoll [dok: abnahme]
   Erstellt
   Vom Kunden unterschrieben
 NAKA
@@ -690,6 +735,31 @@ const projektArt = p => PROJEKT_ARTEN[p.art] ? p.art : 'pv';
 const vorlageFuer = art => S()[CHK_FELD[art] || CHK_FELD.pv];
 // gleiches Formular, beim Service-Auftrag heisst es Service-Rapport
 const rapportName = p => projektArt(p) === 'service' ? 'Service-Rapport' : 'IBN-Rapport';
+const rapportArt = p => projektArt(p) === 'service' ? 'service' : 'ibn';
+// Arbeitsauftrag: Ankreuz-Gruppen unten auf dem Formular.
+// wer 'pl' = kreuzt der Projektleiter an und gibt es dem Monteur mit · 'monteur' = wird leer gedruckt, der Monteur kreuzt vor Ort an
+const pk = (...t) => t.map(text => ({ text, ok: false }));
+const RAPPORT_VORLAGEN = {
+  ibn: { titel: 'IBN PV-Anlage', stunden: false, gruppen: [
+    { titel: 'Lastabwurf', wer: 'pl', punkte: pk('0-100%', '0-30-60-100%', 'Keine') },
+    { titel: 'Infos TAG / IA', wer: 'pl', punkte: pk('TAG bewilligt', 'IA bewilligt', 'Einspeisebegrenzung', 'Rundsteuerempfänger (RSE)') },
+    { titel: 'Fotos/Dok', wer: 'monteur', punkte: pk('WR-Typenschild', 'HV/UV', 'Solarlog/Manager', 'Batterie', 'HAK', 'Zähler', 'Mupp') },
+    { titel: 'Abschluss', wer: 'monteur', punkte: pk('Monitoring erstellt', 'Instruktion', 'Abnahme EW') }] },
+  service: { titel: 'Service PV-Anlage', stunden: true, gruppen: [
+    { titel: 'Fotos/Dok', wer: 'monteur', punkte: pk('WR-Typenschild', 'HV/UV', 'Batterie', 'Zähler') },
+    { titel: 'Abschluss', wer: 'monteur', punkte: pk('Fehler behoben', 'Monitoring geprüft', 'Instruktion Kunde') }] }
+};
+// Abnahmeprotokoll: 1. Gegenstand (mit Details wie Hersteller/Typ, sonst Hinweis in Klammern), 2. Funktionsprüfung
+const ABNAHME_VORLAGE = {
+  titel: 'Photovoltaik-Anlage',
+  gegenstand: [['PV-Module', 'Hersteller, Typ, Anzahl'], ['Unterkonstruktion', 'Dachhaken/Befestigung'], ['Wechselrichter', 'Hersteller, Typ'],
+    ['Batteriespeicher & Energiemanagement', ''], ['Ladeinfrastruktur', 'z.B. Ladestationen'], ['AC-/DC-Verkabelung & Absicherung', '']]
+    .map(([text, hint]) => ({ text, hint, detail: '', ok: false })),
+  pruefung: pk('Anlagenfunktion geprüft & aktiv', 'Monitoring / App eingerichtet & instruiert', 'Dokumentation (Schema, SiNa) übergeben'),
+  erklaerung: 'Die Anlage wird in betriebsbereitem Zustand übernommen.'
+};
+const vorlageKopie = v => JSON.parse(JSON.stringify(v));
+const rapVorlage = art => S().rapportVorlagen[art];
 
 // Anfrage ans Meldewesen (TAG / IA und IBN)
 const MELDEWESEN_TEXT = `Welche Aufgaben möchte ich beim Meldewesen beantragen?
@@ -903,6 +973,8 @@ function migrate(d) {
   d.settings = Object.assign({}, DEFAULT_SETTINGS, d.settings || {});
   if (!Array.isArray(d.settings.standardGewerke)) d.settings.standardGewerke = stdKopie();
   Object.entries(CHK_FELD).forEach(([art, f]) => { if (typeof d.settings[f] !== 'string') d.settings[f] = CHK_STANDARD[art]; });
+  if (!d.settings.rapportVorlagen) d.settings.rapportVorlagen = vorlageKopie(RAPPORT_VORLAGEN);
+  if (!d.settings.abnahmeVorlage) d.settings.abnahmeVorlage = vorlageKopie(ABNAHME_VORLAGE);
   d.settings.checklisteService = d.settings.checklisteService.replace(/^IBN-Rapport erstellt/m, 'Service-Rapport erstellt');
   if (!Array.isArray(d.settings.mailvorlagen)) d.settings.mailvorlagen = MAIL_VORLAGEN.map(m => ({ ...m }));
   // Version 3: ältere Checklisten bekommen Mail-/Dokument-Verknüpfungen und "vor Baustart"-Markierungen der Standardvorlage,
@@ -961,6 +1033,12 @@ function migrate(d) {
   if (d.settings.chkVersion < 6) {
     d.projects.forEach(p => p.checkliste = vorlageUebertragen(p.checkliste, null, d.settings.checklisteVorlage));
     d.settings.chkVersion = 6;
+  }
+  // Version 7: Abnahmeprotokoll als Dokument am Checklisten-Punkt «Abnahmeprotokoll» (PV und Batterie)
+  if (d.settings.chkVersion < 7) {
+    ['checklisteVorlage', 'checklisteBatterie'].forEach(f => d.settings[f] = flagsErgaenzen(d.settings[f]));
+    d.projects.forEach(p => { if (p.art !== 'service') p.checkliste = flagsErgaenzen(p.checkliste); });
+    d.settings.chkVersion = 7;
   }
   return d;
 }
@@ -1553,10 +1631,39 @@ function viewProjekt(p) {
   </div>
   ${freigabeHinweis(p)}
   <div class="tabs">
-    ${[['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
+    ${[['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['dokumente', 'Dokumente'], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
       `<button class="${ui.tab === k ? 'active' : ''}" onclick="ui.tab='${k}';ui.ganttScroll=true;render()">${l}</button>`).join('')}
   </div>
-  ${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'gewerke' ? viewGewerke(p) : ui.tab === 'info' ? viewInfo(p) : viewUebersicht(p)}`;
+  ${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'dokumente' ? viewDokumente(p) : ui.tab === 'gewerke' ? viewGewerke(p) : ui.tab === 'info' ? viewInfo(p) : viewUebersicht(p)}`;
+}
+
+// ---------- Dokumente eines Projekts an einem Ort ----------
+// Checklisten-Punkt, an dem ein Dokument hängt ([dok: …])
+function dokPunkt(p, dok) {
+  let f = null;
+  const walk = n => { if (!f && n.dok === dok) f = n; n.children.forEach(walk); };
+  parseCheckliste(p.checkliste).forEach(ph => ph.items.forEach(walk));
+  return f;
+}
+function viewDokumente(p) {
+  const id = p.id, service = projektArt(p) === 'service', nT = p.termine.length;
+  const L = [
+    { icon: '📋', titel: rapportName(p), info: 'Arbeitsauftrag für den Monteur', dok: 'ibn', da: !!p.ibn, auf: `ibnDialog('${id}')`, pdf: `ibnPdf('${id}')` },
+    ...(service ? [] : [
+      { icon: '✅', titel: 'Abnahmeprotokoll', info: 'Abnahme mit dem Kunden, Mängel und Unterschriften', dok: 'abnahme', da: !!p.abnahme, auf: `abnahmeDialog('${id}')`, pdf: `abnahmePdf('${id}')` },
+      { icon: '⚡', titel: 'Checkliste Blitzschutz', info: 'Bestellung der Abnahme bei LASOLTEC', dok: 'blitz', da: !!p.blitz, auf: `blitzDialog('${id}')`, pdf: p.blitz ? `blitzPdf('${id}')` : '' }]),
+    { icon: '📅', titel: 'Terminplan', info: nT ? `${nT} Termin${nT > 1 ? 'e' : ''} · PDF auf A3 quer` : 'noch keine Termine erfasst', da: nT > 0, auf: `ui.tab='termine';ui.ganttScroll=true;render()`, aufL: 'Zum Terminplan', pdf: nT ? `pdf('${id}')` : '' }
+  ];
+  return `<div class="dok-grid">${L.map(x => {
+    const n = x.dok && dokPunkt(p, x.dok), fertig = n && chkDone(p, n);
+    const status = fertig ? '<span class="tag-ok">✓ in der Checkliste erledigt</span>' : x.da ? '<span class="tag-sub">angefangen</span>' : '<span class="muted klein">noch nicht erstellt</span>';
+    return `<div class="card dok-karte">
+      <div class="dok-ic">${x.icon}</div>
+      <div style="flex:1;min-width:0"><b>${x.titel}</b><div class="muted klein">${x.info}</div><div style="margin-top:6px">${x.dok ? status : ''}</div></div>
+      <div class="dok-knoepfe"><button class="sm" onclick="${x.auf}">${x.aufL || (x.da ? 'Bearbeiten' : 'Ausfüllen')}</button>
+        ${x.pdf && (x.da || !x.dok) ? `<button class="sec sm" onclick="${x.pdf}">PDF</button>` : ''}</div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 // ---------- Projekt-Übersicht: offene Punkte bis Baustart, Leute im Projekt, Terminplan ----------
@@ -1831,188 +1938,370 @@ function kopiereAlt(text, ok) {
   t.remove();
 }
 
-// ---------- IBN-Rapport (nach Vorlage WebRapport) ----------
-const zahl = v => parseFloat(String(v ?? '').replace(',', '.')) || 0;
-const fmtH = n => n ? String(Math.round(n * 100) / 100) : '';
-const fmtFr = n => n ? n.toFixed(2) : '';
-const leer7 = () => ['', '', '', '', '', '', ''];
+// ---------- Arbeitsauftrag (IBN- und Service-Rapport) ----------
+// Adressblöcke für Rapport und Abnahmeprotokoll (eine Angabe pro Zeile)
+const kommaZeilen = s => (s || '').split(',').map(x => x.trim()).filter(Boolean);
+function kundeText(p) {
+  const k = kontaktById(p.kundeId);
+  return k ? [k.name, k.firma, ...kommaZeilen(k.adresse), k.email, k.telefon].filter(Boolean).join('\n') : '';
+}
+const objektText = p => (p.ort ? kommaZeilen(p.ort) : [p.name]).join('\n');
+// Elektriker mit Termin im Terminplan, sonst einer mit eingetragenem Kontakt (nie der Projektleiter als Platzhalter)
+function elektrikerText(p) {
+  const L = p.gewerke.filter(g => /elektri/i.test(g.name)), mitKontakt = g => g.crm || g.kontakt || g.telefon;
+  const roh = L.find(g => p.termine.some(t => t.gewerkId === g.id)) || L.find(mitKontakt);
+  if (!roh) return '';
+  const g = gewerk(p, roh.id);
+  return [g.firma, mitKontakt(roh) ? g.kontakt : '', g.telefon].filter(Boolean).join('\n');
+}
 function ibnDefaults(p) {
   const g = p.gewerke.map(x => gewerk(p, x.id)).find(x => /ibn/i.test(x.name));
   const t = g ? sortTermine(p).find(x => x.gewerkId === g.id) : null;
   // ohne Termin im Terminplan: Datum aus der Checkliste ("Termin von Melih")
   let termin = t ? t.start : '';
   if (!termin) Object.entries(p.chk).forEach(([k, st]) => { if (!termin && /ibn|service/.test(k) && /termin/.test(k) && st.datum) termin = st.datum; });
-  // Monteur, Datum und «Ausgefüllt von» trägt der Monteur selbst ein
+  const v = rapVorlage(rapportArt(p));
+  // Datum, «Ausgefüllt von», Unterschrift, Stunden und die Monteur-Checklisten füllt der Monteur vor Ort aus
   return {
-    termin, zeit: t?.plZeit || '', titel: projektArt(p) === 'service' ? 'Service PV-Anlage' : 'IBN PV-Anlage',
-    kunde: (k => k ? [k.name, k.firma, k.adresse, k.telefon].filter(Boolean).join('\n') : '')(kontaktById(p.kundeId)), objekt: [p.name, p.ort].filter(Boolean).join('\n'), arbeiten: '', bemerkungen: '',
-    monteure: [{ name: '', kw: termin ? String(kw(toDate(termin))) : '', h: leer7(), art: 'MONT', preis: '' }, { name: '', kw: '', h: leer7(), art: '', preis: '' }],
-    material: Array.from({ length: 5 }, () => ({ text: '', art: '', menge: '', preis: '' })),
-    keinMaterial: false, zusatzblatt: false, fertig: '', datum: '', von: '', unterschrift: ''
+    v: 2, termin, zeit: t?.plZeit || '', titel: v.titel,
+    kunde: kundeText(p), objekt: objektText(p), elektriker: elektrikerText(p),
+    arbeiten: '', hinweise: '', stunden: v.stunden, gruppen: vorlageKopie(v.gruppen)
   };
 }
-function ibnSummen(r) {
-  const mont = r.monteure.map(m => { const menge = m.h.reduce((a, h) => a + zahl(h), 0); return { menge, betrag: menge * zahl(m.preis) }; });
-  const mat = r.material.map(m => zahl(m.menge) * zahl(m.preis));
-  return { mont, mat, total: mont.reduce((a, m) => a + m.menge, 0) };
+// Rapporte aus der früheren WebRapport-Vorlage werden ins neue Formular übernommen
+function ibnAktuell(p) {
+  if (!p.ibn) p.ibn = ibnDefaults(p);
+  else if (p.ibn.v !== 2) {
+    const a = p.ibn, n = ibnDefaults(p);
+    p.ibn = { ...n, termin: a.termin || n.termin, zeit: a.zeit || n.zeit, titel: a.titel || n.titel, kunde: a.kunde || n.kunde,
+      objekt: a.objekt || n.objekt, arbeiten: a.arbeiten || '', hinweise: a.bemerkungen || '' };
+  }
+  return p.ibn;
 }
+const AA_ICONS = {
+  kunde: '<circle cx="12" cy="7.5" r="4.5"/><path d="M3 22c0-5 4-8 9-8s9 3 9 8z"/>',
+  objekt: '<path d="M12 2.5 1.5 12H5v9.5h5.5v-6h3v6H19V12h3.5z"/>',
+  elektriker: '<path d="M21.7 6.3 18 10l-3.4-.6L14 6l3.7-3.7a6 6 0 0 0-7.9 7.6L2.6 17.1a2.1 2.1 0 0 0 3 3l7.2-7.2a6 6 0 0 0 7.6-7.9z"/>'
+};
 let ibnPid = null;
 function ibnDialog(pid) {
-  const p = findP(pid), d = $('dlg');
-  if (!p.ibn) { p.ibn = ibnDefaults(p); save(); }
+  const p = findP(pid), d = $('dlg'), war = p.ibn && p.ibn.v === 2;
+  const r = ibnAktuell(p);
+  if (!war) save();
   ibnPid = pid;
-  const r = p.ibn, jahr = (r.termin || todayIso()).slice(0, 4);
-  const f = (pfad, val, attr = '') => `data-f="${pfad}" value="${esc(val)}" oninput="ibnSet(this)" ${attr}`;
-  d.style.width = 'min(920px, calc(100vw - 24px))';
-  d.innerHTML = `<div class="rap">
-    <div class="rap-logo"><div><b>${rapportName(p)}</b><span>${esc([S().firma, S().strasse, S().ort].filter(Boolean).join(' · '))}</span></div>
-      ${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:38px">CKW<i style="width:11px;height:11px"></i></div>'}</div>
-    <div class="rap-bar rap-kopf"><span>Projekt-Nr.: <b>${esc(p.nummer)}</b></span>
-      <span>Termin: <input type="date" ${f('termin', r.termin)}></span><span>Zeit: <input type="time" ${f('zeit', r.zeit)}></span></div>
-    <input class="rap-titel" ${f('titel', r.titel)}>
-    <div class="rap-2">
-      <div><div class="rap-bar">👤 Kunde:</div><textarea rows="4" data-f="kunde" oninput="ibnSet(this)" placeholder="Name, Adresse, Telefon">${esc(r.kunde)}</textarea></div>
-      <div><div class="rap-bar">🏠 Objekt:</div><textarea rows="4" data-f="objekt" oninput="ibnSet(this)">${esc(r.objekt)}</textarea></div>
-    </div>
-    <div class="rap-bar">Ausgeführte Arbeiten: (Text in Rechnung)</div>
-    <textarea rows="8" data-f="arbeiten" oninput="ibnSet(this)">${esc(r.arbeiten)}</textarea>
-    <div class="rap-bar">Bemerkungen / Infos (Intern erscheint nicht in Rechnung)</div>
-    <textarea rows="3" data-f="bemerkungen" oninput="ibnSet(this)">${esc(r.bemerkungen)}</textarea>
-    <div class="table-wrap"><table class="rap-tab">
-      <tr><th style="width:150px">🕓 Monteur</th><th>KW ${jahr}</th>${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(t => `<th>${t}</th>`).join('')}<th>Artikel-Nr.</th><th>Menge</th><th>Preis</th><th>Betrag</th></tr>
-      ${r.monteure.map((m, i) => `<tr><td><input ${f(`monteure.${i}.name`, m.name)}></td><td><input ${f(`monteure.${i}.kw`, m.kw)}></td>
-        ${m.h.map((h, j) => `<td><input inputmode="decimal" ${f(`monteure.${i}.h.${j}`, h)} placeholder="h"></td>`).join('')}
-        <td><input ${f(`monteure.${i}.art`, m.art)}></td><td class="rap-out" id="r-mm${i}"></td><td><input inputmode="decimal" ${f(`monteure.${i}.preis`, m.preis)}></td><td class="rap-out" id="r-mb${i}"></td></tr>`).join('')}
-    </table></div>
-    <div class="table-wrap"><table class="rap-tab">
-      <tr><th style="text-align:left">🔧 Material / Ausmass
-        <label class="rap-cb"><input type="checkbox" data-f="keinMaterial" onchange="ibnSet(this)" ${r.keinMaterial ? 'checked' : ''}> Kein Material</label>
-        <label class="rap-cb"><input type="checkbox" data-f="zusatzblatt" onchange="ibnSet(this)" ${r.zusatzblatt ? 'checked' : ''}> Zusatzblatt/LS</label></th>
-        <th style="width:110px">Artikel-Nr.</th><th style="width:70px">Menge</th><th style="width:80px">Preis</th><th style="width:80px">Betrag</th></tr>
-      ${r.material.map((m, i) => `<tr><td><input ${f(`material.${i}.text`, m.text)}></td><td><input ${f(`material.${i}.art`, m.art)}></td>
-        <td><input inputmode="decimal" ${f(`material.${i}.menge`, m.menge)}></td><td><input inputmode="decimal" ${f(`material.${i}.preis`, m.preis)}></td><td class="rap-out" id="r-xb${i}"></td></tr>`).join('')}
-    </table></div>
-    <div class="row" style="margin:4px 0 10px"><button class="sec sm" onclick="findP(ibnPid).ibn.material.push({text:'',art:'',menge:'',preis:''});save();ibnDialog(ibnPid)">+ Materialzeile</button></div>
-    <div class="rap-bar rap-fuss"><span>Weg- und Rüstzeiten gehen zu Lasten des Auftraggebers</span>
-      <span><label class="rap-cb"><input type="radio" name="r-fertig" value="ja" onchange="findP(ibnPid).ibn.fertig='ja';save()" ${r.fertig === 'ja' ? 'checked' : ''}> Arbeit fertig</label>
-      <label class="rap-cb"><input type="radio" name="r-fertig" value="nein" onchange="findP(ibnPid).ibn.fertig='nein';save()" ${r.fertig === 'nein' ? 'checked' : ''}> Arbeit nicht fertig</label></span></div>
-    <div class="rap-unter">
-      <div><label>Datum</label><input type="date" ${f('datum', r.datum)}></div>
-      <div><label>Ausgefüllt von</label><input ${f('von', r.von)}></div>
-      <div><label>✗ Unterschrift Monteur <a href="#" onclick="event.preventDefault();ibnSigLoeschen()">löschen</a></label><canvas id="r-sig" width="320" height="90"></canvas></div>
-      <div><label>Total Arbeit</label><b id="r-total" style="font-size:18px"></b></div>
-    </div>
+  const f = k => `data-f="${k}" value="${esc(r[k])}" oninput="ibnSet(this)"`;
+  const ta = (k, rows, ph = '') => `<textarea rows="${rows}" data-f="${k}" oninput="ibnSet(this)" placeholder="${ph}">${esc(r[k])}</textarea>`;
+  const spalte = (k, l, ph) => `<div><h4><svg viewBox="0 0 24 24">${AA_ICONS[k]}</svg>${l}</h4>${ta(k, 5, ph)}</div>`;
+  d.style.width = 'min(940px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="aa">
+    <div class="aa-logo">${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:40px">CKW<i style="width:12px;height:12px"></i></div>'}</div>
+    <div class="aa-linie"></div>
+    <div class="aa-bar"><span>Projekt-Nr: <b>${esc(p.nummer)}</b></span>
+      <span class="aa-bar-r"><label>Termin: <input type="date" ${f('termin')}></label><label>Zeit: <input type="time" ${f('zeit')}></label></span></div>
+    <div class="aa-titel"><span>Arbeitsauftrag:</span><input ${f('titel')} placeholder="z.B. IBN PV-Anlage"></div>
+    <div class="aa-3">${spalte('kunde', 'Kunde', 'Name, Adresse, E-Mail, Telefon')}${spalte('objekt', 'Objekt', 'Adresse der Anlage')}${spalte('elektriker', 'Elektriker', 'Firma, Name, Telefon')}</div>
+    <h4 class="aa-h">Auszuführende Arbeiten <span class="muted">– was der Monteur erledigen muss</span></h4>
+    ${ta('arbeiten', 5, '- IBN und Einbindung …\n- …')}
+    <h4 class="aa-h">Hinweise für den Monteur <span class="muted">– optional, z.B. Auflagen aus TAG / IA</span></h4>
+    ${ta('hinweise', 2)}
+    <label class="aa-std"><input type="checkbox" ${r.stunden ? 'checked' : ''} onchange="findP(ibnPid).ibn.stunden=this.checked;save();ibnDialog(ibnPid)"> Stundenrapport für den Monteur</label>
+    ${r.stunden ? aaStundenHtml() : ''}
+    <h4 class="aa-h">Checklisten <span class="muted">– «Vorgabe von mir» kreuzt du an · «Monteur kreuzt an» wird leer gedruckt</span></h4>
+    <div id="aa-gruppen">${aaGruppenHtml('r')}</div>
+    <div class="aa-fuss"><div class="aa-fuss-kopf"><b>Ausfüllen durch den Monteur</b><span><span class="aa-leer"></span> Arbeit fertig <span class="aa-leer"></span> Arbeit nicht fertig</span></div>
+      <div class="aa-linien"><span>Datum:</span><span>Ausgefüllt von:</span><span>Unterschrift Monteur:</span><span>Total Arbeit:</span></div></div>
   </div>
   <div class="row" style="margin-top:16px;justify-content:space-between">
-    <button class="danger sm" onclick="if(confirm('Rapport leeren und mit Projektdaten neu beginnen?')){findP(ibnPid).ibn=ibnDefaults(findP(ibnPid));save();ibnDialog(ibnPid)}">Neu beginnen</button>
+    <div class="row">
+      <button class="danger sm" onclick="if(confirm('Rapport leeren und mit Projektdaten neu beginnen?')){findP(ibnPid).ibn=ibnDefaults(findP(ibnPid));save();ibnDialog(ibnPid)}">Neu beginnen</button>
+      <button class="sec sm" onclick="aaVorlageLaden()">Checklisten aus Vorlage laden</button>
+    </div>
     <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button onclick="ibnPdf(ibnPid)">Als PDF speichern</button></div>
   </div>`;
   d.onkeydown = null;
-  if (!d.open) d.showModal();
-  d.addEventListener('close', () => { d.style.width = ''; render(); }, { once: true });
-  ibnRechnen();
-  ibnSigInit();
+  if (!d.open) {
+    d.showModal();
+    d.addEventListener('close', () => { d.style.width = ''; d.innerHTML = ''; render(); }, { once: true });
+  }
 }
-// Wert anhand des Pfads (z.B. "monteure.0.h.3") speichern
+// leere Stundentabelle, die der Monteur ausfüllt
+function aaStundenHtml() {
+  return `<table class="aa-stunden"><tr><th style="width:30%">Monteur</th><th>KW</th>${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(t => `<th>${t}</th>`).join('')}<th>Total h</th></tr>
+    ${('<tr>' + '<td></td>'.repeat(10) + '</tr>').repeat(3)}</table>
+    <div class="muted" style="font-size:12px;margin-top:4px">füllt der Monteur aus</div>`;
+}
 function ibnSet(el) {
-  const r = findP(ibnPid).ibn, teile = el.dataset.f.split('.');
-  let o = r;
-  teile.slice(0, -1).forEach(k => o = o[k]);
-  o[teile[teile.length - 1]] = el.type === 'checkbox' ? el.checked : el.value;
-  save(); ibnRechnen();
+  findP(ibnPid).ibn[el.dataset.f] = el.value;
+  save();
 }
-function ibnRechnen() {
-  const r = findP(ibnPid).ibn, s = ibnSummen(r);
-  s.mont.forEach((m, i) => { $('r-mm' + i).textContent = fmtH(m.menge); $('r-mb' + i).textContent = fmtFr(m.betrag); });
-  s.mat.forEach((b, i) => { $('r-xb' + i).textContent = fmtFr(b); });
-  $('r-total').textContent = s.total ? fmtH(s.total) + ' h' : '–';
+function aaVorlageLaden() {
+  const r = findP(ibnPid).ibn;
+  if (!confirm('Die Checklisten dieses Rapports durch die Vorlage aus den Einstellungen ersetzen?')) return;
+  r.gruppen = vorlageKopie(rapVorlage(rapportArt(findP(ibnPid))).gruppen);
+  save(); docBereich('r').querySelector('#aa-gruppen').innerHTML = aaGruppenHtml('r');
 }
-function ibnSigInit() {
-  const c = $('r-sig'), ctx = c.getContext('2d'), r = findP(ibnPid).ibn;
-  ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111';
-  if (r.unterschrift) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = r.unterschrift; }
-  let zeichnen = false;
-  const pos = e => { const b = c.getBoundingClientRect(); return [(e.clientX - b.left) * c.width / b.width, (e.clientY - b.top) * c.height / b.height]; };
-  c.onpointerdown = e => { zeichnen = true; c.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.moveTo(...pos(e)); };
-  c.onpointermove = e => { if (!zeichnen) return; ctx.lineTo(...pos(e)); ctx.stroke(); };
-  c.onpointerup = () => { if (!zeichnen) return; zeichnen = false; r.unterschrift = c.toDataURL('image/png'); save(); };
+// Formular im Dialog (ctx 'r') oder Vorlage auf der Einstellungsseite (ctx 's'); beide nutzen dieselben ids
+const docBereich = ctx => ctx === 'r' ? $('dlg') : $('app');
+// Ankreuz-Gruppen bearbeiten: ctx 'r' = aktueller Rapport, 's' = Vorlage in den Einstellungen
+const aaZiel = ctx => ctx === 'r' ? findP(ibnPid).ibn : rapVorlage(ui.aaArt === 'service' ? 'service' : 'ibn');
+function aaGruppenHtml(ctx) {
+  const z = aaZiel(ctx);
+  return `<div class="aa-gruppen">${z.gruppen.map((g, gi) => `<div class="aa-box ${g.wer === 'pl' ? 'aa-pl' : ''}">
+      <div class="aa-box-kopf"><input class="aa-gtitel" value="${esc(g.titel)}" placeholder="Titel" oninput="aaG('${ctx}','titel',${gi},0,this.value)">
+        <button class="ck-btn" title="Gruppe entfernen" onclick="aaG('${ctx}','gdel',${gi})">✕</button></div>
+      <div class="seg aa-wer"><button class="${g.wer === 'pl' ? 'on' : ''}" title="Du kreuzt an, der Monteur bekommt es so mit" onclick="aaG('${ctx}','wer',${gi},0,'pl')">Vorgabe von mir</button><button class="${g.wer !== 'pl' ? 'on' : ''}" title="Wird leer gedruckt, der Monteur kreuzt vor Ort an" onclick="aaG('${ctx}','wer',${gi},0,'monteur')">Monteur kreuzt an</button></div>
+      ${g.punkte.map((x, pi) => `<div class="aa-pkt">
+        ${ctx === 'r' && g.wer === 'pl' ? `<input type="checkbox" ${x.ok ? 'checked' : ''} onchange="aaG('${ctx}','ok',${gi},${pi},this.checked)">` : '<span class="aa-leer"></span>'}
+        <input value="${esc(x.text)}" placeholder="Punkt" oninput="aaG('${ctx}','text',${gi},${pi},this.value)">
+        <button class="ck-btn" title="Punkt entfernen" onclick="aaG('${ctx}','pdel',${gi},${pi})">✕</button></div>`).join('')}
+      <button class="sec sm" onclick="aaG('${ctx}','padd',${gi})">+ Punkt</button>
+    </div>`).join('')}
+    <button class="aa-neu" onclick="aaG('${ctx}','gadd')">+ Gruppe</button></div>`;
 }
-function ibnSigLoeschen() {
-  const c = $('r-sig'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
-  findP(ibnPid).ibn.unterschrift = ''; save();
+function aaG(ctx, op, gi, pi, v) {
+  const G = aaZiel(ctx).gruppen, g = G[gi];
+  if (op === 'titel') g.titel = v;
+  else if (op === 'text') g.punkte[pi].text = v;
+  else if (op === 'ok') g.punkte[pi].ok = v;
+  else if (op === 'wer') g.wer = v;
+  else if (op === 'pdel') g.punkte.splice(pi, 1);
+  else if (op === 'padd') g.punkte.push({ text: '', ok: false });
+  else if (op === 'gdel') { if (g.punkte.some(x => x.text.trim()) && !confirm(`Gruppe «${g.titel || 'ohne Titel'}» entfernen?`)) return; G.splice(gi, 1); }
+  else if (op === 'gadd') G.push({ titel: 'Neue Gruppe', wer: 'monteur', punkte: [{ text: '', ok: false }] });
+  save();
+  if (['titel', 'text', 'ok'].includes(op)) return;
+  const box = docBereich(ctx).querySelector('#aa-gruppen');
+  box.innerHTML = aaGruppenHtml(ctx);
+  // neues Feld gleich zum Schreiben bereit
+  if (op === 'padd') { const L = box.querySelectorAll('.aa-box')[gi].querySelectorAll('.aa-pkt input:not([type=checkbox])'); L[L.length - 1].focus(); }
+  if (op === 'gadd') { const L = box.querySelectorAll('.aa-gtitel'); L[L.length - 1].select(); }
 }
 function ibnPdf(pid) {
   if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
-  const p = findP(pid), r = p.ibn, sum = ibnSummen(r);
+  const p = findP(pid), r = ibnAktuell(p);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const W = 210, M = 12, B = W - 2 * M, GRAU = [150, 150, 150];
-  const bar = (x, y, w, txt, h = 5.5) => {
-    doc.setFillColor(...GRAU); doc.rect(x, y, w, h, 'F');
-    if (txt) { doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255); doc.text(txt, x + 1.5, y + h - 1.6); }
-  };
-  const text = (t, x, y, w, minH) => {
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(20);
-    const lines = doc.splitTextToSize(t || '', w);
-    doc.text(lines, x + 1, y + 4.5);
-    return Math.max(minH, lines.length * 4.3 + 3);
-  };
-  const neueSeite = (y, h) => { if (y + h > 285) { doc.addPage(); return 15; } return y; };
+  const W = 210, H = 297, M = 14, B = W - 2 * M, DUNKEL = AA_DUNKEL, TXT = AA_TXT;
+  const absatz = (t, w) => pdfAbsatz(doc, t, w);
+  const platz = h => { if (y + h > H - 16) { doc.addPage(); y = 18; } };
+  let y = pdfAaKopf(doc, p.nummer, [['Termin', r.termin ? fmt(r.termin) : ''], ['Zeit', r.zeit ? r.zeit + ' Uhr' : '']], `Arbeitsauftrag: ${r.titel || ''}`);
+  y = pdfDreiSpalten(doc, y, [['kunde', 'Kunde', r.kunde], ['objekt', 'Objekt', r.objekt], ['elektriker', 'Elektriker', r.elektriker]]);
 
-  // Kopf: Titel und Firma links, CKW-Logo rechts, darunter eine Linie in CKW-Grün
-  pdfLogo(doc, W - M, 8, 12);
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(20); doc.text(rapportName(p), M, 14);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(90, 90, 98);
-  doc.text([S().firma, S().strasse, S().ort].filter(Boolean).join('  ·  '), M, 19.5);
-  doc.setFillColor(...LIME); doc.rect(M, 22.5, B, 1.2, 'F');
-  let y = 27;
-  bar(M, y, B, '');
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255);
-  doc.text(`Projekt-Nr.:  ${p.nummer}`, M + 1.5, y + 3.9);
-  doc.text(`Termin:  ${fmt(r.termin)}`, M + 118, y + 3.9);
-  doc.text(`Zeit:  ${r.zeit}`, M + 158, y + 3.9);
-  y += 10;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(20); doc.text(r.titel || '', M + 1, y);
-  y += 3;
-  const halb = B / 2 - 2;
-  bar(M, y, halb, 'Kunde:'); bar(M + halb + 4, y, halb, 'Objekt:');
-  y += 5.5;
-  y += Math.max(text(r.kunde, M, y, halb - 2, 22), text(r.objekt, M + halb + 4, y, halb - 2, 22)) + 2;
-  bar(M, y, B, 'Ausgeführte Arbeiten: (Text in Rechnung)'); y += 5.5;
-  y += text(r.arbeiten, M, y, B - 2, 70) + 2;
-  y = neueSeite(y, 40);
-  bar(M, y, B, 'Bemerkungen / Infos (Intern erscheint nicht in Rechnung)'); y += 5.5;
-  y += text(r.bemerkungen, M, y, B - 2, 12) + 1;
+  const abschnitt = (titel, text) => {
+    platz(14);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...TXT); doc.text(titel, M, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40);
+    y += 5.5;
+    absatz(text, B).forEach(l => { platz(5); doc.text(l, M, y); y += 4.4; });
+    y += 5;
+  };
+  abschnitt('Auszuführende Arbeiten', r.arbeiten);
+  if ((r.hinweise || '').trim()) abschnitt('Hinweise für den Monteur', r.hinweise);
 
-  const kopf = { fillColor: GRAU, textColor: 255, fontStyle: 'bold', fontSize: 7.5, halign: 'center' };
-  const stil = { fontSize: 8.5, cellPadding: 1.4, lineColor: [200, 200, 200], lineWidth: 0.2, minCellHeight: 6, textColor: 20 };
-  doc.autoTable({
-    startY: y, margin: { left: M, right: M }, theme: 'grid', styles: stil, headStyles: kopf,
-    head: [['Monteur', 'KW ' + (r.termin || todayIso()).slice(0, 4), 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So', 'Artikel-Nr.', 'Menge', 'Preis', 'Betrag']],
-    body: r.monteure.map((m, i) => [m.name, m.kw, ...m.h.map(h => fmtH(zahl(h))), m.art, fmtH(sum.mont[i].menge), m.preis ? fmtFr(zahl(m.preis)) : '', fmtFr(sum.mont[i].betrag)]),
-    columnStyles: { 0: { cellWidth: 36, halign: 'left' }, 1: { cellWidth: 14, halign: 'center' }, ...Object.fromEntries([2, 3, 4, 5, 6, 7, 8].map(c => [c, { cellWidth: 10, halign: 'center' }])),
-      9: { cellWidth: 20, halign: 'right' }, 10: { cellWidth: 14, halign: 'right' }, 11: { cellWidth: 16, halign: 'right' }, 12: { cellWidth: 16, halign: 'right' } }
+  if (r.stunden) {
+    platz(36);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...TXT); doc.text('Stundenrapport', M, y);
+    doc.autoTable({
+      startY: y + 2.5, margin: { left: M, right: M }, theme: 'grid',
+      styles: { fontSize: 8.5, cellPadding: 1.5, lineColor: [205, 205, 205], lineWidth: 0.25, minCellHeight: 8, textColor: 20 },
+      headStyles: { fillColor: DUNKEL, textColor: 255, fontStyle: 'bold', halign: 'center', minCellHeight: 6 },
+      head: [['Monteur', 'KW', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So', 'Total h']],
+      body: [0, 1, 2].map(() => Array(10).fill('')),
+      columnStyles: { 0: { cellWidth: 52 }, 1: { cellWidth: 14 }, 9: { cellWidth: 20 } }
+    });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+
+  // Ankreuz-Gruppen in Kästchen, drei pro Reihe, möglichst unten über dem Fuss
+  const G = r.gruppen.filter(g => g.titel.trim() || g.punkte.some(x => x.text.trim())), gap = 5, bw = (B - 2 * gap) / 3;
+  const reihen = [];
+  for (let i = 0; i < G.length; i += 3) reihen.push(G.slice(i, i + 3));
+  const rh = reihe => 11 + Math.max(...reihe.map(g => g.punkte.filter(x => x.text.trim()).length)) * 5;
+  const gesamt = reihen.reduce((a, rr) => a + rh(rr) + gap, 0), fussY = H - 30;
+  if (y + gesamt > fussY - 4) { doc.addPage(); y = 18; }
+  y = Math.max(y, fussY - 6 - gesamt);
+  reihen.forEach(reihe => {
+    const h = rh(reihe);
+    reihe.forEach((g, i) => {
+      const x = M + i * (bw + gap);
+      doc.setFillColor(232, 232, 232); doc.roundedRect(x + 0.5, y + 0.8, bw, h, 3, 3, 'F');
+      doc.setFillColor(255); doc.setDrawColor(225); doc.setLineWidth(0.25); doc.roundedRect(x, y, bw, h, 3, 3, 'FD');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...TXT); doc.text(g.titel || '', x + 4, y + 6);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(40);
+      g.punkte.filter(x => x.text.trim()).forEach((pt, j) => {
+        const yy = y + 11 + j * 5;
+        pdfKaestchen(doc, x + 6, yy - 2.6, g.wer === 'pl' && pt.ok);
+        doc.text(doc.splitTextToSize(pt.text, bw - 16)[0], x + 11.5, yy);
+      });
+    });
+    y += h + gap;
   });
-  const cb = v => v ? '[X]' : '[  ]';
-  doc.autoTable({
-    startY: doc.lastAutoTable.finalY + 2, margin: { left: M, right: M }, theme: 'grid', styles: stil, headStyles: kopf,
-    head: [[{ content: `Material / Ausmass        ${cb(r.keinMaterial)} Kein Material        ${cb(r.zusatzblatt)} Zusatzblatt/LS`, styles: { halign: 'left' } }, 'Artikel-Nr.', 'Menge', 'Preis', 'Betrag']],
-    body: r.material.map((m, i) => [m.text, m.art, m.menge ? fmtH(zahl(m.menge)) : '', m.preis ? fmtFr(zahl(m.preis)) : '', fmtFr(sum.mat[i])]),
-    columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 20, halign: 'right' }, 2: { cellWidth: 14, halign: 'right' }, 3: { cellWidth: 16, halign: 'right' }, 4: { cellWidth: 16, halign: 'right' } }
+
+  // Fuss: wird vom Monteur ausgefüllt
+  const fy = Math.max(fussY, y + 4);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...TXT); doc.text('Ausfüllen durch den Monteur', M, fy + 4);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+  const rx = W - M - doc.getTextWidth('Arbeit nicht fertig');
+  pdfKaestchen(doc, rx - 4.5, fy - 1.6, false); doc.text('Arbeit nicht fertig', rx, fy + 0.8);
+  const fx = rx - 9 - doc.getTextWidth('Arbeit fertig');
+  pdfKaestchen(doc, fx - 4.5, fy - 1.6, false); doc.text('Arbeit fertig', fx, fy + 0.8);
+  const lw = (B - 3 * 8) / 4;
+  doc.setFontSize(8.5); doc.setTextColor(60); doc.setDrawColor(150); doc.setLineWidth(0.25);
+  ['Datum:', 'Ausgefüllt von:', 'Unterschrift Monteur:', 'Total Arbeit:'].forEach((l, i) => {
+    const x = M + i * (lw + 8);
+    doc.text(l, x, fy + 14); doc.line(x, fy + 15.5, x + lw, fy + 15.5);
   });
-  y = neueSeite(doc.lastAutoTable.finalY + 3, 30);
-  bar(M, y, 112, 'Weg- und Rüstzeiten gehen zu Lasten des Auftraggebers');
-  bar(M + 128, y, 26, `${cb(r.fertig === 'ja')} Arbeit fertig`); bar(M + 156, y, 30, `${cb(r.fertig === 'nein')} Arbeit nicht fertig`);
-  y += 16;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(20);
-  doc.text(`Datum:  ${fmt(r.datum)}`, M, y);
-  doc.text(`Ausgefüllt von:  ${r.von || ''}`, M + 42, y);
-  doc.setFont('helvetica', 'bold'); doc.text('X', M + 96, y); doc.setFont('helvetica', 'normal');
-  doc.text('Unterschrift Monteur:', M + 100, y);
-  if (r.unterschrift) try { doc.addImage(r.unterschrift, 'PNG', M + 100, y - 13.5, 36, 10.1); } catch (e) { /* ohne Unterschrift weiter */ }
-  doc.text(`Total Arbeit:  ${sum.total ? fmtH(sum.total) + ' h' : ''}`, M + 146, y);
   doc.save(`${rapportName(p)}_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
   toast(`${rapportName(p)} als PDF gespeichert.`);
+}
+
+// ---------- Abnahmeprotokoll ----------
+function abnahmeDefaults(p) {
+  const v = vorlageKopie(S().abnahmeVorlage);
+  // Datum, Zeit, Mängel und Unterschriften werden bei der Abnahme vor Ort eingetragen
+  return { v: 1, datum: '', zeit: '', titel: projektArt(p) === 'batterie' ? 'Batteriespeicher' : v.titel,
+    kunde: kundeText(p), objekt: objektText(p), ersteller: [S().firma, S().name, S().telefon].filter(Boolean).join('\n'),
+    gegenstand: v.gegenstand, pruefung: v.pruefung, erklaerung: v.erklaerung };
+}
+let abPid = null;
+// ctx 'r' = Protokoll des Projekts, 's' = Vorlage in den Einstellungen
+const abZiel = ctx => ctx === 'r' ? findP(abPid).abnahme : S().abnahmeVorlage;
+function abListeHtml(ctx, key) {
+  const mitDetail = key === 'gegenstand';
+  return abZiel(ctx)[key].map((x, i) => `<div class="ab-pkt">
+      ${ctx === 'r' ? `<input type="checkbox" ${x.ok ? 'checked' : ''} onchange="abL('r','${key}','ok',${i},this.checked)">` : '<span class="aa-leer"></span>'}
+      <input class="ab-text" value="${esc(x.text)}" placeholder="${mitDetail ? 'Bauteil' : 'Prüfpunkt'}" oninput="abL('${ctx}','${key}','text',${i},this.value)">
+      ${!mitDetail ? '' : ctx === 'r'
+        ? `<input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Details')}" oninput="abL('r','${key}','detail',${i},this.value)">`
+        : `<input class="ab-detail" value="${esc(x.hint)}" placeholder="Hinweis in Klammern, z.B. Hersteller, Typ" oninput="abL('s','${key}','hint',${i},this.value)">`}
+      <button class="ck-btn" title="Punkt entfernen" onclick="abL('${ctx}','${key}','del',${i})">✕</button></div>`).join('')
+    + `<button class="sec sm" onclick="abL('${ctx}','${key}','add')">+ Punkt</button>`;
+}
+function abL(ctx, key, op, i, v) {
+  const L = abZiel(ctx)[key];
+  if (op === 'del') L.splice(i, 1);
+  else if (op === 'add') L.push({ text: '', hint: '', detail: '', ok: false });
+  else L[i][op] = v;
+  save();
+  if (op !== 'del' && op !== 'add') return;
+  const box = docBereich(ctx).querySelector('#ab-' + key);
+  box.innerHTML = abListeHtml(ctx, key);
+  if (op === 'add') { const t = box.querySelectorAll('.ab-text'); t[t.length - 1].focus(); }
+}
+function abnahmeDialog(pid) {
+  const p = findP(pid), d = $('dlg');
+  if (!p.abnahme) { p.abnahme = abnahmeDefaults(p); save(); }
+  abPid = pid;
+  const a = p.abnahme;
+  const f = k => `data-a="${k}" value="${esc(a[k])}" oninput="abSet(this)"`;
+  const ta = (k, rows, ph = '') => `<textarea rows="${rows}" data-a="${k}" oninput="abSet(this)" placeholder="${ph}">${esc(a[k])}</textarea>`;
+  const spalte = (icon, k, l, ph) => `<div><h4><svg viewBox="0 0 24 24">${AA_ICONS[icon]}</svg>${l}</h4>${ta(k, 5, ph)}</div>`;
+  d.style.width = 'min(940px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="aa">
+    <div class="aa-logo">${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:40px">CKW<i style="width:12px;height:12px"></i></div>'}</div>
+    <div class="aa-linie"></div>
+    <div class="aa-bar"><span>Projekt-Nr: <b>${esc(p.nummer)}</b></span>
+      <span class="aa-bar-r"><label>Datum: <input type="date" ${f('datum')}></label><label>Zeit: <input type="time" ${f('zeit')}></label></span></div>
+    <div class="aa-titel"><span>Abnahmeprotokoll:</span><input ${f('titel')} placeholder="z.B. Photovoltaik-Anlage"></div>
+    <div class="aa-3">${spalte('kunde', 'kunde', 'Kunde', 'Name, Adresse, E-Mail, Telefon')}${spalte('objekt', 'objekt', 'Objekt', 'Adresse der Anlage')}${spalte('elektriker', 'ersteller', 'Projektleitung / Ersteller', 'Firma, Name, Telefon')}</div>
+    <div class="ab-2">
+      <div><h4 class="aa-h">1. Gegenstand der Abnahme</h4>
+        <div class="muted klein" style="margin-bottom:6px">Rechts Hersteller, Typ, Anzahl usw. eintragen – leer bleibt im PDF eine Linie zum Ausfüllen.</div>
+        <div id="ab-gegenstand" class="ab-liste">${abListeHtml('r', 'gegenstand')}</div></div>
+      <div><h4 class="aa-h">2. Funktionsprüfung &amp; Übergabe</h4>
+        <div id="ab-pruefung" class="ab-liste">${abListeHtml('r', 'pruefung')}</div></div>
+    </div>
+    <div class="ab-maengel"><h4>3. Festgestellte Mängel &amp; Pendenzen</h4>
+      <table class="aa-stunden ab-tab"><tr><th style="width:44px">Nr.</th><th style="width:28%">Bereich / Bauteil</th><th>Beschreibung des Mangels</th><th style="width:18%">Erledigt bis</th></tr>
+        ${[1, 2, 3].map(n => `<tr><td>${n}</td><td></td><td></td><td></td></tr>`).join('')}</table>
+      <div class="muted klein" style="margin:6px 0 8px">Bleibt leer zum Ausfüllen von Hand · im PDF so viele Zeilen, wie Platz ist (mindestens 3)</div>
+      <div><span class="aa-leer"></span> Keine Mängel (Anlage mängelfrei abgenommen)</div>
+      <div style="margin-top:4px"><span class="aa-leer"></span> Mängel festgestellt (siehe Tabelle)</div></div>
+    <h4 class="aa-h">4. Abnahmeerklärung &amp; Unterschriften</h4>
+    ${ta('erklaerung', 2)}
+    <div class="aa-linien ab-unter"><span>Ort, Datum:</span><span>Unterschrift Kunde / Bauherr</span><span>Unterschrift ${/ckw/i.test(S().firma) ? 'CKW' : 'Firma'} / Projektleitung</span></div>
+  </div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="danger sm" onclick="if(confirm('Protokoll leeren und mit Projektdaten neu beginnen?')){findP(abPid).abnahme=abnahmeDefaults(findP(abPid));save();abnahmeDialog(abPid)}">Neu beginnen</button>
+    <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button onclick="abnahmePdf(abPid)">Als PDF speichern</button></div>
+  </div>`;
+  d.onkeydown = null;
+  if (!d.open) {
+    d.showModal();
+    d.addEventListener('close', () => { d.style.width = ''; d.innerHTML = ''; render(); }, { once: true });
+  }
+}
+function abSet(el) { findP(abPid).abnahme[el.dataset.a] = el.value; save(); }
+function abnahmePdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid);
+  if (!p.abnahme) { p.abnahme = abnahmeDefaults(p); save(); }
+  const a = p.abnahme, { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, M = 14, B = W - 2 * M;
+  let y = pdfAaKopf(doc, p.nummer, [['Datum', a.datum ? fmt(a.datum) : ''], ['Zeit', a.zeit ? a.zeit + ' Uhr' : '']], `Abnahmeprotokoll: ${a.titel || ''}`);
+  y = pdfDreiSpalten(doc, y, [['kunde', 'Kunde', a.kunde], ['objekt', 'Objekt', a.objekt], ['werkzeug', 'Projektleitung / Ersteller', a.ersteller]]);
+
+  // 1. und 2. nebeneinander; ohne Angabe bleibt beim Gegenstand eine Linie zum Ausfüllen
+  const cw = (B - 8) / 2;
+  const liste = (x, titel, L, mitDetail) => {
+    let yy = y;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text(titel, x, yy);
+    yy += 6.5;
+    L.filter(i => i.text.trim()).forEach(i => {
+      const det = (i.detail || '').trim();
+      const t = i.text.trim() + (mitDetail ? (det ? `: ${det}` : i.hint ? ` (${i.hint})` : '') : '');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(40);
+      const lines = doc.splitTextToSize(t, cw - 6);
+      pdfKaestchen(doc, x, yy - 2.7, i.ok);
+      doc.text(lines, x + 5.5, yy);
+      if (mitDetail && !det) {
+        const ex = x + 5.5 + doc.getTextWidth(lines[lines.length - 1]) + 2, ly = yy + (lines.length - 1) * 4.3 + 0.8;
+        if (x + cw - ex > 12) { doc.setDrawColor(170); doc.setLineWidth(0.2); doc.line(ex, ly, x + cw, ly); }
+      }
+      yy += lines.length * 4.3 + 1.7;
+    });
+    return yy;
+  };
+  y = Math.max(liste(M, '1. Gegenstand der Abnahme', a.gegenstand, true), liste(M + cw + 8, '2. Funktionsprüfung & Übergabe', a.pruefung, false)) + 6;
+
+  // 3. Mängel: leere Tabelle, so viele Zeilen wie bis zur Abnahmeerklärung Platz haben
+  const unten = 52, rowH = 9, kopfH = 7, boxFix = 34;
+  let frei = H - 14 - unten - y - boxFix;
+  if (frei < 3 * rowH) { doc.addPage(); y = 18; frei = H - 14 - unten - y - boxFix; }
+  const n = Math.max(3, Math.min(14, Math.floor(frei / rowH))), boxH = boxFix + n * rowH;
+  doc.setDrawColor(190); doc.setLineWidth(0.35); doc.roundedRect(M, y, B, boxH, 3, 3, 'S');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('3. Festgestellte Mängel & Pendenzen', M + 5, y + 7);
+  const tx = M + 5, tw = B - 10, ty = y + 11, sp = [12, 48, tw - 12 - 48 - 30, 30];
+  doc.setFillColor(240, 241, 243); doc.rect(tx, ty, tw, kopfH, 'F');
+  doc.setFontSize(9);
+  let cx = tx;
+  ['Nr.', 'Bereich / Bauteil', 'Beschreibung des Mangels', 'Erledigt bis'].forEach((l, i) => { doc.text(l, cx + 2, ty + 4.8); cx += sp[i]; });
+  doc.setDrawColor(130); doc.setLineWidth(0.3); doc.rect(tx, ty, tw, kopfH + n * rowH, 'S');
+  for (let i = 0; i < n; i++) doc.line(tx, ty + kopfH + i * rowH, tx + tw, ty + kopfH + i * rowH);
+  cx = tx; sp.slice(0, -1).forEach(w => { cx += w; doc.line(cx, ty, cx, ty + kopfH + n * rowH); });
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60);
+  for (let i = 0; i < n; i++) doc.text(String(i + 1), tx + 6, ty + kopfH + i * rowH + 5.8, { align: 'center' });
+  let cy = ty + kopfH + n * rowH + 6.5;
+  doc.setFontSize(9.5); doc.setTextColor(40);
+  ['Keine Mängel (Anlage mängelfrei abgenommen)', 'Mängel festgestellt (siehe Tabelle)'].forEach(t => { pdfKaestchen(doc, tx, cy - 2.7, false); doc.text(t, tx + 5.5, cy); cy += 5.5; });
+  y += boxH + 8;
+
+  // 4. Abnahmeerklärung und Unterschriften, unten auf der Seite
+  y = Math.max(y, H - 14 - unten);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('4. Abnahmeerklärung & Unterschriften', M, y + 4);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40);
+  const el = pdfAbsatz(doc, a.erklaerung, B);
+  doc.text(el, M, y + 10);
+  const ly = y + 10 + el.length * 4.4 + 8;
+  doc.text('Ort, Datum:', M, ly);
+  doc.setDrawColor(120); doc.setLineWidth(0.3); doc.line(M + 21, ly + 0.6, M + 95, ly + 0.6);
+  const sy = ly + 18, sw = 80;
+  doc.line(M, sy, M + sw, sy); doc.line(W - M - sw, sy, W - M, sy);
+  doc.setFontSize(9.5);
+  doc.text('Unterschrift Kunde / Bauherr', M, sy + 5);
+  doc.text(`Unterschrift ${/ckw/i.test(S().firma) ? 'CKW' : 'Firma'} / Projektleitung`, W - M - sw, sy + 5);
+  doc.save(`Abnahmeprotokoll_${p.nummer}_${p.name}.pdf`.replace(/[\\/:*?"<>|\s]+/g, '_'));
+  toast('Abnahmeprotokoll als PDF gespeichert.');
 }
 
 // ---------- Checkliste Blitzschutz & Photovoltaik (Original-PDF der LASOLTEC GmbH wird ausgefüllt) ----------
@@ -2071,7 +2360,7 @@ function blitzDialog(pid) {
   </div>`;
   d.onkeydown = null;
   if (!d.open) d.showModal();
-  d.addEventListener('close', () => { d.style.width = ''; render(); }, { once: true });
+  d.addEventListener('close', () => { d.style.width = ''; d.innerHTML = ''; render(); }, { once: true });
 }
 function blitzSet(el) {
   const b = findP(blitzPid).blitz, [k, sub] = el.dataset.b.split('.');
@@ -2123,7 +2412,8 @@ async function blitzPdf(pid) {
 // Dokumente, die an Checklisten-Punkten hängen können ([dok: …])
 const DOKS = {
   ibn: { label: 'IBN- / Service-Rapport', fn: 'ibnDialog', hat: p => !!p.ibn },
-  blitz: { label: 'Checkliste Blitzschutz', fn: 'blitzDialog', hat: p => !!p.blitz }
+  blitz: { label: 'Checkliste Blitzschutz', fn: 'blitzDialog', hat: p => !!p.blitz },
+  abnahme: { label: 'Abnahmeprotokoll', fn: 'abnahmeDialog', hat: p => !!p.abnahme }
 };
 
 // ---------- Checklisten-Editor (für Vorlage und einzelne Projekte) ----------
@@ -2928,10 +3218,48 @@ function viewEinstellungen() {
   return `
   <div class="page-head"><h1>Einstellungen</h1></div>
   <div class="tabs">
-    ${[['backup', 'Backup'], ['firma', 'Projektleiter & Firma'], ['gewerke', 'Standard-Gewerke'], ['checkliste', 'Checkliste'], ['mails', 'Mailvorlagen'], ['app', 'App']].map(([k, l]) =>
+    ${[['backup', 'Backup'], ['firma', 'Projektleiter & Firma'], ['gewerke', 'Standard-Gewerke'], ['checkliste', 'Checkliste'], ['rapport', 'Dokumente'], ['mails', 'Mailvorlagen'], ['app', 'App']].map(([k, l]) =>
       `<button class="${ui.setTab === k ? 'active' : ''}" onclick="ui.setTab='${k}';render()">${l}</button>`).join('')}
   </div>
-  ${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, mails: viewMails, app: viewApp }[ui.setTab] || viewBackup)()}`;
+  ${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, app: viewApp }[ui.setTab] || viewBackup)()}`;
+}
+
+// Vorlagen für Arbeitsauftrag und Abnahmeprotokoll: jedes neue Dokument startet damit
+function viewRapportVorlage() {
+  const wahl = ['service', 'abnahme'].includes(ui.aaArt) ? ui.aaArt : 'ibn';
+  const seg = `<div class="seg seg-breit" style="margin-bottom:14px">${[['ibn', 'IBN-Rapport'], ['service', 'Service-Rapport'], ['abnahme', 'Abnahmeprotokoll']].map(([k, l]) =>
+      `<button class="${wahl === k ? 'on' : ''}" onclick="ui.aaArt='${k}';render()">${l}</button>`).join('')}</div>`;
+  if (wahl === 'abnahme') return seg + viewAbnahmeVorlage();
+  const art = wahl, v = rapVorlage(art);
+  return `${seg}
+  <div class="card aa">
+    <h3 style="margin-top:0">Arbeitsauftrag – ${art === 'service' ? 'Service-Rapport' : 'IBN-Rapport'}</h3>
+    <p class="muted" style="margin-top:0">Jeder neue Rapport startet mit dieser Vorlage. Im einzelnen Rapport kannst du Punkte und Gruppen trotzdem ergänzen oder weglassen.
+      <b>Vorgabe von mir</b> kreuzt du im Rapport an (z.B. Lastabwurf, TAG / IA) · <b>Monteur kreuzt an</b> wird leer gedruckt.</p>
+    <div class="grid">
+      <div><label>Titel nach «Arbeitsauftrag:»</label><input value="${esc(v.titel)}" onchange="rapVorlage('${art}').titel=this.value.trim();save();toast('Vorlage gespeichert.')"></div>
+      <div><label>Stunden</label><label class="aa-std" style="margin-top:6px"><input type="checkbox" ${v.stunden ? 'checked' : ''} onchange="rapVorlage('${art}').stunden=this.checked;save()"> Stundenrapport für den Monteur drucken</label></div>
+    </div>
+    <h4 class="aa-h">Checklisten</h4>
+    <div id="aa-gruppen">${aaGruppenHtml('s')}</div>
+    <div class="row" style="margin-top:14px"><button class="sec" onclick="if(confirm('Vorlage auf den Standard zurücksetzen?')){S().rapportVorlagen['${art}']=vorlageKopie(RAPPORT_VORLAGEN['${art}']);save();render()}">Standard laden</button></div>
+  </div>`;
+}
+function viewAbnahmeVorlage() {
+  const v = S().abnahmeVorlage, setz = k => `onchange="S().abnahmeVorlage.${k}=this.value.trim();save();toast('Vorlage gespeichert.')"`;
+  return `<div class="card aa">
+    <h3 style="margin-top:0">Abnahmeprotokoll</h3>
+    <p class="muted" style="margin-top:0">Jedes neue Abnahmeprotokoll startet mit diesen Punkten. Im Projekt kannst du Details eintragen, Punkte ergänzen oder weglassen.
+      Die Mängeltabelle bleibt immer leer zum Ausfüllen von Hand.</p>
+    <div><label>Titel nach «Abnahmeprotokoll:»</label><input value="${esc(v.titel)}" ${setz('titel')}></div>
+    <div class="ab-2">
+      <div><h4 class="aa-h">1. Gegenstand der Abnahme</h4><div class="muted klein" style="margin-bottom:6px">Rechts der Hinweis in Klammern, z.B. «Hersteller, Typ, Anzahl».</div>
+        <div id="ab-gegenstand" class="ab-liste">${abListeHtml('s', 'gegenstand')}</div></div>
+      <div><h4 class="aa-h">2. Funktionsprüfung &amp; Übergabe</h4><div id="ab-pruefung" class="ab-liste">${abListeHtml('s', 'pruefung')}</div></div>
+    </div>
+    <div style="margin-top:14px"><label>4. Abnahmeerklärung</label><textarea rows="2" ${setz('erklaerung')}>${esc(v.erklaerung)}</textarea></div>
+    <div class="row" style="margin-top:14px"><button class="sec" onclick="if(confirm('Vorlage auf den Standard zurücksetzen?')){S().abnahmeVorlage=vorlageKopie(ABNAHME_VORLAGE);save();render()}">Standard laden</button></div>
+  </div>`;
 }
 
 function viewChkVorlage() {
@@ -3329,6 +3657,67 @@ function pdfLogo(doc, xr, yTop, h, mitte = false) {
   doc.text('CKW', xr - 2 * r - h * 0.05 - tw, yTop + h);
   doc.setFillColor(...LIME); doc.circle(xr - r, yTop + h - r, r, 'F');
   return true;
+}
+
+// Linie mit Farbverlauf Blau → Türkis → Grün → Gelb (Arbeitsauftrag)
+function pdfVerlauf(doc, x, y, w, h) {
+  const st = [[0, 85, 140], [0, 150, 200], [120, 190, 60], [230, 200, 40]], n = 80;
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1) * (st.length - 1), a = Math.min(Math.floor(t), st.length - 2), f = t - a;
+    doc.setFillColor(...st[a].map((v, j) => Math.round(v + (st[a + 1][j] - v) * f)));
+    doc.rect(x + w * i / n, y, w / n + 0.05, h, 'F');
+  }
+}
+// Kopf von Arbeitsauftrag und Abnahmeprotokoll: Logo, Farbverlauf, dunkler Balken, Titel; gibt die nächste y-Position zurück
+const AA_DUNKEL = [55, 71, 79], AA_TXT = [24, 24, 27];
+const pdfAbsatz = (doc, t, w) => String(t || '').split('\n').flatMap(l => l.trim() ? doc.splitTextToSize(l, w) : ['']);
+function pdfAaKopf(doc, nummer, rechts, titel) {
+  const W = 210, M = 14, B = W - 2 * M;
+  pdfLogo(doc, W / 2, 10, 11, true);
+  pdfVerlauf(doc, M, 25.5, B, 0.9);
+  doc.setFillColor(...AA_DUNKEL); doc.roundedRect(M, 30, B, 9, 2, 2, 'F');
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(255);
+  doc.text(`Projekt-Nr: ${nummer}`, M + 4, 35.8);
+  let x = W - M - 4;
+  [...rechts].reverse().forEach(([l, v]) => { const t = `${l}: ${v}`; doc.text(t, x, 35.8, { align: 'right' }); x -= doc.getTextWidth(t) + 9; });
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(19); doc.setTextColor(...AA_TXT);
+  const tl = doc.splitTextToSize(titel, B);
+  doc.text(tl, M, 51);
+  return 51 + tl.length * 7.5 + 4;
+}
+// drei Spalten mit Symbol und Trennlinien (Kunde · Objekt · …)
+function pdfDreiSpalten(doc, y, spalten) {
+  const M = 14, sw = (210 - 2 * M) / 3; let hoch = 0;
+  spalten.forEach(([icon, l, text], i) => {
+    const x = M + i * sw + (i ? 4 : 0);
+    pdfIcon(doc, icon, x, y - 4.2, AA_DUNKEL);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT);
+    if (doc.getTextWidth(l) > sw - 11) doc.setFontSize(10);
+    doc.text(l, x + 7, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40);
+    const L = pdfAbsatz(doc, text, sw - 13);
+    doc.text(L, x + 7, y + 5.2);
+    hoch = Math.max(hoch, 7 + L.length * 4.3);
+  });
+  hoch = Math.max(hoch, 18);
+  doc.setDrawColor(205); doc.setLineWidth(0.3);
+  [1, 2].forEach(i => doc.line(M + i * sw, y - 4, M + i * sw, y + hoch));
+  return y + hoch + 9;
+}
+// kleine Symbole (ca. 5 mm) für Kunde, Objekt, Elektriker und Projektleitung
+function pdfIcon(doc, art, x, y, farbe) {
+  doc.setFillColor(...farbe);
+  if (art === 'kunde') { doc.circle(x + 2.6, y + 1.4, 1.4, 'F'); doc.roundedRect(x + 0.3, y + 3.2, 4.6, 2.4, 1.2, 1.2, 'F'); }
+  else if (art === 'objekt') { doc.triangle(x, y + 2.6, x + 2.7, y, x + 5.4, y + 2.6, 'F'); doc.rect(x + 0.9, y + 2.5, 3.6, 3.1, 'F'); }
+  else if (art === 'werkzeug') {
+    doc.setDrawColor(...farbe); doc.setLineWidth(0.9); doc.line(x + 0.8, y + 5.2, x + 4.6, y + 1.4); doc.line(x + 0.8, y + 1.4, x + 4.6, y + 5.2);
+    doc.circle(x + 4.7, y + 1.2, 1.1, 'F'); doc.circle(x + 0.7, y + 1.2, 1.1, 'F');
+  }
+  else { doc.triangle(x + 3.4, y, x + 0.8, y + 3.2, x + 3, y + 3.2, 'F'); doc.triangle(x + 2.2, y + 2.4, x + 4.6, y + 2.4, x + 1.6, y + 5.8, 'F'); }
+}
+function pdfKaestchen(doc, x, y, an) {
+  doc.setDrawColor(140); doc.setLineWidth(0.3); doc.setFillColor(255); doc.roundedRect(x, y, 3.2, 3.2, 0.5, 0.5, 'FD');
+  if (an) { doc.setDrawColor(24); doc.setLineWidth(0.55); doc.line(x + 0.6, y + 1.7, x + 1.4, y + 2.6); doc.line(x + 1.4, y + 2.6, x + 2.7, y + 0.6); }
 }
 
 function pdf(pid) {
