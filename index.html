@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="CKW Projekte">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -533,6 +534,69 @@
     .card { box-shadow: none; border: 1px solid #ddd; }
     table.wk { min-width: 0; }
   }
+  /* Controlling (Kosten und DB-Prognose) */
+  .kt-grid { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 18px; align-items: start; margin-bottom: 18px; }
+  .kt-grid > .card { margin-bottom: 0; }
+  /* schmaler: Projekt und DB-Prognose nebeneinander, Kostentabelle darunter in voller Breite */
+  @media (max-width: 1150px) { .kt-grid { grid-template-columns: 1fr 1fr; } .kt-grid > .kt-c3 { order: 1; } .kt-grid > .kt-kosten { order: 2; grid-column: 1 / -1; } }
+  table.kt-ct { min-width: 400px; }
+  .seg { flex-wrap: wrap; }
+  @media (max-width: 700px) { .kt-grid { grid-template-columns: 1fr; } }
+  .kt-result { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: var(--ink); color: #fff; }
+  .kt-result span { opacity: .75; font-size: 13px; }
+  .kt-result b { font-size: 17px; font-weight: 600; white-space: nowrap; }
+  .kt-zonen { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .kt-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--ok); flex-shrink: 0; margin-right: 6px; }
+  .kt-dot.w { background: var(--warn); } .kt-dot.b { background: var(--danger); } .kt-dot.x { background: #8e1414; } .kt-dot.n, .kt-dot.g { background: #c4c3bc; }
+  .kt-big { font-size: 28px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .kt-big small { font-size: 15px; color: var(--muted); font-weight: 500; }
+  input[type=range].kt-slider { padding: 0; border: none; background: none; accent-color: var(--ink); margin: 8px 0 2px; }
+  .kt-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  .kt-num, input.kt-num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.kt-ct th, table.kt-ct td { padding: 4px; border-bottom: none; }
+  table.kt-ct input { padding: 5px 8px; }
+  table.kt-ct tbody tr td { background: #f7f6f2; }
+  table.kt-ct tbody tr td:first-child { border-radius: 10px 0 0 10px; padding-left: 10px; }
+  table.kt-ct tbody tr td:last-child { border-radius: 0 10px 10px 0; }
+  table.kt-ct tr.kt-plain td { background: none; }
+  .kt-std { font-size: 11.5px; padding: 3px 6px; border-radius: 8px; background: #fff; color: var(--text); border: 1px solid #e3e2dc; width: 100%; }
+  .kt-std:hover { background: #f1f0eb; }
+  .kt-std.gleich { opacity: .4; }
+  table.kt-ct tr.kt-sum td { background: none; font-weight: 600; border-top: 1px solid var(--line); padding: 8px 4px; }
+  table.kt-ct tr.kt-total td { font-weight: 700; background: var(--ink); color: #fff; padding: 9px 6px; }
+  .kt-gauge { position: relative; width: 220px; max-width: 100%; margin: 0 auto; }
+  .kt-gauge svg { width: 100%; display: block; }
+  .kt-gauge .c { position: absolute; left: 0; right: 0; top: 36%; text-align: center; }
+  .kt-gauge .v { font-size: 36px; font-weight: 600; letter-spacing: -.02em; }
+  .kt-gauge .v small { font-size: 17px; color: var(--muted); }
+  .kt-gauge .s { font-size: 12px; color: var(--muted); }
+  .kt-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .kt-legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .kt-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .kt-stat { background: #f7f6f2; border-radius: 12px; padding: 9px 12px; min-width: 0; }
+  .kt-stat .l { font-size: 11.5px; color: var(--muted); }
+  .kt-stat .v { font-size: 15px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  .kt-pos { color: var(--ok) !important; } .kt-neg { color: var(--danger) !important; } .kt-wrn { color: var(--warn) !important; }
+  .kt-hint { font-size: 13px; line-height: 1.5; color: var(--muted); background: #f7f6f2; border-radius: 12px; padding: 10px 12px; margin-top: 10px; }
+  .kt-chart { border: 1px solid var(--line); border-radius: 14px; padding: 10px 6px 2px; background: #fff; }
+  .kt-chart svg { width: 100%; display: block; }
+  table.kt-hist th, table.kt-hist td { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.kt-hist th:first-child, table.kt-hist td:first-child { text-align: left; }
+  table.kt-hist tbody tr { cursor: pointer; }
+  table.kt-hist tbody tr:hover td, table.kt-hist tr.cur td { background: #f7f6f2; }
+  .kt-locked input, .kt-locked textarea, .kt-locked select, .kt-locked button { pointer-events: none; opacity: .6; }
+  .frei.warn { background: #fdf2e0; color: #7a5300; border: 1px solid #f3d9a8; }
+  .frei .row { justify-content: space-between; }
+  .kt-v { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .kt-v .muted { font-weight: 400; font-size: 12px; }
+  .li.kt-w { box-shadow: inset 3px 0 0 var(--warn); padding-left: 10px; }
+  .li.kt-b, .li.kt-x { box-shadow: inset 3px 0 0 var(--danger); padding-left: 10px; }
+  .kt-kpi-s { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  #ktPrint { display: none; }
+  @media print {
+    body.kt-druck .layout, body.kt-druck .login, body.kt-druck dialog, body.kt-druck .toast { display: none !important; }
+    body.kt-druck #ktPrint { display: block; }
+  }
   @media (max-width: 800px) {
     .layout { padding: 8px; gap: 8px; }
     aside { top: 8px; border-radius: 16px; }
@@ -587,7 +651,9 @@
 </div>
 <dialog id="dlg"></dialog>
 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJson(this)">
+<input type="file" id="ktImportFile" accept=".json,application/json" style="display:none" onchange="ktImportDatei(this)">
 <div class="toast" id="toast"></div>
+<div id="ktPrint"></div>
 
 <script>
 // ---------- Stammdaten ----------
@@ -611,6 +677,10 @@ const STANDARD_GEWERKE = [
   { name: 'Kran', art: 'extern', firma: 'Flück AG', farbe: '#e84393' }
 ];
 const ARTEN = { intern: 'intern', sub: 'Subunternehmer', extern: 'extern' };
+// Controlling: Personal und Gewerke der Kostenschätzung
+const KT_PERSONAL = ['Projektleiter', 'Montage / IBN', 'Admin'];
+const KT_GEWERKE = ['Elektriker', 'ToiToi', 'Gerüst', 'Gärtner', 'Maler', 'Unabhängige Kontrolle', 'Blitzschutzabnahme', 'Transport', 'Kran', 'Bestellungen', 'Abdichtung / Brandschottung'];
+const KT_ALT_KEY = 'projektkontrolling.v1'; // Speicher des alten Projektkontrollings (gleiche Web-Adresse)
 const PALETTE = ['#00558c', '#16a085', '#e67e22', '#8e44ad', '#c0392b', '#2c7be5', '#7f8c8d', '#d4a017', '#27ae60', '#d35400'];
 // Gut unterscheidbare Farben für automatische Vorschläge
 const FARBEN = ['#00558c', '#e67e22', '#16a085', '#8e44ad', '#c0392b', '#d4a017', '#2c7be5', '#27ae60', '#e84393', '#8d6e63',
@@ -1082,6 +1152,7 @@ function migrate(d) {
     d.projects.forEach(p => { if (p.abnahme && String(p.abnahme.maengelZeilen) === '10') p.abnahme.maengelZeilen = 5; });
     d.settings.abVersion = 1;
   }
+  ktMigrate(d);
   return d;
 }
 function neueId() { return Math.random().toString(36).slice(2, 10); }
@@ -1254,7 +1325,8 @@ const ICONS = {
 };
 ICONS.woche = '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 14h3M13 14h3M8 17h3"/>';
 ICONS.kontakte = '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2c3 .2 5.5 2.2 5.5 5.3"/>';
-const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['kontakte', 'Kontakte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
+ICONS.controlling = '<path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/><circle cx="19" cy="6" r="1.5"/>';
+const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
 
 function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
 function nav(h) { if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
@@ -1332,6 +1404,7 @@ function render(opt = {}) {
   const html =
     p ? viewProjekt(p) :
     r.page === 'projekte' ? viewProjekte() :
+    r.page === 'controlling' ? viewControlling() :
     r.page === 'termine' ? viewKalender() :
     r.page === 'woche' ? viewWoche() :
     r.page === 'kontakte' ? viewKontakte() :
@@ -1340,7 +1413,7 @@ function render(opt = {}) {
   // andere Seite: neu aufbauen und kurz einblenden · anderer Tab, Monat usw.: nur Geändertes abgleichen,
   // Kopf und Tabs bleiben stehen, nur der Tab-Inhalt blendet ein · sonst: nur abgleichen, ohne Bewegung.
   // Bewusst ohne View Transitions: das Abfotografieren grosser Seiten (Terminplan, Kalender) liess die Wechsel ruckeln.
-  const seite = location.hash, ansicht = [seite, ui.tab, ui.setTab, ui.aaArt, ui.chkArt, ui.zoom, ui.month, ui.woche, ui.kart].join('|');
+  const seite = location.hash, ansicht = [seite, ui.tab, ui.setTab, ui.aaArt, ui.chkArt, ui.zoom, ui.month, ui.woche, ui.kart, ui.ktF].join('|');
   const neueSeite = seite !== ui.seite, wechsel = ansicht !== ui.ansicht;
   ui.seite = seite; ui.ansicht = ansicht;
   const app = $('app');
@@ -1512,7 +1585,7 @@ function mangelErledigt(pid, mid, el) {
   zeile.classList.add('weg');
   setTimeout(render, wenigBewegung() ? 0 : 380);
 }
-function zwischenUebernehmen(pid) { abPid = pid; abArt = 'zwischen'; abInMaengelliste(); render(); }
+function zwischenUebernehmen(pid) { maengelSpiegeln(findP(pid)); save(); render(); }
 function viewOffen(today) {
   const list = state.projects.filter(p => projektArt(p) !== 'service').map(p => ({ p, ...freigabe(p) }))
     .filter(x => !x.s || x.s.ende >= today)
@@ -1604,6 +1677,7 @@ function viewDashboard() {
     <div class="kpi" onclick="ui.q='service-auftrag';nav('projekte')"><b style="color:#b35c00" data-zahl="${serviceOffen}">${serviceOffen}</b><span>Service offen</span></div>
     ${(n => `<div class="kpi" onclick="document.querySelector('.mg-item')?.scrollIntoView({behavior:'smooth',block:'center'})"><b style="color:var(--danger)" data-zahl="${n}">${n}</b><span>Mängel offen</span></div>`)(
       state.projects.reduce((a, p) => { const o = offeneMaengel(p); return a + o.L.length + o.zw.length; }, 0))}
+    ${ktKpi()}
   </div>
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:6px">
@@ -1659,6 +1733,7 @@ function viewProjekte() {
       <div class="muted" style="margin-top:6px">${s ? fmt(s.start) + ' – ' + fmt(s.ende) : 'noch keine Termine'} · ${p.termine.length} Termine</div>
       <div class="muted" style="margin-top:8px">Checkliste ${ck.done}/${ck.total}</div>
       <div class="progress"><div style="width:${ck.pct}%"></div></div>
+      ${ktKarte(p)}
     </div>`; }).join('')}</div>`
     : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
 }
@@ -1721,10 +1796,10 @@ function viewProjekt(p) {
   </div>
   ${freigabeHinweis(p)}
   <div class="tabs">
-    ${[['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['dokumente', 'Dokumente'], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
+    ${[['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['controlling', ktTabTitel(p)], ['dokumente', 'Dokumente'], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
       `<button class="${ui.tab === k ? 'active' : ''}" onclick="ui.tab='${k}';ui.ganttScroll=true;render()">${l}</button>`).join('')}
   </div>
-  <div class="tab-inhalt" data-form="${ui.tab}">${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'dokumente' ? viewDokumente(p) : ui.tab === 'gewerke' ? viewGewerke(p) : ui.tab === 'info' ? viewInfo(p) : viewUebersicht(p)}</div>`;
+  <div class="tab-inhalt" data-form="${ui.tab}">${ui.tab === 'termine' ? viewTermine(p) : ui.tab === 'checkliste' ? viewCheckliste(p) : ui.tab === 'controlling' ? viewKtProjekt(p) : ui.tab === 'dokumente' ? viewDokumente(p) : ui.tab === 'gewerke' ? viewGewerke(p) : ui.tab === 'info' ? viewInfo(p) : viewUebersicht(p)}</div>`;
 }
 
 // ---------- Dokumente eines Projekts an einem Ort ----------
@@ -1820,6 +1895,7 @@ function viewUebersicht(p) {
       <div style="margin-top:10px"><label>Person hinzufügen</label>${kontaktPicker('personHinzu', { platzhalter: 'Aus Kontakten (CRM) suchen …' })}</div>
     </div>
   </div>
+  ${ktUebersicht(p)}
   <div class="card">
     <div class="ck-head"><h3 style="margin:0">Terminplan</h3>
       <div class="row"><button class="sec sm" onclick="pdf('${p.id}')">PDF (A3)</button><button class="sm" onclick="ui.tab='termine';ui.ganttScroll=true;render()">Zum Terminplan →</button></div></div>
@@ -2288,8 +2364,21 @@ function abnahmeDefaults(p, art = 'abnahme') {
   // Datum, Zeit und Unterschriften werden bei der Abnahme vor Ort eingetragen
   return { v: 1, datum: '', zeit: '', titel: projektArt(p) === 'batterie' ? 'Batteriespeicher' : v.titel,
     kunde: kundeText(p), objekt: objektText(p), ersteller: [S().firma, S().name, S().telefon].filter(Boolean).join('\n'),
-    gegenstand: v.gegenstand, pruefung: v.pruefung, erklaerung: art === 'zwischen' ? (v.erklaerungZwischen || ERKLAERUNG_ZWISCHEN) : v.erklaerung,
+    // Punkt 1 vom anderen Protokoll übernehmen; die Abnahme übernimmt zudem die Häkchen der Funktionsprüfung aus der Zwischenabnahme
+    gegenstand: anderesProtokoll(p, art)?.gegenstand ? vorlageKopie(anderesProtokoll(p, art).gegenstand) : v.gegenstand,
+    pruefung: art === 'abnahme' && p.zwischen ? v.pruefung.map(x => ({ ...x, ok: p.zwischen.pruefung.some(z => z.ok && gleicherText(z, x)) })) : v.pruefung,
+    erklaerung: art === 'zwischen' ? (v.erklaerungZwischen || ERKLAERUNG_ZWISCHEN) : v.erklaerung,
     maengelZeilen: 5, maengelListe: [] };
+}
+const anderesProtokoll = (p, art) => p[art === 'zwischen' ? 'abnahme' : 'zwischen'];
+const gleicherText = (a, b) => (a.text || '').trim().toLowerCase() === (b.text || '').trim().toLowerCase();
+// Zwischenabnahme und Abnahme abgleichen: Punkt 1 (Gegenstand mit Typen und Häkchen) ist in beiden gleich;
+// Häkchen der Funktionsprüfung gehen nur von der Zwischenabnahme in die Abnahme
+function protokolleAbgleichen(p, von) {
+  const a = p[von], b = anderesProtokoll(p, von);
+  if (!a || !b) return;
+  b.gegenstand = vorlageKopie(a.gegenstand);
+  if (von === 'zwischen') b.pruefung.forEach(y => { if (a.pruefung.some(x => x.ok && gleicherText(x, y))) y.ok = true; });
 }
 let abPid = null, abArt = 'abnahme';
 // ctx 'r' = Protokoll des Projekts, 's' = Vorlage in den Einstellungen
@@ -2310,27 +2399,33 @@ function abMaengelHtml() {
       <td><button class="ck-btn" title="Mangel entfernen" onclick="abM(${i},'del')">✕</button></td></tr>`).join('')}
     ${L.length ? '' : '<tr><td colspan="5" class="muted" style="text-align:left;padding:8px">Noch keine Mängel eingetragen – die Tabelle im PDF bleibt dann leer zum Ausfüllen von Hand.</td></tr>'}</table>
     <div class="row" style="margin-top:8px"><button class="sec sm" onclick="abM(0,'add')">+ Mangel eintragen</button>
-      ${L.length ? `<button class="sec sm" onclick="abInMaengelliste()" title="Für den Monteur, mit Platz für Bilder">→ In Mängelliste übernehmen</button>` : ''}</div>`;
+      ${L.length ? '<span class="muted klein">Wird automatisch in die Mängelliste übernommen – Bilder dort ergänzen.</span>' : ''}</div>`;
 }
 function abM(i, op, v) {
-  const L = findP(abPid)[abArt].maengelListe;
+  const p = findP(abPid), L = p[abArt].maengelListe;
   if (op === 'add') L.push({ id: uid(), bereich: '', text: '', bis: '', ml: '' });
   else if (op === 'del') L.splice(i, 1);
-  else { L[i][op] = v; save(); return; }
+  else { L[i][op] = v; maengelSpiegeln(p, L[i]); save(); return; }
+  maengelSpiegeln(p);
   save();
   const box = $('dlg').querySelector('#ab-maengel-tab');
   box.innerHTML = abMaengelHtml();
   if (op === 'add') { const t = box.querySelectorAll('tr:last-child input'); t[0]?.focus(); }
 }
-// eingetragene Mängel als Aufträge an den Monteur in die Mängelliste kopieren (nur einmal pro Mangel)
-function abInMaengelliste() {
-  const p = findP(abPid), E = abEintraege(p[abArt]).filter(x => !(p.maengel?.punkte || []).some(m => m.id === x.ml));
-  if (!E.length) return toast('Alle eingetragenen Mängel sind bereits in der Mängelliste.');
+// Mängel aus Zwischenabnahme und Abnahme laufend in die Mängelliste spiegeln (ohne Bilder, die kommen dort dazu):
+// neue anlegen, den gerade geänderten nachführen, im Protokoll gelöschte oder geleerte entfernen
+function maengelSpiegeln(p, geaendert) {
+  const E = ['zwischen', 'abnahme'].flatMap(k => abEintraege(p[k]).map(x => ({ x, k })));
+  if (!E.length && !p.maengel) return;
   if (!p.maengel) { p.maengel = maengelDefaults(p); p.maengel.punkte = []; }
-  p.maengel.punkte = p.maengel.punkte.filter(x => !mangelLeer(x));
-  E.forEach(x => { const m = { ...mangelNeu(), bereich: x.bereich, text: x.text }; x.ml = m.id; p.maengel.punkte.push(m); });
-  save();
-  toast(`${E.length} Mängel in die Mängelliste übernommen – dort Bilder ergänzen und dem Monteur mitgeben.`);
+  const P = p.maengel.punkte, verknuepft = new Set(E.map(({ x }) => x.ml).filter(Boolean));
+  for (let i = P.length - 1; i >= 0; i--) if (P[i].quelle && !verknuepft.has(P[i].id)) { bildLoeschen(P[i].bild); P.splice(i, 1); }
+  E.forEach(({ x, k }) => {
+    let m = P.find(m => m.id === x.ml);
+    if (!m) { m = { ...mangelNeu(), bereich: x.bereich || '', text: x.text || '' }; x.ml = m.id; P.push(m); }
+    else if (x === geaendert) Object.assign(m, { bereich: x.bereich || '', text: x.text || '' });
+    m.quelle = k;
+  });
 }
 function abListeHtml(ctx, key) {
   const mitDetail = key === 'gegenstand';
@@ -2348,6 +2443,7 @@ function abL(ctx, key, op, i, v) {
   if (op === 'del') L.splice(i, 1);
   else if (op === 'add') L.push({ text: '', hint: '', detail: '', ok: false });
   else L[i][op] = v;
+  if (ctx === 'r') protokolleAbgleichen(findP(abPid), abArt);
   save();
   if (op !== 'del' && op !== 'add') return;
   const box = docBereich(ctx).querySelector('#ab-' + key);
@@ -2362,6 +2458,8 @@ function abnahmeDialog(pid, art = 'abnahme') {
   abPid = pid; abArt = art;
   const a = p[art];
   if (!Array.isArray(a.maengelListe)) a.maengelListe = [];
+  // früher von Hand übernommene oder noch nicht übernommene Mängel nachführen
+  maengelSpiegeln(p); save();
   // bei der Schlussabnahme: Stand der Mängel aus der Zwischenabnahme
   const zw = art === 'abnahme' && zwischenOffen(p);
   const zwHinweis = !zw || !zw.total ? '' : zw.offen
@@ -2381,9 +2479,11 @@ function abnahmeDialog(pid, art = 'abnahme') {
     <div class="aa-3">${spalte('kunde', 'kunde', 'Kunde', 'Name, Adresse, E-Mail, Telefon')}${spalte('objekt', 'objekt', 'Objekt', 'Adresse der Anlage')}${spalte('elektriker', 'ersteller', 'Projektleitung / Ersteller', 'Firma, Name, Telefon')}</div>
     <div class="ab-2">
       <div><h4 class="aa-h">${T.gegenstand}</h4>
-        <div class="muted klein" style="margin-bottom:6px">${art === 'zwischen' ? 'Abgenommene Teile ankreuzen. ' : ''}Rechts Hersteller, Typ, Anzahl usw. eintragen – leer bleibt im PDF eine Linie zum Ausfüllen.</div>
+        <div class="muted klein" style="margin-bottom:6px">${art === 'zwischen' ? 'Abgenommene Teile ankreuzen. ' : ''}Rechts Hersteller, Typ, Anzahl usw. eintragen – leer bleibt im PDF eine Linie zum Ausfüllen.
+          <b>Wird mit dem ${art === 'zwischen' ? 'Abnahmeprotokoll' : 'Zwischenabnahmeprotokoll'} abgeglichen.</b></div>
         <div id="ab-gegenstand" class="ab-liste">${abListeHtml('r', 'gegenstand')}</div></div>
       <div><h4 class="aa-h">2. Funktionsprüfung &amp; Übergabe</h4>
+        ${art === 'zwischen' ? '<div class="muted klein" style="margin-bottom:6px"><b>Häkchen werden ins Abnahmeprotokoll übernommen.</b></div>' : ''}
         <div id="ab-pruefung" class="ab-liste">${abListeHtml('r', 'pruefung')}</div></div>
     </div>
     <div class="ab-maengel"><h4>3. Festgestellte Mängel &amp; Pendenzen</h4>
@@ -2534,7 +2634,7 @@ function maengelStand(p) {
 let mlPid = null;
 function mlKarteHtml(x, i) {
   return `<div class="ml-karte ${x.erledigt ? 'ml-ok' : ''}">
-    <div class="ml-kopf"><b>Mangel ${i + 1}</b>
+    <div class="ml-kopf"><b>Mangel ${i + 1}</b>${x.quelle ? `<span class="tag-sub" title="Kommt aus dem Protokoll; Änderungen dort werden hier nachgeführt">${x.quelle === 'zwischen' ? 'Zwischenabnahme' : 'Abnahme'}</span>` : ''}
       <input class="ml-bereich" value="${esc(x.bereich)}" placeholder="Bereich / Bauteil, z.B. Dach Süd" oninput="mlSet(${i},'bereich',this.value)">
       <button class="ck-btn" title="Mangel entfernen" onclick="mlOp('del',${i})">✕</button></div>
     <label class="ml-bild ${x.bild ? 'hat' : ''}" title="${x.bild ? 'Klicken, um das Bild zu ersetzen' : ''}">
@@ -3655,10 +3755,10 @@ function viewEinstellungen() {
   return `
   <div class="page-head"><h1>Einstellungen</h1></div>
   <div class="tabs">
-    ${[['backup', 'Backup'], ['firma', 'Projektleiter & Firma'], ['gewerke', 'Standard-Gewerke'], ['checkliste', 'Checkliste'], ['rapport', 'Dokumente'], ['mails', 'Mailvorlagen'], ['app', 'App']].map(([k, l]) =>
+    ${[['backup', 'Backup'], ['firma', 'Projektleiter & Firma'], ['gewerke', 'Standard-Gewerke'], ['checkliste', 'Checkliste'], ['rapport', 'Dokumente'], ['mails', 'Mailvorlagen'], ['controlling', 'Controlling'], ['app', 'App']].map(([k, l]) =>
       `<button class="${ui.setTab === k ? 'active' : ''}" onclick="ui.setTab='${k}';render()">${l}</button>`).join('')}
   </div>
-  <div class="tab-inhalt" data-form="${ui.setTab}">${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, app: viewApp }[ui.setTab] || viewBackup)()}</div>`;
+  <div class="tab-inhalt" data-form="${ui.setTab}">${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, controlling: viewKtEinst, app: viewApp }[ui.setTab] || viewBackup)()}</div>`;
 }
 
 // Vorlagen für Arbeitsauftrag und Abnahmeprotokoll: jedes neue Dokument startet damit
@@ -4017,6 +4117,8 @@ function importJson(input) {
     try {
       const d = JSON.parse(r.result);
       if (!Array.isArray(d.projects)) throw 0;
+      // Backup aus dem alten Projektkontrolling: nicht ersetzen, sondern den Projekten zuordnen
+      if (d.projects.some(x => Array.isArray(x.weeks))) { input.value = ''; return ktImportStart(d); }
       if (confirm(`${d.projects.length} Projekte importieren? Die aktuellen Daten werden ersetzt.`)) {
         const bilder = d.bilder || {};
         delete d.bilder;
@@ -4426,6 +4528,622 @@ function pdfTerminplan(p, termine, f) {
     doc.text(`Projekt ${p.nummer} · Stand ${fmt(todayIso())}${n > 1 ? ` · Seite ${i} / ${n}` : ''}`, W - M, H - 8, { align: 'right' });
   }
   return doc;
+}
+
+// ---------- Controlling (Kosten und DB-Prognose) ----------
+// pro Projekt: p.ktr = { vk, ek, weeks: [{ id, date, ist, progress, note, gewerke: [{ name, amount, fixed }], personal: [{ name, rate, hours }] }], wid, closed }
+// Prognose (Landung) = Ist + noch erwartete Kosten · Trend = Ist ÷ Fortschritt
+// Ampel: gut = DB Verkauf erreicht, Achtung = bis zur Hälfte, kritisch = darunter, Verlust = DB negativ
+// (KT_PERSONAL, KT_GEWERKE, KT_ALT_KEY stehen bei den Stammdaten, weil migrate() schon beim Laden läuft)
+function ktMigrate(d) {
+  const k = d.settings.ktr = d.settings.ktr || {};
+  if (!Array.isArray(k.rates) || k.rates.length !== 3) k.rates = [120, 85, 70];
+  if (!Array.isArray(k.gewerke)) k.gewerke = KT_GEWERKE.map(name => ({ name, price: 0 }));
+  d.projects.forEach(p => { if (p.ktr && !Array.isArray(p.ktr.weeks)) p.ktr.weeks = []; });
+}
+const ktNum = v => { const n = parseFloat(String(v ?? '').replace(/['’\s]/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const ktFmt = n => Math.round(n).toLocaleString('de-CH');
+const ktChf = n => 'CHF ' + ktFmt(n);
+const ktPct = (n, d = 1) => n == null || !isFinite(n) ? '–' : n.toFixed(d) + '%';
+const ktSgnChf = n => (n >= 0 ? '+' : '−') + 'CHF ' + ktFmt(Math.abs(n));
+const ktKchf = n => Math.abs(n) >= 1000 ? Math.round(n / 1000) + 'k' : ktFmt(n);
+const ktKw = iso => kw(toDate(iso));
+const ktMontag = iso => { const d = toDate(iso); return isoOf(addDays(d, -((d.getUTCDay() + 6) % 7))); };
+const ktSorted = k => [...k.weeks].sort((a, b) => a.date.localeCompare(b.date));
+const ktLatest = k => { const s = ktSorted(k); return s[s.length - 1]; };
+const ktCurWeek = k => k.weeks.find(w => w.id === k.wid) || ktLatest(k);
+const ktStdPreis = name => { const g = S().ktr.gewerke.find(g => g.name === name); return g ? ktNum(g.price) : 0; };
+const ktAktiv = p => !!(p.ktr && p.ktr.weeks.length && !p.ktr.closed);
+const ktDue = p => ktAktiv(p) && ktMontag(ktLatest(p.ktr).date) !== ktMontag(todayIso());
+function ktNewWeek(prev) {
+  const w = prev ? JSON.parse(JSON.stringify(prev)) : { ist: 0, progress: 0, note: '',
+    gewerke: S().ktr.gewerke.filter(g => g.name).map(g => ({ name: g.name, amount: ktNum(g.price), fixed: true })),
+    personal: KT_PERSONAL.map(name => ({ name, rate: 0, hours: 0 })) };
+  w.id = uid(); w.date = todayIso();
+  w.personal.forEach((x, i) => { if (i < 3) x.rate = ktNum(S().ktr.rates[i]); });
+  return w;
+}
+function ktCalc(k, w) {
+  const vk = ktNum(k.vk), ek = ktNum(k.ek);
+  const dbPlan = vk - ek, dbPlanPct = vk ? dbPlan / vk * 100 : null;
+  const restGw = w ? w.gewerke.reduce((s, g) => s + ktNum(g.amount), 0) : 0;
+  const restPe = w ? w.personal.reduce((s, x) => s + ktNum(x.rate) * ktNum(x.hours), 0) : 0;
+  const ist = w ? ktNum(w.ist) : 0, prog = w ? ktNum(w.progress) : 0;
+  const rest = restGw + restPe, eac = ist + rest;
+  const dbProg = vk - eac, dbProgPct = vk ? dbProg / vk * 100 : null;
+  const eacTrend = prog > 0 ? ist / (prog / 100) : null;
+  const dbTrendPct = eacTrend != null && vk ? (vk - eacTrend) / vk * 100 : null;
+  return { vk, ek, dbPlan, dbPlanPct, restGw, restPe, rest, ist, prog, eac, dbProg, dbProgPct, eacTrend, dbTrendPct, deltaChf: dbProg - dbPlan };
+}
+const KT_LBL = { '': 'Gut', w: 'Achtung', b: 'Kritisch', x: 'Verlust', n: 'Daten fehlen' };
+const KT_RANK = { x: 0, b: 1, w: 2, n: 3, '': 4 };
+const KT_TXT = { '': 'kt-pos', w: 'kt-wrn', b: 'kt-neg', x: 'kt-neg', n: '' };
+function ktClassify(dbChf, planChf) {
+  if (dbChf >= planChf) return '';
+  if (dbChf < 0) return 'x';
+  return dbChf >= planChf / 2 ? 'w' : 'b';
+}
+function ktStatus(c) {
+  if (c.dbProgPct == null || !c.ek) return { cls: 'n', lbl: KT_LBL.n, txt: 'VK und EK erfassen' };
+  const cls = ktClassify(c.dbProg, c.dbPlan);
+  return { cls, lbl: KT_LBL[cls], txt: `${KT_LBL[cls]} · DB ${ktPct(c.dbProgPct)} statt ${ktPct(c.dbPlanPct)} (${ktSgnChf(c.deltaChf)})` };
+}
+function ktInfo(p) { const k = p.ktr, w = ktLatest(k), c = ktCalc(k, w); return { p, k, w, c, st: ktStatus(c), due: ktDue(p) }; }
+const ktCount = xs => { const n = {}; xs.forEach(x => n[x.st.cls] = (n[x.st.cls] || 0) + 1); return n; };
+const ktRisk = n => [['x', 'Verlust'], ['b', 'kritisch'], ['w', 'Achtung']].filter(([k]) => n[k]).map(([k, l]) => `${n[k]} ${l}`).join(' · ');
+const ktLetzte = w => { const d = diffDays(w.date, todayIso()); return d <= 0 ? 'heute' : d === 1 ? 'gestern' : `vor ${d} Tagen`; };
+
+// Farben: Bildschirm im Stil der App, PDF hell
+const KT_TH = { acc: '#18181b', plan: '#a1a1aa', grid: '#efeee9', muted: '#74747c', text: '#18181b', bg: '#fff', band: .1,
+  st: { '': '#2e8b3e', w: '#c27c0e', b: '#c0392b', x: '#8e1414', n: '#a1a1aa' } };
+const KT_PDF = { acc: '#4f9a48', plan: '#888', grid: '#e8ebe8', muted: '#777', text: '#222', bg: '#fff', band: .1,
+  st: { '': '#4f9a48', w: '#d08a14', b: '#d9502f', x: '#a3121a', n: '#888' } };
+const KT_GC = { '': ['#b9dfc0', '#2e8b3e'], w: ['#f1d39c', '#c27c0e'], b: ['#efb0a8', '#c0392b'], x: ['#d98080', '#8e1414'], n: ['#e3e2dc', '#a1a1aa'] };
+
+// ---------- Controlling: Grafiken ----------
+function ktPolar(cx, cy, r, deg) { const a = (deg - 90) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
+function ktArc(cx, cy, r, a0, a1) {
+  const [x0, y0] = ktPolar(cx, cy, r, a0), [x1, y1] = ktPolar(cx, cy, r, a1);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+function ktGaugeSVG(size, val, max, color, marks, sw, zones) {
+  const cx = size / 2, cy = size / 2, r = size / 2 - sw - 6, A0 = -135, SW = 270;
+  const f = Math.max(0, Math.min(1, (val ?? 0) / max)), a1 = A0 + SW * f, gid = 'g' + uid();
+  let s = `<svg viewBox="0 0 ${size} ${size}"><defs><linearGradient id="${gid}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${color[0]}"/><stop offset="1" stop-color="${color[1]}"/></linearGradient></defs>
+    <path d="${ktArc(cx, cy, r, A0, A0 + SW)}" stroke="#ecebe6" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+  (zones || []).forEach(z => {
+    const a = A0 + SW * Math.max(0, Math.min(1, z.from / max)), b = A0 + SW * Math.max(0, Math.min(1, z.to / max));
+    if (b - a > 0.5) s += `<path d="${ktArc(cx, cy, r, a, b)}" stroke="${z.c}" stroke-opacity=".18" stroke-width="${sw}" fill="none"/>`;
+  });
+  if (f > 0.004) {
+    s += `<path d="${ktArc(cx, cy, r, A0, a1)}" stroke="url(#${gid})" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+    const [kx, ky] = ktPolar(cx, cy, r, a1);
+    s += `<circle cx="${kx}" cy="${ky}" r="${sw * .62}" fill="#fff" stroke="${color[1]}" stroke-width="4"/>`;
+  }
+  (marks || []).forEach(m => {
+    if (m.v == null || !isFinite(m.v)) return;
+    const a = A0 + SW * Math.max(0, Math.min(1, m.v / max));
+    const [x0, y0] = ktPolar(cx, cy, r - sw / 2 - 3, a), [x1, y1] = ktPolar(cx, cy, r + sw / 2 + 5, a);
+    s += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${m.c}" stroke-width="3" stroke-linecap="round"/>`;
+  });
+  return s + '</svg>';
+}
+const ktNiceStep = v => { const m = 10 ** Math.floor(Math.log10(v || 1)), r = v / m; return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10) * m; };
+// Verlauf: x = Fortschritt, y = Kosten. Ist-Linie über die Wochen, gestrichelt die Prognose bis Abschluss,
+// rechts die «Landezone» (grün bis EK, orange bis ½ DB, rot bis VK, darüber Verlust).
+function ktChartSVG(k, th, H = 270, wSel = ktLatest(k)) {
+  const W = 760, L = 50, R = 150, T = 20, B = 38, iw = W - L - R, ih = H - T - B;
+  const base = ktCalc(k, null), cs = ktCalc(k, wSel), st = ktStatus(cs), vk = base.vk, ek = base.ek, half = ek + base.dbPlan / 2;
+  const ws = ktSorted(k).filter(w => w.date <= wSel.date);
+  const top = Math.max(vk, cs.eac, ...ws.map(w => ktCalc(k, w).eac), 1) * 1.08;
+  const x = v => L + Math.max(0, Math.min(100, v)) / 100 * iw, y = v => T + (1 - Math.max(0, v) / top) * ih;
+  const sx = x(100) + 14, txt = (X, Y, t, o = '') => `<text x="${X}" y="${Y}" ${o} stroke="${th.bg}" stroke-width="4" paint-order="stroke">${t}</text>`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" font-family="Inter,Arial,sans-serif">`;
+  if (vk > 0 && ek > 0) [[0, ek, th.st['']], [ek, Math.max(ek, half), th.st.w], [Math.max(ek, half), Math.max(vk, ek), th.st.b], [Math.max(vk, ek), top, th.st.x]].forEach(([a, b, c]) => {
+    if (b > a) s += `<rect x="${L}" y="${y(b)}" width="${iw}" height="${y(a) - y(b)}" fill="${c}" opacity="${th.band}"/><rect x="${sx}" y="${y(b)}" width="10" height="${y(a) - y(b)}" fill="${c}" opacity=".9"/>`;
+  });
+  const step = ktNiceStep(top / 5);
+  for (let v = 0; v <= top; v += step) s += `<line x1="${L}" x2="${x(100)}" y1="${y(v)}" y2="${y(v)}" stroke="${th.grid}"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="${th.muted}">${ktKchf(v)}</text>`;
+  [0, 25, 50, 75, 100].forEach(v => s += `<text x="${x(v)}" y="${H - 20}" text-anchor="middle" font-size="11" fill="${th.muted}">${v}%</text>`);
+  s += `<text x="${x(50)}" y="${H - 5}" text-anchor="middle" font-size="10.5" fill="${th.muted}">Leistungsfortschritt</text>`;
+  if (vk) s += `<line x1="${L}" x2="${sx + 10}" y1="${y(vk)}" y2="${y(vk)}" stroke="${th.text}" stroke-width="1.4" stroke-dasharray="6 4" opacity=".75"/>` + txt(sx + 16, y(vk) + 4, `Verkauf ${ktKchf(vk)}`, `font-size="11" fill="${th.text}"`);
+  if (ek) { const ly = Math.abs(y(ek) - y(vk)) < 14 ? y(vk) + 15 : y(ek) + 4;
+    s += `<line x1="${L}" x2="${sx + 10}" y1="${y(ek)}" y2="${y(ek)}" stroke="${th.plan}" stroke-width="1.2" stroke-dasharray="3 4"/>` + txt(sx + 16, ly, `EK ${ktKchf(ek)}`, `font-size="11" fill="${th.muted}"`);
+    s += `<line x1="${x(0)}" y1="${y(0)}" x2="${x(100)}" y2="${y(ek)}" stroke="${th.plan}" stroke-width="1.3" stroke-dasharray="2 4"/>`; }
+  const pts = [[x(0), y(0)]].concat(ws.map(w => { const c = ktCalc(k, w); return [x(c.prog), y(c.ist)]; }));
+  s += `<path d="M${pts.map(q => q.join(' ')).join(' L')} L${pts[pts.length - 1][0]} ${y(0)} Z" fill="${th.acc}" opacity=".08"/>`;
+  s += `<polyline points="${pts.map(q => q.join(',')).join(' ')}" fill="none" stroke="${th.acc}" stroke-width="2.6" stroke-linejoin="round"/>`;
+  ws.forEach(w => { if (w.id === wSel.id) return; const c = ktCalc(k, w);
+    s += `<circle cx="${x(c.prog)}" cy="${y(c.ist)}" r="3.5" fill="${th.acc}"/><circle cx="${x(100)}" cy="${y(c.eac)}" r="3" fill="none" stroke="${th.muted}" stroke-width="1.3"/>`; });
+  const col = th.st[st.cls], cx0 = x(cs.prog), cy0 = y(cs.ist), lx = x(100), ly = y(cs.eac);
+  s += `<line x1="${cx0}" y1="${cy0}" x2="${lx}" y2="${ly}" stroke="${col}" stroke-width="2.4" stroke-dasharray="7 5"/>`;
+  s += `<circle cx="${cx0}" cy="${cy0}" r="5.5" fill="${th.bg}" stroke="${th.acc}" stroke-width="2.6"/>` + txt(cx0, cy0 + (cy0 > T + ih - 30 ? -12 : 20), `Ist ${ktKchf(cs.ist)} · ${cs.prog}%`, `text-anchor="middle" font-size="11" fill="${th.text}"`);
+  s += `<circle cx="${lx}" cy="${ly}" r="7.5" fill="${col}" stroke="${th.bg}" stroke-width="2.5"/>`;
+  s += txt(lx - 12, vk && Math.abs(ly - 12 - y(vk)) < 12 ? ly + 22 : ly - 12, `Landung ${ktChf(cs.eac)} · DB ${ktPct(cs.dbProgPct)}`, `text-anchor="end" font-size="12" font-weight="600" fill="${col}"`);
+  return s + '</svg>';
+}
+
+// ---------- Controlling: Eingaben ----------
+// Zahlenfelder: beim Tippen rohe Zahl, sonst mit Tausendertrennzeichen
+const ktIn = (wert, on, roh) => `class="kt-num" inputmode="decimal" placeholder="0" value="${ktNum(wert) ? (roh ? ktNum(wert) : ktFmt(ktNum(wert))) : ''}"
+  ${roh ? '' : 'onfocus="ktFokus(this)" onblur="ktBlur(this)"'} oninput="${on}"`;
+function ktFokus(el) { if (el.value) el.value = String(ktNum(el.value)); }
+function ktBlur(el) { if (el.value.trim()) el.value = ktFmt(ktNum(el.value)); }
+// beim Tippen sofort neu rechnen, gespeichert wird kurz danach
+let ktSaveT;
+function ktSpeichern() { clearTimeout(ktSaveT); ktSaveT = setTimeout(save, 400); }
+function ktUpdate() { ktSpeichern(); render(); }
+function ktSet(pid, f, v) {
+  const k = findP(pid).ktr, w = ktCurWeek(k);
+  if (f === 'vk' || f === 'ek') k[f] = ktNum(v);
+  else if (f === 'ist' || f === 'progress') w[f] = ktNum(v);
+  else if (f === 'date') { if (!v) return; w.date = v; }
+  else if (f === 'note') w.note = v;
+  ktUpdate();
+}
+function ktGw(pid, i, f, v) { const g = ktCurWeek(findP(pid).ktr).gewerke[i]; g[f] = f === 'amount' ? ktNum(v) : v; ktUpdate(); }
+function ktPe(pid, i, v) { ktCurWeek(findP(pid).ktr).personal[i].hours = ktNum(v); ktUpdate(); }
+function ktStd(pid, i) { const g = ktCurWeek(findP(pid).ktr).gewerke[i]; g.amount = ktStdPreis(g.name); save(); render(); }
+function ktGwX(pid, i) {
+  const w = ktCurWeek(findP(pid).ktr), g = w.gewerke[i];
+  if (g.fixed) g.amount = 0; else w.gewerke.splice(i, 1);
+  save(); render();
+}
+function ktGwNeu(pid) {
+  ktCurWeek(findP(pid).ktr).gewerke.push({ name: '', amount: 0 }); save(); render();
+  const L = document.querySelectorAll('.kt-gwname'); if (L.length) L[L.length - 1].focus();
+}
+function ktWoche(pid, wid) { findP(pid).ktr.wid = wid; save(); render(); }
+function ktWocheWeg(pid) {
+  const k = findP(pid).ktr, w = ktCurWeek(k);
+  if (k.weeks.length < 2) return toast('Die einzige Erfassung kann nicht gelöscht werden.');
+  if (!confirm(`Erfassung KW ${ktKw(w.date)} (${fmt(w.date)}) löschen?`)) return;
+  k.weeks = k.weeks.filter(x => x.id !== w.id); k.wid = ktLatest(k).id; save(); render();
+}
+// neue Kalenderwoche: neue Erfassung mit den Werten der letzten
+function ktWocheStarten(p) {
+  const k = p.ktr, last = ktLatest(k), t = todayIso();
+  if (!ktDue(p)) { if (last.date < t && ktMontag(last.date) === ktMontag(t)) last.date = t; k.wid = last.id; return false; }
+  const w = ktNewWeek(last); k.weeks.push(w); k.wid = w.id;
+  toast(`Erfassung KW ${ktKw(t)} gestartet – Werte vom ${fmt(last.date)} übernommen`);
+  return true;
+}
+function ktNeueWoche(pid) { ktWocheStarten(findP(pid)); save(); render(); }
+function ktKontrollieren(pid) {
+  const p = findP(pid);
+  if (p.ktr && p.ktr.weeks.length && !p.ktr.closed) { ktWocheStarten(p); save(); }
+  ui.tab = 'controlling'; ui.editTermin = ui.editGewerk = null; nav('projekt/' + pid);
+}
+function ktStarten(pid) {
+  const p = findP(pid), w = ktNewWeek();
+  p.ktr = { vk: ktNum(val('kt-vk')), ek: ktNum(val('kt-ek')), weeks: [w], wid: w.id };
+  save(); render(); toast('Controlling gestartet.');
+}
+function ktEntfernen(pid) {
+  const p = findP(pid);
+  if (!confirm(`Controlling von «${p.nummer} ${p.name}» mit allen Erfassungen löschen? Das Projekt selbst bleibt bestehen.`)) return;
+  delete p.ktr; save(); render(); toast('Controlling entfernt.');
+}
+function ktWiederOeffnen(pid) { delete findP(pid).ktr.closed; save(); render(); toast('Controlling wieder geöffnet.'); }
+
+// ---------- Controlling: Projektabschluss ----------
+function ktAbschlussDialog(pid) {
+  const k = findP(pid).ktr, c = ktCalc(k, ktLatest(k)), d = $('dlg');
+  d.innerHTML = `
+    <h2>Projekt abschliessen</h2>
+    <p class="muted" style="margin-top:-6px">Schlussabrechnung erfassen. Das Controlling wird danach unter «Abgeschlossen» geführt.</p>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div><label>Abschlussdatum</label><input type="date" id="kt-m-date" value="${todayIso()}"></div>
+      <div><label>Schluss-VK inkl. Nachträge (CHF)</label><input id="kt-m-vk" class="kt-num" inputmode="decimal" value="${ktFmt(c.vk)}" oninput="ktAbUpd('${pid}')"></div>
+      <div><label>Endkosten (CHF)</label><input id="kt-m-cost" class="kt-num" inputmode="decimal" value="${ktFmt(c.eac)}" oninput="ktAbUpd('${pid}')"></div>
+      <div><label>End-DB (%)</label><input id="kt-m-pct" class="kt-num" inputmode="decimal" oninput="ktAbUpd('${pid}','pct')"></div>
+    </div>
+    <div class="kt-hint" id="kt-m-info"></div>
+    <div class="row" style="margin-top:16px;justify-content:flex-end">
+      <button class="sec" onclick="$('dlg').close()">Abbrechen</button>
+      <button onclick="ktAbschluss('${pid}')">Abschliessen</button>
+    </div>`;
+  d.showModal(); ktAbUpd(pid);
+}
+function ktAbUpd(pid, src) {
+  const vk = ktNum($('kt-m-vk').value); let cost = ktNum($('kt-m-cost').value), pc = ktNum($('kt-m-pct').value);
+  if (src === 'pct') { cost = vk * (1 - pc / 100); $('kt-m-cost').value = ktFmt(cost); }
+  else $('kt-m-pct').value = (vk ? (vk - cost) / vk * 100 : 0).toFixed(1);
+  const base = ktCalc(findP(pid).ktr, null), k = ktClassify(vk - cost, base.dbPlan);
+  $('kt-m-info').innerHTML = `End-DB <b>${ktChf(vk - cost)}</b> · DB Verkauf ${ktPct(base.dbPlanPct)} (${ktChf(base.dbPlan)}) · <b class="${KT_TXT[k]}">${KT_LBL[k]}, ${ktSgnChf(vk - cost - base.dbPlan)}</b>`;
+}
+function ktAbschluss(pid) {
+  const k = findP(pid).ktr, vk = ktNum($('kt-m-vk').value), cost = ktNum($('kt-m-cost').value);
+  k.closed = { date: $('kt-m-date').value || todayIso(), vk, cost, dbPct: vk ? (vk - cost) / vk * 100 : 0 };
+  $('dlg').close(); save(); render(); toast('Projekt abgeschlossen – End-DB ' + ktPct(k.closed.dbPct));
+}
+
+// ---------- Controlling: Ansicht im Projekt ----------
+const ktTabTitel = p => p.ktr && ktDue(p) ? 'Controlling <span class="tag-warn" style="margin-left:2px">fällig</span>' : 'Controlling';
+function ktHint(c) {
+  if (!c.vk || !c.ek) return 'Zuerst Verkauf (VK) und Kosten (EK) erfassen.';
+  if (!c.prog) return 'Fortschritt setzen, damit der Trend berechnet wird.';
+  const gap = c.dbProgPct - c.dbTrendPct;
+  if (gap > 3) return `<span class="kt-wrn">⚠ Prüfen:</span> Nach Fortschritt (Ist ÷ ${c.prog}%) wären es nur ${ktPct(c.dbTrendPct)}. Sind alle kommenden Rechnungen erfasst?`;
+  if (gap < -3) return '<span class="kt-pos">✓</span> Der Trend liegt über der Prognose – die Restkosten sind eher vorsichtig geschätzt.';
+  return '<span class="kt-pos">✓</span> Prognose und Trend passen zusammen.';
+}
+function viewKtProjekt(p) {
+  const id = p.id, k = p.ktr;
+  if (!k) return `<div class="card">
+    <h3>Controlling starten</h3>
+    <p class="muted" style="margin-top:0">Verkauf (VK) und kalkulierte Kosten (EK) erfassen. Danach jede Woche den Ist-Stand und die noch erwarteten Kosten nachführen – daraus entsteht die DB-Prognose.</p>
+    <div class="grid"><div><label>Verkauf VK (CHF)</label><input id="kt-vk" class="kt-num" inputmode="decimal" placeholder="0"></div>
+      <div><label>Kosten EK (CHF)</label><input id="kt-ek" class="kt-num" inputmode="decimal" placeholder="0"></div></div>
+    <div class="row" style="margin-top:14px"><button onclick="ktStarten('${id}')">Controlling starten</button>
+      <span class="muted">Daten aus dem alten Projektkontrolling? <a href="#" onclick="event.preventDefault();ui.setTab='controlling';nav('einstellungen')">Importieren →</a></span></div>
+  </div>`;
+  const w = ktCurWeek(k), c = ktCalc(k, w), st = ktStatus(c), last = ktLatest(k), zu = !!k.closed;
+  const plan = c.dbPlanPct || 0, gMax = Math.max(30, Math.ceil((Math.max(plan, c.dbProgPct || 0) + 8) / 10) * 10);
+  const zonen = plan > 0 ? [{ from: 0, to: plan / 2, c: KT_TH.st.b }, { from: plan / 2, to: plan, c: KT_TH.st.w }, { from: plan, to: gMax, c: KT_TH.st[''] }] : [];
+  const sgnCls = v => v == null || !isFinite(v) ? '' : v >= 0 ? 'kt-pos' : 'kt-neg';
+  let kopf;
+  if (zu) {
+    const e = k.closed.vk - k.closed.cost, kl = ktClassify(e, c.dbPlan);
+    kopf = `<div class="frei ok"><div class="row"><span>✓ Abgeschlossen am <b>${fmt(k.closed.date)}</b> · End-DB <b class="${KT_TXT[kl]}">${ktPct(k.closed.dbPct)}</b> (${ktChf(e)}) · <span class="${KT_TXT[kl]}">${KT_LBL[kl]}, ${ktSgnChf(e - c.dbPlan)} zu Verkauf</span></span>
+      <button class="sec sm" onclick="ktWiederOeffnen('${id}')">Wieder öffnen</button></div></div>`;
+  } else kopf = `<div class="frei ${{ '': 'ok', w: 'warn', n: 'warn' }[st.cls] ?? 'rot'}"><span class="kt-dot ${st.cls}"></span>${esc(st.txt)}</div>`;
+  const faellig = !zu && ktDue(p) ? `<div class="note"><div class="row" style="justify-content:space-between">
+    <span>Letzte Erfassung KW ${ktKw(last.date)} (${fmt(last.date)}, ${ktLetzte(last)}). Ist-Kosten und kommende Rechnungen für diese Woche erfassen.</span>
+    <button class="sm" onclick="ktNeueWoche('${id}')">Erfassung KW ${ktKw(todayIso())} starten</button></div></div>` : '';
+  const gwRows = w.gewerke.map((g, i) => {
+    const sp = ktStdPreis(g.name);
+    return `<tr><td>${g.fixed ? esc(g.name) : `<input class="kt-gwname" value="${esc(g.name)}" placeholder="Weitere Position …" oninput="ktGw('${id}',${i},'name',this.value)">`}</td>
+      <td>${sp ? `<button class="kt-std ${ktNum(g.amount) === sp ? 'gleich' : ''}" title="Standardpreis einsetzen" onclick="ktStd('${id}',${i})">${ktFmt(sp)}</button>` : ''}</td>
+      <td><input ${ktIn(g.amount, `ktGw('${id}',${i},'amount',this.value)`)}></td>
+      <td>${g.fixed && !ktNum(g.amount) ? '' : `<button class="ck-btn" title="${g.fixed ? 'Betrag löschen' : 'Position entfernen'}" onclick="ktGwX('${id}',${i})">✕</button>`}</td></tr>`;
+  }).join('');
+  const peRows = w.personal.map((x, i) => `<tr><td>${esc(x.name)}</td><td class="kt-num muted">${ktFmt(x.rate)}/h</td>
+    <td><input ${ktIn(x.hours, `ktPe('${id}',${i},this.value)`, true)}></td><td class="kt-num">${ktFmt(ktNum(x.rate) * ktNum(x.hours))}</td></tr>`).join('');
+  const hist = ktSorted(k).reverse().map(x => { const cc = ktCalc(k, x), kc = KT_TXT[ktStatus(cc).cls];
+    return `<tr class="${x.id === w.id ? 'cur' : ''}" onclick="ktWoche('${id}','${x.id}')"><td>KW ${ktKw(x.date)} · ${fmt(x.date)}</td><td>${cc.prog}%</td><td>${ktFmt(cc.ist)}</td><td>${ktFmt(cc.rest)}</td>
+      <td><b>${ktFmt(cc.eac)}</b></td><td class="${kc}">${ktPct(cc.dbProgPct)}</td><td class="${kc}">${ktSgnChf(cc.deltaChf)}</td></tr>`; }).join('');
+  return `
+  ${kopf}${faellig}
+  <div class="row" style="justify-content:flex-end;margin-bottom:14px">
+    <button class="sec sm" onclick="ktPdf('${id}')">PDF erstellen</button>
+    ${zu ? '' : `<button class="sm" onclick="ktAbschlussDialog('${id}')">✓ Projekt abschliessen</button>`}
+  </div>
+  <div class="kt-grid ${zu ? 'kt-locked' : ''}">
+    <div class="card">
+      <h3>Projekt</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div><label>Verkauf VK (CHF)</label><input ${ktIn(k.vk, `ktSet('${id}','vk',this.value)`)}></div>
+        <div><label>Kosten EK (CHF)</label><input ${ktIn(k.ek, `ktSet('${id}','ek',this.value)`)}></div>
+      </div>
+      <div class="kt-result"><span>DB Verkauf = Ziel</span><b>${ktPct(c.dbPlanPct)} · ${ktChf(c.dbPlan)}</b></div>
+      ${c.vk && c.ek ? `<div class="kt-zonen"><span><span class="kt-dot"></span>Gut ab ${ktChf(c.dbPlan)}</span><span><span class="kt-dot w"></span>Achtung ab ${ktChf(c.dbPlan / 2)}</span><span><span class="kt-dot b"></span>Kritisch darunter</span><span><span class="kt-dot x"></span>Verlust unter 0</span></div>` : ''}
+      <h3 style="margin-top:20px">Erfassung</h3>
+      <div class="row" style="flex-wrap:nowrap">
+        <select onchange="ktWoche('${id}',this.value)">${ktSorted(k).reverse().map(x => `<option value="${x.id}" ${x.id === w.id ? 'selected' : ''}>KW ${ktKw(x.date)} · ${fmt(x.date)}</option>`).join('')}</select>
+        <button class="danger sm" title="Erfassung löschen" onclick="ktWocheWeg('${id}')">✕</button>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px">
+        <div><label>Stichtag</label><input type="date" value="${w.date}" onchange="ktSet('${id}','date',this.value)"></div>
+        <div><label>Aufgelaufene Kosten Ist (CHF)</label><input ${ktIn(w.ist, `ktSet('${id}','ist',this.value)`)}></div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="row" style="justify-content:space-between"><b style="font-weight:600">Fortschritt</b><span class="kt-big">${c.prog}<small>%</small></span></div>
+        <input type="range" class="kt-slider" min="0" max="100" step="1" value="${c.prog}" oninput="ktSet('${id}','progress',this.value)">
+        <div class="kt-scale"><span>Start</span><span>Hälfte</span><span>Abschluss</span></div>
+      </div>
+      <div style="margin-top:12px"><label>Bemerkung / Massnahmen</label><textarea oninput="ktSet('${id}','note',this.value)">${esc(w.note)}</textarea></div>
+    </div>
+    <div class="card kt-kosten">
+      <div class="ck-head"><h3 style="margin:0">Noch erwartete Kosten</h3><b>${ktChf(c.rest)}</b></div>
+      <div class="table-wrap"><table class="kt-ct">
+        <colgroup><col><col style="width:74px"><col style="width:112px"><col style="width:66px"></colgroup>
+        <thead><tr><th>Gewerke / Fremdleistungen</th><th class="kt-num">Standard</th><th class="kt-num">CHF</th><th></th></tr></thead>
+        <tbody>${gwRows}</tbody>
+        <tr class="kt-plain"><td colspan="4"><button class="sec sm" onclick="ktGwNeu('${id}')">+ Position</button></td></tr>
+        <tr class="kt-sum"><td colspan="2">Total Gewerke</td><td class="kt-num">${ktFmt(c.restGw)}</td><td></td></tr>
+        <thead><tr><th style="padding-top:14px">Personal</th><th class="kt-num">Ansatz</th><th class="kt-num">Std.</th><th class="kt-num">CHF</th></tr></thead>
+        <tbody>${peRows}</tbody>
+        <tr class="kt-sum"><td colspan="3">Total Personal</td><td class="kt-num">${ktFmt(c.restPe)}</td></tr>
+        <tr class="kt-total"><td colspan="3" style="border-radius:10px 0 0 10px">Total noch erwartet</td><td class="kt-num" style="border-radius:0 10px 10px 0">${ktFmt(c.rest)}</td></tr>
+      </table></div>
+      <div class="muted" style="margin-top:8px">Aufgelaufene Kosten sind im Feld «Ist» erfasst. Hier nur eintragen, was noch kommt.</div>
+    </div>
+    <div class="card kt-c3">
+      <h3>DB-Prognose</h3>
+      <div class="kt-gauge">${ktGaugeSVG(240, c.dbProgPct, gMax, KT_GC[st.cls], [{ v: c.dbPlanPct, c: '#18181b' }, { v: plan / 2 || null, c: KT_TH.st.w }], 15, zonen)}
+        <div class="c"><div class="v ${st.cls === 'x' ? 'kt-neg' : ''}">${c.dbProgPct == null ? '–' : `${c.dbProgPct.toFixed(1)}<small>%</small>`}</div>
+        <div class="s"><b class="${KT_TXT[st.cls]}">${st.lbl}</b> · verkauft mit ${ktPct(c.dbPlanPct)}</div></div></div>
+      <div class="kt-legend" style="justify-content:center"><span><i style="background:#18181b"></i>DB Verkauf</span><span><i style="background:${KT_TH.st.w}"></i>½ DB</span></div>
+      <div class="kt-stats">
+        <div class="kt-stat"><div class="l">Endkosten</div><div class="v">${ktChf(c.eac)}</div></div>
+        <div class="kt-stat"><div class="l">DB Prognose</div><div class="v ${KT_TXT[st.cls]}">${ktChf(c.dbProg)}</div></div>
+        <div class="kt-stat"><div class="l">Δ zu Verkauf</div><div class="v ${sgnCls(c.deltaChf)}">${ktSgnChf(c.deltaChf)}</div></div>
+        <div class="kt-stat"><div class="l">Trend nach Fortschritt</div><div class="v ${sgnCls(c.dbTrendPct == null || c.dbPlanPct == null ? null : c.dbTrendPct - c.dbPlanPct)}">${ktPct(c.dbTrendPct)}</div></div>
+      </div>
+      <div class="kt-hint">${ktHint(c)}</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Verlauf · Wo landen die Kosten?</h3>
+    <div class="kt-legend"><span><i style="background:${KT_TH.acc}"></i>Aufgelaufene Kosten (Ist)</span><span><i style="background:${KT_TH.st[st.cls]}"></i>- - Prognose bis Abschluss</span>
+      <span><i style="background:${KT_TH.plan}"></i>··· Plan (EK linear)</span><span><i style="background:${KT_TH.st['']}"></i>DB erreicht</span><span><i style="background:${KT_TH.st.w}"></i>bis ½ DB</span>
+      <span><i style="background:${KT_TH.st.b}"></i>unter ½ DB</span><span><i style="background:${KT_TH.st.x}"></i>Verlust</span></div>
+    <div class="kt-chart">${ktChartSVG(k, KT_TH, 270, w)}</div>
+    <div class="table-wrap" style="margin-top:12px"><table class="kt-hist">
+      <thead><tr><th>Erfassung</th><th>Fortschritt</th><th>Ist CHF</th><th>+ noch kommt CHF</th><th>= Landung CHF</th><th>DB</th><th>Δ zu Verkauf</th></tr></thead>
+      <tbody>${hist}</tbody></table></div>
+  </div>
+  <div class="row" style="justify-content:flex-end"><button class="danger sm" onclick="ktEntfernen('${id}')">Controlling entfernen</button></div>`;
+}
+// kurze Zusammenfassung im Tab «Übersicht» und auf der Projektkarte
+function ktUebersicht(p) {
+  if (!p.ktr || !p.ktr.weeks.length) return '';
+  const x = ktInfo(p), c = x.c, zu = p.ktr.closed;
+  return `<div class="card" style="cursor:pointer" onclick="ui.tab='controlling';render()" title="Zum Controlling">
+    <div class="ck-head"><h3 style="margin:0">Controlling</h3>
+      ${zu ? `<span class="tag-ok">✓ abgeschlossen · End-DB ${ktPct(zu.dbPct)}</span>` : x.due ? '<span class="tag-warn">Erfassung fällig</span>' : `<span class="tag-ok">✓ KW ${ktKw(x.w.date)} erfasst</span>`}</div>
+    <div class="row" style="gap:28px">
+      <div><label>DB Prognose</label><b class="${KT_TXT[x.st.cls]}"><span class="kt-dot ${x.st.cls}"></span>${ktPct(c.dbProgPct)} · ${x.st.lbl}</b></div>
+      <div><label>DB Verkauf</label><b>${ktPct(c.dbPlanPct)}</b></div>
+      <div><label>Δ zu Verkauf</label><b class="${c.deltaChf >= 0 ? 'kt-pos' : 'kt-neg'}">${ktSgnChf(c.deltaChf)}</b></div>
+      <div><label>Endkosten</label><b>${ktChf(c.eac)}</b></div>
+      <div><label>Fortschritt</label><b>${c.prog}%</b></div>
+    </div>
+  </div>`;
+}
+function ktKarte(p) {
+  if (!p.ktr || !p.ktr.weeks.length) return '';
+  const x = ktInfo(p);
+  if (p.ktr.closed) return `<div class="muted" style="margin-top:8px"><span class="kt-dot g"></span>Controlling abgeschlossen · End-DB ${ktPct(p.ktr.closed.dbPct)}</div>`;
+  return `<div class="muted" style="margin-top:8px"><span class="kt-dot ${x.st.cls}"></span>DB ${ktPct(x.c.dbProgPct)} · ${x.st.lbl}${x.due ? ' · <span class="rot-txt">Controlling fällig</span>' : ''}</div>`;
+}
+function ktKpi() {
+  const n = state.projects.filter(ktDue).length;
+  return `<div class="kpi" onclick="nav('controlling')"><b style="color:var(--warn)" data-zahl="${n}">${n}</b><span>Controlling fällig</span></div>`;
+}
+
+// ---------- Controlling: Übersicht aller Projekte ----------
+function viewControlling() {
+  const today = todayIso(), F = ui.ktF || 'run';
+  const mit = state.projects.filter(p => p.ktr && p.ktr.weeks.length).map(ktInfo);
+  const act = mit.filter(x => !x.k.closed), zu = mit.filter(x => x.k.closed), due = act.filter(x => x.due), n = ktCount(act);
+  const ohne = state.projects.filter(p => !p.ktr || !p.ktr.weeks.length);
+  const vk = act.reduce((s, x) => s + x.c.vk, 0), dbPlan = act.reduce((s, x) => s + x.c.dbPlan, 0), dbProg = act.reduce((s, x) => s + x.c.dbProg, 0);
+  const pp = vk ? dbProg / vk * 100 : null, pl = vk ? dbPlan / vk * 100 : null, pk = ktClassify(dbProg, dbPlan);
+  const zeile = x => {
+    if (x.k.closed) { const cd = x.k.closed, e = cd.vk - cd.cost, kl = KT_TXT[ktClassify(e, x.c.dbPlan)];
+      return `<div class="li" onclick="ktKontrollieren('${x.p.id}')"><span class="kt-dot g"></span>
+        <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">abgeschlossen ${fmt(cd.date)} · VK ${ktFmt(cd.vk)}</div></div>
+        <div class="kt-v"><div class="${kl}">${ktPct(cd.dbPct)}</div><div class="muted">${ktSgnChf(e - x.c.dbPlan)}</div></div></div>`; }
+    return `<div class="li kt-${x.st.cls}" onclick="ktKontrollieren('${x.p.id}')"><span class="kt-dot ${x.st.cls}"></span>
+      <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}
+        <div class="muted">${x.due ? '<span class="rot-txt">fällig</span> · ' : ''}${x.st.lbl} · Fortschritt ${x.c.prog}% · erfasst ${ktLetzte(x.w)}</div>
+        <div class="progress"><div style="width:${x.c.prog}%"></div></div></div>
+      <div class="kt-v"><div class="${KT_TXT[x.st.cls]}">${ktPct(x.c.dbProgPct)}</div><div class="muted">${ktSgnChf(x.c.deltaChf)}</div></div></div>`;
+  };
+  const sortRisk = (a, b) => KT_RANK[a.st.cls] - KT_RANK[b.st.cls] || a.c.deltaChf - b.c.deltaChf;
+  const liste = F === 'done' ? zu.sort((a, b) => b.k.closed.date.localeCompare(a.k.closed.date)).map(zeile).join('') || '<div class="empty">Noch kein Projekt abgeschlossen.</div>'
+    : F === 'ohne' ? ohne.map(p => `<div class="li" onclick="ktKontrollieren('${p.id}')"><span class="pdot" style="background:${p.farbe}"></span>
+        <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">${PROJEKT_ARTEN[projektArt(p)]} · ${badge(p)}</div></div>
+        <button class="sec sm" onclick="event.stopPropagation();ktKontrollieren('${p.id}')">Controlling starten</button></div>`).join('') || '<div class="empty">Alle Projekte haben ein Controlling.</div>'
+    : act.sort(sortRisk).map(zeile).join('') || `<div class="empty">Noch kein laufendes Controlling. Öffne ein Projekt und wähle den Tab «Controlling».</div>`;
+  return `
+  <div class="dash-head">
+    <div><h1>Controlling</h1><div class="muted" style="margin-top:4px">Kosten und DB-Prognose · ${fmtLong(today)} · KW ${kw(toDate(today))}</div></div>
+    <div class="row"><button class="sec" onclick="ui.setTab='controlling';nav('einstellungen')">Stundenansätze & Import</button></div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b data-zahl="${act.length}">${act.length}</b><span>laufende Projekte</span><span class="kt-kpi-s ${n.x || n.b ? 'kt-neg' : n.w ? 'kt-wrn' : ''}">${ktRisk(n) || 'alle Projekte gut'}</span></div>
+    <div class="kpi"><b style="font-size:24px">${ktChf(vk)}</b><span>Auftragsvolumen VK</span><span class="kt-kpi-s">DB Verkauf ${ktChf(dbPlan)}</span></div>
+    <div class="kpi"><b class="${pp == null ? '' : KT_TXT[pk]}">${ktPct(pp)}</b><span>Ø DB Prognose</span><span class="kt-kpi-s">Verkauf ${ktPct(pl)} · ${ktSgnChf(dbProg - dbPlan)}</span></div>
+    <div class="kpi" onclick="ui.ktF='run';render()"><b class="${due.length ? 'kt-wrn' : 'kt-pos'}" data-zahl="${due.length}">${due.length}</b><span>zu kontrollieren</span><span class="kt-kpi-s">${due.length ? 'Ist & kommende Rechnungen erfassen' : 'alles kontrolliert'}</span></div>
+  </div>
+  <div class="cols">
+    <div class="card">
+      <h3>Zu kontrollieren · KW ${kw(toDate(today))}</h3>
+      ${due.length ? due.sort((a, b) => a.w.date.localeCompare(b.w.date)).map(x => `<div class="li"><span class="kt-dot ${x.st.cls}"></span>
+        <div style="flex:1;min-width:0" onclick="ktKontrollieren('${x.p.id}')"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">letzte Kontrolle ${fmt(x.w.date)} · ${ktLetzte(x.w)}</div></div>
+        <button class="sm" onclick="ktKontrollieren('${x.p.id}')">Kontrollieren →</button></div>`).join('')
+        : '<div class="empty">✓ Alle laufenden Projekte sind diese Woche kontrolliert.</div>'}
+      <div class="muted" style="margin-top:10px">Wöchentlich: neuen Ist-Betrag und die kommenden Rechnungen erfassen.</div>
+    </div>
+    <div class="card">
+      <h3>Projekte</h3>
+      <div style="margin-bottom:10px">
+        <div class="seg">${[['run', `Laufend (${act.length})`], ['done', `Abgeschlossen (${zu.length})`], ['ohne', `Ohne Controlling (${ohne.length})`]].map(([k, l]) =>
+          `<button class="${F === k ? 'on' : ''}" onclick="ui.ktF='${k}';render()">${l}</button>`).join('')}</div></div>
+      ${liste}
+    </div>
+  </div>`;
+}
+
+// ---------- Controlling: Einstellungen und Import ----------
+function viewKtEinst() {
+  const k = S().ktr;
+  let alt = null; try { alt = JSON.parse(localStorage.getItem(KT_ALT_KEY)); } catch (e) {}
+  return `
+  <div class="card">
+    <h3>Stundenansätze (CHF/h)</h3>
+    ${['Projektleiter', 'Monteure (Montage / IBN)', 'Admin'].map((l, i) => `<div class="row" style="margin-bottom:8px"><span style="flex:1">${l}</span>
+      <input style="width:140px" ${ktIn(k.rates[i], `ktRate(${i},this.value)`)}></div>`).join('')}
+    <div class="muted">Gilt für neue Erfassungen und wird in der aktuellen Erfassung aller laufenden Projekte übernommen.</div>
+  </div>
+  <div class="card">
+    <h3>Gewerke & Standardpreise (Controlling)</h3>
+    <div class="table-wrap"><table class="kt-ct">
+      <colgroup><col><col style="width:150px"><col style="width:40px"></colgroup>
+      <thead><tr><th>Gewerk / Fremdleistung</th><th class="kt-num">Standardpreis CHF</th><th></th></tr></thead>
+      <tbody>${k.gewerke.map((g, i) => `<tr><td><input value="${esc(g.name)}" placeholder="Gewerk …" oninput="ktSg(${i},'name',this.value)"></td>
+        <td><input ${ktIn(g.price, `ktSg(${i},'price',this.value)`)}></td>
+        <td><button class="ck-btn" title="Entfernen" onclick="ktSgWeg(${i})">✕</button></td></tr>`).join('')}</tbody>
+    </table></div>
+    <button class="sec sm" style="margin-top:8px" onclick="ktSgNeu()">+ Gewerk</button>
+    <div class="muted" style="margin-top:8px">Diese Gewerke werden beim Start eines Controllings mit dem Standardpreis vorausgefüllt. Leer lassen (0), wenn der Preis variiert.</div>
+  </div>
+  <div class="card">
+    <h3>Daten aus dem alten Projektkontrolling übernehmen</h3>
+    <p class="muted" style="margin-top:0">Im alten Programm unter <b>Einstellungen → Backup speichern</b> eine Datei erstellen und hier laden. Die Controlling-Projekte werden über die <b>Projektnummer</b> den Projekten hier zugeordnet; du kannst die Zuordnung vor dem Übernehmen prüfen.</p>
+    <div class="row">
+      <button onclick="$('ktImportFile').click()">Controlling-Backup laden</button>
+      ${alt && Array.isArray(alt.projects) ? `<button class="sec" onclick="ktImportBrowser()">Aus diesem Browser übernehmen (${alt.projects.length} Projekte)</button>` : ''}
+    </div>
+  </div>`;
+}
+function ktRate(i, v) {
+  S().ktr.rates[i] = ktNum(v);
+  state.projects.filter(ktAktiv).forEach(p => ktLatest(p.ktr).personal.forEach((x, j) => { if (j < 3) x.rate = ktNum(S().ktr.rates[j]); }));
+  ktSpeichern();
+}
+function ktSg(i, f, v) { S().ktr.gewerke[i][f] = f === 'price' ? ktNum(v) : v; ktSpeichern(); }
+function ktSgNeu() { S().ktr.gewerke.push({ name: '', price: 0 }); save(); render(); }
+function ktSgWeg(i) { S().ktr.gewerke.splice(i, 1); save(); render(); }
+
+let ktImp = null;
+function ktImportDatei(input) {
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { try { ktImportStart(JSON.parse(r.result)); } catch (e) { toast('Ungültige Backup-Datei.'); } input.value = ''; };
+  r.readAsText(f);
+}
+function ktImportBrowser() { try { ktImportStart(JSON.parse(localStorage.getItem(KT_ALT_KEY))); } catch (e) { toast('Keine Daten gefunden.'); } }
+const ktNorm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function ktImportStart(d) {
+  if (!d || !Array.isArray(d.projects) || !d.projects.length || d.projects.some(x => !Array.isArray(x.weeks))) return toast('Datei ist kein Projektkontrolling-Backup.');
+  ktImp = d;
+  const P = [...state.projects].sort((a, b) => b.nummer.localeCompare(a.nummer, 'de', { numeric: true }));
+  const rows = d.projects.map((cp, i) => {
+    const m = (cp.nr && P.find(p => ktNorm(p.nummer) === ktNorm(cp.nr))) || P.find(p => ktNorm(p.name) === ktNorm(cp.name));
+    const sel = m ? m.id : 'neu';
+    return `<tr><td><b>${esc(cp.name || 'Unbenannt')}</b><div class="muted">${esc(cp.nr || 'ohne Nr.')} · ${cp.weeks.length} Erfassungen${cp.closed ? ' · abgeschlossen' : ''}</div></td>
+      <td><select id="kt-imp-${i}"><option value="">— nicht übernehmen —</option><option value="neu" ${sel === 'neu' ? 'selected' : ''}>+ als neues Projekt anlegen</option>
+        ${P.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${esc(p.nummer)} · ${esc(p.name)}${p.ktr ? ' (Controlling wird ersetzt)' : ''}</option>`).join('')}</select></td></tr>`;
+  }).join('');
+  const dl = $('dlg');
+  dl.style.width = 'min(760px, calc(100vw - 32px))';
+  dl.addEventListener('close', () => dl.style.width = '', { once: true });
+  dl.innerHTML = `
+    <h2>Controlling übernehmen</h2>
+    <p class="muted" style="margin-top:-6px">${d.projects.length} Projekte im Backup. Zuordnung über die Projektnummer – bitte prüfen.</p>
+    <div class="table-wrap" style="max-height:55vh;overflow:auto"><table><thead><tr><th>Projektkontrolling</th><th>Übernehmen in</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <label class="check" style="margin-top:12px"><input type="checkbox" id="kt-imp-set" ${d.settings ? 'checked' : 'disabled'}> Stundenansätze und Gewerke-Standardpreise übernehmen</label>
+    <div class="row" style="margin-top:16px;justify-content:flex-end">
+      <button class="sec" onclick="$('dlg').close()">Abbrechen</button>
+      <button onclick="ktImportOk()">Übernehmen</button>
+    </div>`;
+  dl.showModal();
+}
+function ktImportOk() {
+  const d = ktImp; let n = 0, neu = 0;
+  d.projects.forEach((cp, i) => {
+    const v = $('kt-imp-' + i).value; if (!v) return;
+    let p = v === 'neu' ? null : findP(v);
+    if (!p) {
+      let nummer = (cp.nr || cp.name || 'Projekt').trim(), z = 2;
+      while (state.projects.some(x => x.nummer === nummer)) nummer = `${(cp.nr || cp.name || 'Projekt').trim()}-${z++}`;
+      p = { id: uid(), art: 'pv', nummer, name: cp.name || nummer, ort: '', farbe: freieFarbe(state.projects.map(x => x.farbe)), bemerkung: '', erstellt: todayIso(),
+        gewerke: S().standardGewerke.map(({ sid, ...g }) => ({ ...g, id: uid(), std: sid, fix: true, eigen: g.art === 'intern' })), termine: [],
+        checkliste: vorlageFuer('pv'), chk: {}, personen: [], kundeId: '' };
+      state.projects.push(p); neu++;
+    }
+    p.ktr = { vk: ktNum(cp.vk), ek: ktNum(cp.ek), weeks: JSON.parse(JSON.stringify(cp.weeks)), wid: cp.wid || null, ...(cp.closed ? { closed: cp.closed } : {}) };
+    n++;
+  });
+  const s = d.settings;
+  if (s && $('kt-imp-set').checked) {
+    if (Array.isArray(s.rates) && s.rates.length === 3) S().ktr.rates = s.rates.map(ktNum);
+    if (Array.isArray(s.gewerke)) S().ktr.gewerke = s.gewerke.map(g => ({ name: g.name || '', price: ktNum(g.price) }));
+  }
+  ktImp = null; $('dlg').close(); save(); ui.ktF = 'run'; nav('controlling');
+  toast(`${n} Controlling(s) übernommen${neu ? ` · ${neu === 1 ? '1 neues Projekt' : neu + ' neue Projekte'} angelegt` : ''}.`);
+}
+
+// ---------- Controlling: PDF (immer eine A4-Seite) ----------
+function ktPdfName(p) {
+  const n = (p.nummer || p.name || 'Projekt').trim().replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '-');
+  return `Projektcontrolling_${n}_${todayIso().replace(/-/g, '').slice(2)}`; // Datum als JJMMTT
+}
+function ktReportHTML(p, w) {
+  const k = p.ktr, c = ktCalc(k, w), st = ktStatus(c), col = KT_PDF.st[st.cls];
+  const gw = w.gewerke.filter(g => ktNum(g.amount)).map(g => `<tr><td>${esc(g.name || 'Weitere Position')}</td><td></td><td class="r">${ktFmt(g.amount)}</td></tr>`).join('') || '<tr><td colspan="3" class="m">Keine offenen Gewerke</td></tr>';
+  const pe = w.personal.map(x => `<tr><td>${esc(x.name)}</td><td class="r">${ktNum(x.hours) || '–'} h × ${ktFmt(x.rate)}</td><td class="r">${ktFmt(ktNum(x.rate) * ktNum(x.hours))}</td></tr>`).join('');
+  const hist = ktSorted(k).filter(x => x.date <= w.date).reverse().slice(0, 5).map(x => { const kk = ktCalc(k, x), kc = KT_PDF.st[ktStatus(kk).cls];
+    return `<tr${x.id === w.id ? ' class="cur"' : ''}><td>KW ${ktKw(x.date)} · ${fmt(x.date)}</td><td class="r">${kk.prog}%</td><td class="r">${ktFmt(kk.ist)}</td><td class="r">${ktFmt(kk.rest)}</td><td class="r"><b>${ktFmt(kk.eac)}</b></td><td class="r" style="color:${kc}">${ktPct(kk.dbProgPct)}</td><td class="r" style="color:${kc}">${ktSgnChf(kk.deltaChf)}</td></tr>`; }).join('');
+  const tile = (l, v, cl) => `<div class="tile"><div class="tl">${l}</div><div class="tv"${cl ? ` style="color:${cl}"` : ''}>${v}</div></div>`;
+  const stTxt = k.closed ? `Abgeschlossen am ${fmt(k.closed.date)} · End-DB ${ktPct(k.closed.dbPct)} (${ktChf(k.closed.vk - k.closed.cost)}) · ${ktSgnChf(k.closed.vk - k.closed.cost - c.dbPlan)} zu Verkauf` : esc(st.txt);
+  return `<div class="rp"><style>
+  .rp{font-family:Inter,Arial,sans-serif;color:#222;font-size:11px;width:760px;padding:4px 2px;background:#fff;line-height:1.35}
+  .rp *{box-sizing:border-box}
+  .rp .hd{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:3px solid #4f9a48;padding-bottom:10px;margin-bottom:10px}
+  .rp .lab{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#4f9a48;font-weight:600}
+  .rp h1{font-size:22px;margin:2px 0 0;font-weight:500}.rp .sub{color:#555;margin-top:3px}
+  .rp .meta{text-align:right;color:#555;font-size:11px;flex:0 0 auto;white-space:nowrap}
+  .rp .meta b{display:block;font-size:16px;color:#222;font-weight:600}
+  .rp .st{padding:7px 12px;border-radius:8px;background:#f4f7f3;border-left:4px solid ${col};margin-bottom:10px;font-size:12px}
+  .rp .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+  .rp .tile{border:1px solid #e3e6e3;border-radius:8px;padding:7px 10px}.rp .tl{color:#777;font-size:10px}.rp .tv{font-size:14px;font-weight:600;margin-top:2px;white-space:nowrap}
+  .rp h2{font-size:12.5px;margin:10px 0 5px;font-weight:600}
+  .rp table{width:100%;border-collapse:collapse}.rp td,.rp th{padding:3px 6px;border-bottom:1px solid #eceeec;text-align:left;font-size:11px;color:#222}
+  .rp th{background:#f1f1f1;font-weight:600;font-size:10.5px}.rp .r{text-align:right;white-space:nowrap}.rp .m{color:#888}
+  .rp tr.tot td{font-weight:700;background:#e9f2e7;border-top:1.5px solid #333}.rp tr.cur td{background:#f0f7ee}
+  .rp .two{display:grid;grid-template-columns:1.05fr 1fr;gap:16px}
+  .rp .note{border:1px solid #e3e6e3;border-radius:8px;padding:7px 10px;min-height:28px;white-space:pre-wrap}
+  .rp .ft{margin-top:8px;color:#999;font-size:9.5px;border-top:1px solid #eee;padding-top:5px;display:flex;justify-content:space-between}
+  </style>
+  <div class="hd"><div><div class="lab">Projektcontrolling</div><h1>${esc(p.name)}</h1>
+    <div class="sub">Projekt-Nr. ${esc(p.nummer)}${p.ort ? ' · ' + esc(p.ort) : ''} · Projektleiter: ${esc(S().name || '–')}</div></div>
+    <div class="meta"><b>KW ${ktKw(w.date)} · ${fmt(w.date)}</b>Erstellt: ${fmt(todayIso())}</div></div>
+  <div class="st"><b>Status:</b> ${stTxt}</div>
+  <div class="tiles">
+    ${tile('Verkauf VK', ktChf(c.vk))}${tile('Kosten EK', ktChf(c.ek))}${tile('DB Verkauf', ktPct(c.dbPlanPct) + ' · ' + ktChf(c.dbPlan))}${tile('Status', st.lbl, col)}
+    ${tile('Landung (Endkosten)', ktChf(c.eac))}${tile('DB Prognose', ktPct(c.dbProgPct) + ' · ' + ktChf(c.dbProg), col)}${tile('Δ zu Verkauf', ktSgnChf(c.deltaChf), col)}${tile('Trend nach Fortschritt', ktPct(c.dbTrendPct))}
+  </div>
+  <div class="two">
+    <div><h2>Noch erwartete Kosten (CHF)</h2>
+      <table><tr><th>Gewerke / Fremdleistungen</th><th></th><th class="r">CHF</th></tr>${gw}
+      <tr><th>Personal</th><th class="r">Aufwand</th><th class="r">CHF</th></tr>${pe}
+      <tr class="tot"><td>Total noch erwartet</td><td></td><td class="r">${ktFmt(c.rest)}</td></tr></table></div>
+    <div><h2>Kostenübersicht (CHF)</h2><table>
+      <tr><td>Aufgelaufene Kosten (Ist)</td><td class="r">${ktFmt(c.ist)}</td></tr>
+      <tr><td>Noch erwartete Kosten</td><td class="r">${ktFmt(c.rest)}</td></tr>
+      <tr class="tot"><td>Endkosten Prognose</td><td class="r">${ktFmt(c.eac)}</td></tr>
+      <tr><td>Kosten EK (Kalkulation)</td><td class="r">${ktFmt(c.ek)}</td></tr>
+      <tr><td>Abweichung zu EK</td><td class="r" style="color:${c.ek - c.eac >= 0 ? '#4f9a48' : '#c9543c'}">${ktSgnChf(c.ek - c.eac)}</td></tr>
+      <tr><td>Fortschritt</td><td class="r">${c.prog}%</td></tr>
+      <tr><td>Budgetverbrauch (Ist / EK)</td><td class="r">${c.ek ? ktPct(c.ist / c.ek * 100, 0) : '–'}</td></tr></table>
+      <h2>Bemerkung / Massnahmen</h2><div class="note">${esc(w.note) || '<span class="m">–</span>'}</div></div>
+  </div>
+  <h2>Verlauf · Wo landen die Kosten?</h2>${ktChartSVG(k, KT_PDF, 215, w)}
+  <div style="font-size:9.5px;color:#777;margin:0 0 6px">Grün: Ist-Kosten nach Fortschritt · gestrichelt: Prognose bis Abschluss · Landezone rechts: grün bis EK, orange bis ½ DB, rot bis VK, dunkelrot = Verlust</div>
+  <table><tr><th>Erfassung</th><th class="r">Fortschritt</th><th class="r">Ist</th><th class="r">+ noch kommt</th><th class="r">= Landung</th><th class="r">DB</th><th class="r">Δ zu Verkauf</th></tr>${hist}</table>
+  <div class="ft"><span>Prognose = Ist + noch erwartete Kosten · Trend = Ist ÷ Fortschritt · Beträge in CHF</span><span>${esc(S().firma || '')} · ${esc(S().name || '')}</span></div>
+  </div>`;
+}
+async function ktPdf(pid) {
+  const p = findP(pid), w = ktCurWeek(p.ktr), name = ktPdfName(p), html = ktReportHTML(p, w);
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-20000px;top:0;background:#fff';
+  host.innerHTML = html; document.body.appendChild(host);
+  try {
+    if (!window.html2canvas || !window.jspdf) throw new Error('offline');
+    toast('PDF wird erstellt …');
+    if (document.fonts) await document.fonts.ready;
+    // 4-fache Auflösung (~400 dpi auf A4), damit Text auch beim Zoomen scharf bleibt
+    const canvas = await html2canvas(host.querySelector('.rp'), { scale: 4, backgroundColor: '#ffffff', windowWidth: 1200 });
+    const pdf = new jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const PW = 210, PH = 297, M = 10;
+    let iw = PW - 2 * M, ih = canvas.height * iw / canvas.width;
+    if (ih > PH - 2 * M) { ih = PH - 2 * M; iw = canvas.width * ih / canvas.height; } // auf eine Seite skalieren
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (PW - iw) / 2, M, iw, ih, undefined, 'FAST');
+    pdf.save(name + '.pdf');
+    toast('PDF gespeichert: ' + name + '.pdf');
+  } catch (e) {
+    // ohne Internet: Druckdialog → «Als PDF speichern»
+    $('ktPrint').innerHTML = html; document.body.classList.add('kt-druck');
+    const t = document.title; document.title = name;
+    window.print();
+    document.title = t; document.body.classList.remove('kt-druck'); $('ktPrint').innerHTML = '';
+  } finally { host.remove(); }
 }
 
 // ---------- Anmeldung und Cloud-Speicher (Firebase) ----------
