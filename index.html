@@ -80,7 +80,7 @@
   .pnum { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-2); display: inline-block; padding: 2px 8px; border-radius: 99px; }
   .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; display: inline-block; }
   .b-laufend { background: #e3f4e8; color: var(--ok); } .b-geplant { background: var(--brand-2); color: var(--brand); }
-  .b-abgeschlossen { background: #eceff3; color: var(--muted); } .b-leer { background: #fdf2e0; color: var(--warn); }
+  .b-abgeschlossen { background: #eceff3; color: var(--muted); } .b-zu { background: #e6f2e3; color: #3d7a37; } .b-leer { background: #fdf2e0; color: var(--warn); }
   .tag-int { font-size: 11px; background: var(--brand); color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
   .tag-sub { font-size: 11px; background: #fdf2e0; color: #9a5b00; border: 1px solid #f3d9a8; padding: 0 6px; border-radius: 4px; margin-left: 6px; }
   .tag-ext { font-size: 11px; background: #fff; color: var(--muted); border: 1px solid var(--line); padding: 0 6px; border-radius: 4px; margin-left: 6px; }
@@ -203,7 +203,9 @@
   input, select, textarea { border-radius: 10px; border-color: #e3e2dc; background: #fbfbf9; }
   input:focus, select:focus, textarea:focus { outline: none; border-color: #bdbcb4; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,.05); }
   button { border-radius: 12px; padding: 9px 16px; background: var(--ink); border-color: var(--ink); font-weight: 500; }
-  button:hover { filter: none; background: #000; }
+  /* schwarz nur für die dunklen Standard-Knöpfe; helle/transparente Knöpfe (+ Mangel, ✕ …) behalten ihre Farbe */
+  button:where(:hover) { filter: none; background: #000; }
+  .aa-neu:hover, .ck-btn:hover { background: #f1f0eb; }
   button.sec { background: #fff; color: var(--text); border-color: #e3e2dc; }
   button.sec:hover { background: #f5f4f0; }
   button.danger:hover { background: #fdf1ef; }
@@ -567,6 +569,31 @@
   }
   .cal-ampel { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #fff; margin-right: 5px; vertical-align: -1px; }
   .dash-cal .cal-week { min-height: 74px; }
+  /* Kalender: Baustart und eigene Einsätze stark, Projektbalken dezent */
+  .cal-bs { display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: var(--c); border-radius: 3px; padding: 0 4px; margin-left: 3px; cursor: pointer; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 0 0 1.5px #18181b; }
+  .cal-pl { box-shadow: 0 1px 4px rgba(200,40,30,.35); }
+  .cal-num .cal-bs, .cal-num .cal-pl { flex-basis: 100%; max-width: none; margin: 1px 0 0; white-space: normal; line-height: 1.25; padding: 1px 4px; overflow-wrap: anywhere; }
+  /* Dashboard: kompakte Zahlenleiste, «Diese Woche», einklappbare Karten */
+  .kpi-leiste { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .kpi-leiste .kpi { padding: 9px 13px; border-radius: 14px; display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+  .kpi-leiste .kpi b { font-size: 21px; display: inline; }
+  .kpi-leiste .kpi span { font-size: 12px; }
+  .wo-tag + .wo-tag { margin-top: 10px; }
+  .wo-kopf { font-size: 12.5px; font-weight: 600; padding: 4px 0; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+  .wo-it { display: flex; align-items: center; gap: 10px; padding: 6px 4px; border-radius: 10px; cursor: pointer; }
+  .wo-it:hover { background: #f5f4f0; }
+  .wo-pl { background: #fdf1ef; }
+  .wo-pl:hover { background: #fbe4e0; }
+  .wo-mark { font-size: 12px; font-weight: 700; color: #fff; background: var(--danger); border-radius: 6px; padding: 2px 7px; white-space: nowrap; }
+  .wo-t { font-size: 12.5px; color: var(--muted); padding: 3px 4px; }
+  .wo-t span:nth-child(2) { color: var(--text); flex: 1; min-width: 0; }
+  .klapp-kopf { cursor: pointer; user-select: none; }
+  .klapp-pfeil { display: inline-block; width: 16px; color: var(--muted); transition: transform .15s; }
+  .klapp-pfeil.auf { transform: rotate(90deg); }
+  .klapp-info { cursor: pointer; padding-left: 16px; }
+  .progress.kt-prog > div { background: repeating-linear-gradient(45deg, #52525b 0 6px, #71717a 6px 12px); }
+  .cal-bar { background: color-mix(in srgb, var(--c) 16%, #fff) !important; color: #3f3f46; font-weight: 400; border-left: 3px solid var(--c); height: 19px; line-height: 19px; }
+  .cal-bar .cal-ampel { border-color: transparent; }
   .li.kt-glow { border-radius: 12px; padding-left: 10px; padding-right: 8px; margin: 6px 0; border-bottom-color: transparent; }
   .kt-big { font-size: 28px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .kt-big small { font-size: 15px; color: var(--muted); font-weight: 500; }
@@ -1304,12 +1331,13 @@ function span(p) {
 }
 function status(p) {
   const s = span(p), t = todayIso();
+  if (p.abschluss) return { key: 'zu', label: '✓ abgeschlossen' };
   if (!s) return { key: 'leer', label: 'ohne Termine' };
   if (t < s.start) return { key: 'geplant', label: 'geplant' };
-  if (t > s.ende) return { key: 'abgeschlossen', label: 'abgeschlossen' };
+  if (t > s.ende) return { key: 'abgeschlossen', label: 'Bau beendet' };
   return { key: 'laufend', label: 'laufend' };
 }
-const meineEinsaetze = () => state.projects.flatMap(p => p.termine.filter(t => t.pl).map(t => ({ t, p, g: gewerk(p, t.gewerkId) })))
+const meineEinsaetze = () => offenP().flatMap(p => p.termine.filter(t => t.pl).map(t => ({ t, p, g: gewerk(p, t.gewerkId) })))
   .sort((a, b) => a.t.start.localeCompare(b.t.start) || (a.t.plZeit || '').localeCompare(b.t.plZeit || ''));
 
 // Kalenderdatei (.ics) für Outlook / Google / Apple
@@ -1342,6 +1370,8 @@ function icsDownload(pairs) {
 const badge = p => { const s = status(p); return `<span class="badge b-${s.key}">${s.label}</span>`; };
 const artBadge = p => projektArt(p) === 'pv' ? '' : `<span class="art-tag art-${p.art}">${PROJEKT_ARTEN[p.art]}</span>`;
 const findP = id => state.projects.find(p => p.id === id);
+// abgeschlossene Projekte verschwinden aus Dashboard, Kalender und Leiste (unter «Projekte» weiterhin abrufbar)
+const offenP = () => state.projects.filter(p => !p.abschluss);
 
 // ---------- Navigation ----------
 const ICONS = {
@@ -1356,9 +1386,15 @@ ICONS.controlling = '<path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/><circle cx
 const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
 
 function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
-function nav(h) { if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
+function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (h === 'projekte') ui.pZu = false; if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
 function openProjekt(id) { ui.tab = 'uebersicht'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
-window.addEventListener('hashchange', () => render({ nachOben: true }));
+window.addEventListener('hashchange', () => {
+  // beim Hingehen immer zuerst die laufenden / offenen Projekte zeigen
+  const pg = route().page;
+  if (pg === 'controlling') ui.ktF = 'run';
+  if (pg === 'projekte') ui.pZu = false;
+  render({ nachOben: true });
+});
 
 const wenigBewegung = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 // ---------- DOM-Abgleich: nur Geändertes anfassen, damit nichts flackert und Übergänge laufen ----------
@@ -1471,7 +1507,7 @@ function einblenden(el) {
 // laufende und kommende Projekte als Schnellzugriff in der Leiste
 function navProjekte(r) {
   const heute = todayIso();
-  const list = state.projects.map(p => ({ p, s: span(p) })).filter(x => x.s && x.s.ende >= heute)
+  const list = offenP().map(p => ({ p, s: span(p) })).filter(x => x.s && x.s.ende >= heute)
     .sort((a, b) => a.s.start.localeCompare(b.s.start)).slice(0, 6);
   if (!list.length) return '';
   return '<div class="nav-sec">Aktuelle Projekte</div>' + list.map(({ p }) =>
@@ -1552,15 +1588,17 @@ function serviceStatus(p) {
 }
 const SERVICE_ALARM = 14; // so viele Tage ohne Termin: Auftrag wird hervorgehoben
 function viewService(today) {
-  const list = state.projects.filter(p => projektArt(p) === 'service').map(p => ({ p, ...serviceStatus(p) })).filter(x => x.key !== 'erledigt')
+  const list = offenP().filter(p => projektArt(p) === 'service').map(p => ({ p, ...serviceStatus(p) })).filter(x => x.key !== 'erledigt')
     .sort((a, b) => (a.termin || '9999').localeCompare(b.termin || '9999') || (b.tage || 0) - (a.tage || 0));
   const tag = x => x.key === 'rapport' ? (x.rapportFertig ? '<span class="tag-ok">Rapport fertig</span>' : '<span class="tag-sub">Rapport in Arbeit</span>')
     : x.key === 'termin' ? `<span class="tag-sub">Termin fix · ${fmt(x.termin)}${x.termin >= today ? ' · ' + relTage(x.termin) : ''}</span>`
     : `<span class="${x.tage > SERVICE_ALARM ? 'tag-warn' : 'tag-sub'}">offen</span>`;
-  return `<div class="card">
-    <div class="ck-head"><h3 style="margin:0">Offene Service-Aufträge${list.length ? ` <span class="muted" style="font-weight:400">· ${list.length}</span>` : ''}</h3>
+  const alt = list.filter(x => x.key === 'offen' && x.tage > SERVICE_ALARM).length, zu = klappZu('service', alt > 0);
+  return `<div class="card" data-klapp="service">
+    <div class="ck-head"><h3 style="margin:0" class="klapp-kopf" onclick="klapp('service',${zu})"><span class="klapp-pfeil ${zu ? '' : 'auf'}">›</span>Offene Service-Aufträge${list.length ? ` <span class="muted" style="font-weight:400">· ${list.length}</span>` : ''}</h3>
       <button class="sec sm" onclick="neuesProjektDialog();npArt('service')">+ Service-Auftrag</button></div>
-    ${list.length ? list.map(x => `<div class="li sv-row ${x.key === 'offen' && x.tage > SERVICE_ALARM ? 'sv-alt' : ''}" onclick="ui.tab='checkliste';nav('projekt/${x.p.id}')" title="Auftrag öffnen">
+    ${zu ? `<div class="muted klapp-info" onclick="klapp('service',true)">${list.length ? `${list.length} offen${alt ? ` · <span class="rot-txt">${alt} seit über ${SERVICE_ALARM} Tagen ohne Termin</span>` : ' · nichts Dringendes'}` : 'Keine offenen Service-Aufträge.'} · anzeigen</div>`
+    : list.length ? list.map(x => `<div class="li sv-row ${x.key === 'offen' && x.tage > SERVICE_ALARM ? 'sv-alt' : ''}" onclick="ui.tab='checkliste';nav('projekt/${x.p.id}')" title="Auftrag öffnen">
       <span class="swatch" style="background:${x.p.farbe}"></span>
       <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)} ${esc(x.p.name)}</b>
         <div class="muted">${x.p.ort ? esc(x.p.ort) + ' · ' : ''}${x.tage === null ? '' : x.tage === 0 ? 'heute eröffnet' : `seit ${x.tage} Tag${x.tage > 1 ? 'en' : ''} offen`} · Checkliste ${x.st.done}/${x.st.total}</div></div>
@@ -1578,13 +1616,14 @@ function offeneMaengel(p) {
 }
 const MAENGEL_ALARM = 14; // so viele Tage offen: Mangel wird rot
 function viewMaengel(today) {
-  const P = state.projects.map(p => ({ p, ...offeneMaengel(p) })).filter(x => x.L.length || x.zw.length);
+  const P = offenP().map(p => ({ p, ...offeneMaengel(p) })).filter(x => x.L.length || x.zw.length);
   if (!P.length) return '';
   const total = P.reduce((a, x) => a + x.L.length + x.zw.length, 0);
-  return `<div class="card">
-    <div class="ck-head"><h3 style="margin:0">Offene Mängel <span class="muted" style="font-weight:400">· ${total}</span></h3>
+  const alt = P.reduce((a, x) => a + x.L.filter(m => m.erfasst && diffDays(m.erfasst, today) >= MAENGEL_ALARM).length, 0), zu = klappZu('maengel', alt > 0);
+  return `<div class="card" data-klapp="maengel">
+    <div class="ck-head"><h3 style="margin:0" class="klapp-kopf" onclick="klapp('maengel',${zu})"><span class="klapp-pfeil ${zu ? '' : 'auf'}">›</span>Offene Mängel <span class="muted" style="font-weight:400">· ${total}</span></h3>
       <span class="muted">abhaken, sobald der Monteur sie behoben hat · rot ab ${MAENGEL_ALARM} Tagen</span></div>
-    ${P.map(({ p, L, zw }) => `<div class="of-proj">
+    ${zu ? `<div class="muted klapp-info" onclick="klapp('maengel',true)">${total} offen in ${P.length} Projekt${P.length > 1 ? 'en' : ''}${alt ? ` · <span class="rot-txt">${alt} seit über ${MAENGEL_ALARM} Tagen</span>` : ' · nichts Dringendes'} · anzeigen</div>` : P.map(({ p, L, zw }) => `<div class="of-proj">
       <div class="of-head" onclick="ui.tab='dokumente';nav('projekt/${p.id}')" title="Projekt öffnen">
         <span class="pdot" style="background:${p.farbe}"></span><b class="link">${esc(p.nummer)} ${esc(p.name)}</b>
         <span class="tag-warn" style="margin-left:auto">${L.length + zw.length} offen</span>
@@ -1614,7 +1653,7 @@ function mangelErledigt(pid, mid, el) {
 }
 function zwischenUebernehmen(pid) { maengelSpiegeln(findP(pid)); save(); render(); }
 function viewOffen(today) {
-  const list = state.projects.filter(p => projektArt(p) !== 'service').map(p => ({ p, ...freigabe(p) }))
+  const list = offenP().filter(p => projektArt(p) !== 'service').map(p => ({ p, ...freigabe(p) }))
     .filter(x => !x.s || x.s.ende >= today)
     .sort((a, b) => (a.s ? a.s.start : '9999').localeCompare(b.s ? b.s.start : '9999'))
     .filter(x => x.offen.length || (x.s && x.s.start >= today && diffDays(today, x.s.start) <= 30));
@@ -1643,19 +1682,17 @@ function viewOffen(today) {
 function viewDashboard() {
   const today = todayIso();
   // Bauprojekte (PV, Batterie) und Service-Aufträge werden getrennt gezählt
-  const bau = state.projects.filter(p => projektArt(p) !== 'service');
-  const serviceOffen = state.projects.filter(p => projektArt(p) === 'service' && serviceStatus(p).key !== 'erledigt').length;
+  const bau = offenP().filter(p => projektArt(p) !== 'service');
+  const serviceOffen = offenP().filter(p => projektArt(p) === 'service' && serviceStatus(p).key !== 'erledigt').length;
   const mit = bau.map(p => ({ p, s: span(p) })).filter(x => x.s);
   const geplant = mit.filter(x => x.s.start > today).sort((a, b) => a.s.start.localeCompare(b.s.start));
   const laufend = mit.filter(x => x.s.start <= today && x.s.ende >= today).sort((a, b) => a.s.ende.localeCompare(b.s.ende));
   const ohne = bau.length - mit.length;
   const next = geplant[0];
   const einsaetze = meineEinsaetze().filter(e => e.t.start >= today);
-  const proTag = {};
-  einsaetze.forEach(e => proTag[e.t.start] = (proTag[e.t.start] || 0) + 1);
+  // Reihenfolge nach Dringlichkeit: Zahlen, Kalender, diese Woche, Baufreigabe, Projekte, dann Mängel und Service (einklappbar)
   const in30 = einsaetze.filter(e => diffDays(today, e.t.start) <= 30).length;
-  const termine =state.projects.flatMap(p => p.termine.filter(t => t.ende >= today).map(t => ({ t, p, g: gewerk(p, t.gewerkId) })))
-    .sort((a, b) => a.t.start.localeCompare(b.t.start)).slice(0, 8);
+  const maengelN = offenP().reduce((a, p) => { const o = offeneMaengel(p); return a + o.L.length + o.zw.length; }, 0);
 
   const nextCard = next ? `
     <div class="card next" style="cursor:pointer" onclick="openProjekt('${next.p.id}')" title="Projekt öffnen"><div class="next-grid"><div>
@@ -1691,58 +1728,70 @@ function viewDashboard() {
       <button onclick="neuesProjektDialog()">+ Neues Projekt</button>
     </div>
   </div>
-  ${dashKalender()}
-  ${nextCard}
-  ${viewOffen(today)}
-  ${viewService(today)}
-  ${viewMaengel(today)}
-  <div class="kpis">
-    <div class="kpi" onclick="nav('projekte')"><b data-zahl="${bau.length}">${bau.length}</b><span>Projekte total</span></div>
+  <div class="kpis kpi-leiste">
     <div class="kpi" onclick="nav('projekte')"><b style="color:var(--ok)" data-zahl="${laufend.length}">${laufend.length}</b><span>laufend</span></div>
     <div class="kpi" onclick="nav('projekte')"><b style="color:var(--brand)" data-zahl="${geplant.length}">${geplant.length}</b><span>geplant</span></div>
     <div class="kpi" onclick="nav('projekte')"><b style="color:var(--warn)" data-zahl="${ohne}">${ohne}</b><span>ohne Termine</span></div>
-    <div class="kpi" onclick="nav('woche')"><b style="color:var(--danger)" data-zahl="${in30}">${in30}</b><span>meine Einsätze (30 Tage)</span></div>
-    <div class="kpi" onclick="ui.q='service-auftrag';nav('projekte')"><b style="color:#b35c00" data-zahl="${serviceOffen}">${serviceOffen}</b><span>Service offen</span></div>
-    ${(n => `<div class="kpi" onclick="document.querySelector('.mg-item')?.scrollIntoView({behavior:'smooth',block:'center'})"><b style="color:var(--danger)" data-zahl="${n}">${n}</b><span>Mängel offen</span></div>`)(
-      state.projects.reduce((a, p) => { const o = offeneMaengel(p); return a + o.L.length + o.zw.length; }, 0))}
+    <div class="kpi" onclick="nav('woche')"><b style="color:var(--danger)" data-zahl="${in30}">${in30}</b><span>Einsätze 30 Tage</span></div>
+    <div class="kpi" onclick="klappAuf('service')"><b style="color:#b35c00" data-zahl="${serviceOffen}">${serviceOffen}</b><span>Service offen</span></div>
+    <div class="kpi" onclick="klappAuf('maengel')"><b style="color:var(--danger)" data-zahl="${maengelN}">${maengelN}</b><span>Mängel offen</span></div>
     ${ktKpi()}
   </div>
+  ${dashKalender()}
+  ${dashWoche(today, einsaetze)}
+  ${viewOffen(today)}
+  ${nextCard}
   <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:6px">
-      <h3 style="margin:0">Meine Einsätze vor Ort</h3>
-      ${einsaetze.length ? `<button class="sec sm" onclick="icsDownload(${esc(JSON.stringify(einsaetze.map(e => [e.p.id, e.t.id])))})">📅 Alle in Outlook übernehmen</button>` : ''}
-    </div>
-    ${einsaetze.length ? einsaetze.slice(0, 10).map(({ t, p, g }) => `<div class="li" onclick="openProjekt('${p.id}')">
-      <span class="date" style="width:130px"><b style="color:var(--text)">${fmtLong(t.start)}</b><br>${t.plZeit ? 'ab ' + t.plZeit : 'ganztags'} · ${relTage(t.start)}</span>
-      <span class="swatch" style="background:${p.farbe}"></span>
-      <div style="flex:1;min-width:0">${t.meilenstein ? '◆ ' : ''}<b>${esc(t.titel)}</b>${proTag[t.start] > 1 ? '<span class="tag-warn">Doppelbelegung</span>' : ''}
-        <div class="muted">${esc(p.nummer)} ${esc(p.name)}${p.ort ? ' · ' + esc(p.ort) : ''} · ${esc(g.name)} (${ARTEN[artOf(g)]})</div></div>
-      <button class="sec sm" title="In Outlook / Kalender übernehmen" onclick="event.stopPropagation();icsDownload([['${p.id}','${t.id}']])">📅</button>
-    </div>`).join('') : '<div class="empty">Noch keine Einsätze geplant. Setze im Terminplan bei einem Termin das Häkchen «Ich bin am 1. Tag vor Ort».</div>'}
+    <h3>Laufende Projekte</h3>
+    ${laufend.length ? laufend.map(({ p, s }) => {
+      const pr = Math.min(100, Math.round((diffDays(s.start, today) + 1) / (diffDays(s.start, s.ende) + 1) * 100));
+      return `<div class="li" onclick="openProjekt('${p.id}')"><span class="swatch" style="background:${p.farbe}"></span>
+        <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">bis ${fmt(s.ende)} · Bauzeit ${pr}% · Checkliste ${chkStats(p).pct}%</div>
+        <div class="progress"><div style="width:${pr}%"></div></div></div>${ktAmpel(p)}</div>`;
+    }).join('') : '<div class="empty">Zurzeit läuft kein Projekt.</div>'}
   </div>
-  <div class="cols">
-    <div class="card">
-      <h3>Laufende Projekte</h3>
-      ${laufend.length ? laufend.map(({ p, s }) => {
-        const pr = Math.min(100, Math.round((diffDays(s.start, today) + 1) / (diffDays(s.start, s.ende) + 1) * 100));
-        return `<div class="li" onclick="openProjekt('${p.id}')"><span class="swatch" style="background:${p.farbe}"></span>
-          <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">bis ${fmt(s.ende)} · Zeit ${pr}% · Checkliste ${chkStats(p).done}/${chkStats(p).total}</div>
-          <div class="progress"><div style="width:${pr}%"></div></div></div></div>`;
-      }).join('') : '<div class="empty">Zurzeit läuft kein Projekt.</div>'}
-    </div>
-    <div class="card">
-      <h3>Nächste Termine</h3>
-      ${termine.length ? termine.map(({ t, p, g }) => `<div class="li" onclick="openProjekt('${p.id}')">
-        <span class="date">${t.start <= today ? 'läuft' : fmt(t.start)}${zeitTxt(t) ? `<br>${zeitTxt(t)}` : ''}</span><span class="swatch" style="background:${g.farbe}"></span>
-        <div style="flex:1;min-width:0"><span style="${g.eigen ? 'font-weight:600' : ''}">${t.meilenstein ? '◆ ' : ''}${esc(t.titel)}</span>
-        <div class="muted">${esc(p.nummer)} · ${esc(g.name)}</div></div></div>`).join('') : '<div class="empty">Keine anstehenden Termine.</div>'}
-    </div>
+  ${viewMaengel(today)}
+  ${viewService(today)}`;
+}
+
+// «Diese Woche»: heute und die nächsten 6 Tage – meine Einsätze und Baustarts stark, übrige Termine dezent
+function dashWoche(today, einsaetze) {
+  const bis = isoOf(addDays(toDate(today), 6)), inWoche = d => d >= today && d <= bis, tag = {};
+  const add = (d, x) => (tag[d] = tag[d] || []).push(x);
+  einsaetze.filter(e => inWoche(e.t.start)).forEach(e => add(e.t.start, { art: 'pl', ...e }));
+  offenP().filter(p => projektArt(p) !== 'service').forEach(p => { const s = span(p); if (s && inWoche(s.start)) add(s.start, { art: 'bs', p }); });
+  offenP().forEach(p => p.termine.filter(t => !t.pl && inWoche(t.start)).forEach(t => add(t.start, { art: 't', t, p, g: gewerk(p, t.gewerkId) })));
+  const due = state.projects.filter(ktDue), rang = { pl: 0, bs: 1, t: 2 };
+  const zeile = x => x.art === 'pl' ? `<div class="wo-it wo-pl" onclick="openProjekt('${x.p.id}')"><span class="wo-mark">📍 ${x.t.plZeit ? 'ab ' + x.t.plZeit : 'vor Ort'}</span>
+      <div style="flex:1;min-width:0"><b>${x.t.meilenstein ? '◆ ' : ''}${esc(x.t.titel)}</b>${(tag[x.t.start] || []).filter(y => y.art === 'pl').length > 1 ? '<span class="tag-warn">Doppelbelegung</span>' : ''}
+        <div class="muted">${esc(x.p.nummer)} ${esc(x.p.name)}${x.p.ort ? ' · ' + esc(x.p.ort) : ''} · ${esc(x.g.name)}</div></div>
+      <button class="sec sm" title="In Outlook / Kalender übernehmen" onclick="event.stopPropagation();icsDownload([['${x.p.id}','${x.t.id}']])">📅</button></div>`
+    : x.art === 'bs' ? `<div class="wo-it" onclick="openProjekt('${x.p.id}')"><span class="cal-bs" style="--c:${x.p.farbe};margin:0">▶ Baustart</span>
+      <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)} ${esc(x.p.name)}</b>${freigabe(x.p).kritisch ? ` <span class="tag-warn">${freigabe(x.p).offen.length} Punkte offen</span>` : ''}</div></div>`
+    : `<div class="wo-it wo-t" onclick="openProjekt('${x.p.id}')"><span class="swatch" style="background:${x.g.farbe}"></span>
+      <span>${x.t.meilenstein ? '◆ ' : ''}${esc(x.t.titel)}${zeitTxt(x.t) ? ' · ' + zeitTxt(x.t) : ''}</span><span class="muted">${esc(x.p.nummer)} · ${esc(x.g.name)}</span></div>`;
+  const tage = Object.keys(tag).sort().map(d => `<div class="wo-tag"><div class="wo-kopf">${d === today ? 'Heute' : fmtLong(d)}${d === today ? ` <span class="muted">· ${fmtLong(d)}</span>` : ` <span class="muted">· ${relTage(d)}</span>`}</div>
+    ${tag[d].sort((a, b) => rang[a.art] - rang[b.art]).map(zeile).join('')}</div>`).join('');
+  const naechster = einsaetze.find(e => e.t.start > bis);
+  return `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Diese Woche</h3>
+      <div class="row">${einsaetze.length ? `<button class="sec sm" onclick="icsDownload(${esc(JSON.stringify(einsaetze.map(e => [e.p.id, e.t.id])))})">📅 Alle Einsätze in Outlook</button>` : ''}
+        <button class="sec sm" onclick="nav('woche')">Wochenplan →</button></div></div>
+    ${due.length ? `<div class="note kt-tour" style="margin-bottom:10px"><span><b>${due.length}</b> Controlling${due.length > 1 ? 's' : ''} diese Woche fällig</span>
+      <button class="sm" onclick="ktTourStart()">${due.length > 1 ? 'Nacheinander durchgehen →' : 'Kontrollieren →'}</button></div>` : ''}
+    ${tage || '<div class="empty">Diese Woche keine Einsätze, Baustarts oder Termine.</div>'}
+    ${naechster ? `<div class="muted" style="margin-top:8px">Nächster Einsatz danach: <b>${fmtLong(naechster.t.start)}</b> · ${esc(naechster.p.nummer)} ${esc(naechster.t.titel)}</div>` : ''}
+    ${!einsaetze.length ? '<div class="muted" style="margin-top:8px">Einsätze erscheinen, wenn im Terminplan «Ich bin am 1. Tag vor Ort» angehakt ist.</div>' : ''}
   </div>`;
 }
+// einklappbare Karten (Mängel, Service): ohne Dringendes zu, sonst offen; ein Klick merkt sich die Wahl bis zum Neuladen
+const klappZu = (key, dringend) => { const v = (ui.klapp || {})[key]; return v == null ? !dringend : !v; };
+function klapp(key, offen) { (ui.klapp = ui.klapp || {})[key] = offen; render(); }
+function klappAuf(key) { klapp(key, true); document.querySelector(`[data-klapp="${key}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
 // Kalender oben im Dashboard: alle Projekte im Monat, Klick auf einen Balken öffnet das Projekt
 function dashKalender() {
-  const monat = ui.dMonat || todayIso().slice(0, 7), k = kalenderMonat(monat, false), { y, m } = k;
+  const monat = ui.dMonat || todayIso().slice(0, 7), k = kalenderMonat(monat, true), { y, m } = k;
   return `<div class="card dash-cal">
     <div class="ck-head" style="margin-bottom:12px"><h3 style="margin:0">Projektkalender</h3>
       <div class="row">
@@ -1753,32 +1802,38 @@ function dashKalender() {
         <button class="sec sm" onclick="ui.month='${monat}';nav('termine')">Alle Termine →</button>
       </div></div>
     <div style="overflow-x:auto"><div class="cal" style="min-width:640px">${k.html}</div></div>
-    ${k.spans.some(x => x.p.ktr) ? `<div class="kt-zonen" style="margin-top:8px">Punkt im Balken = Controlling: <span><span class="kt-dot"></span>gut</span><span><span class="kt-dot w"></span>Achtung</span><span><span class="kt-dot b"></span>kritisch</span><span><span class="kt-dot x"></span>Verlust</span></div>` : ''}
+    <div class="kt-zonen" style="margin-top:8px"><span><b class="cal-bs" style="--c:#4f9a48;margin:0">▶ Baustart</b></span><span><b class="cal-pl" style="margin:0">📍 vor Ort</b> = ich bin dort</span><span>Balken = Bauzeit</span>
+      ${k.spans.some(x => x.p.ktr) ? `<span>Punkt im Balken = Controlling:</span><span><span class="kt-dot"></span>gut</span><span><span class="kt-dot w"></span>Achtung</span><span><span class="kt-dot b"></span>kritisch</span><span><span class="kt-dot x"></span>Verlust</span>` : ''}</div>
   </div>`;
 }
 
 // ---------- Projekte ----------
 function viewProjekte() {
-  const list = [...state.projects].sort((a, b) => b.nummer.localeCompare(a.nummer, 'de', { numeric: true }));
+  const zuN = state.projects.filter(p => p.abschluss).length, zeigeZu = ui.pZu && zuN;
+  const list = state.projects.filter(p => !p.abschluss === !zeigeZu)
+    .sort((a, b) => zeigeZu ? b.abschluss.date.localeCompare(a.abschluss.date) : b.nummer.localeCompare(a.nummer, 'de', { numeric: true }));
   return `
   <div class="page-head">
     <h1>Projekte</h1>
     <div class="row">
+      <div class="seg"><button class="${zeigeZu ? '' : 'on'}" onclick="ui.pZu=false;render()">Offen (${state.projects.length - zuN})</button><button class="${zeigeZu ? 'on' : ''}" onclick="ui.pZu=true;render()">Abgeschlossen (${zuN})</button></div>
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input placeholder="Projekt suchen…" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)"></div>
       <button class="plus" title="Neues Projekt" onclick="neuesProjektDialog()">+</button>
     </div>
   </div>
   ${list.length ? `<div class="projects">${list.map(p => { const s = span(p), ck = chkStats(p); return `
-    <div class="pcard${ktGlow(p)}" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
+    <div class="pcard${p.abschluss ? '' : ktGlow(p)}" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
       <div class="row" style="justify-content:space-between"><span class="pnum">${esc(p.nummer)}</span>
         <div class="row" style="gap:4px">${freigabe(p).kritisch ? '<span class="tag-warn" style="margin:0">Freigabe fehlt</span>' : ''}${artBadge(p)}${badge(p)}</div></div>
       <h3 style="margin:8px 0 4px">${esc(p.name)}</h3>
       <div class="muted">${esc(p.ort || '–')}</div>
       <div class="muted" style="margin-top:6px">${s ? fmt(s.start) + ' – ' + fmt(s.ende) : 'noch keine Termine'} · ${p.termine.length} Termine</div>
-      <div class="muted" style="margin-top:8px">Checkliste ${ck.done}/${ck.total}</div>
+      ${p.abschluss ? `<div style="margin-top:8px">Erlös <b>${ktChf(p.abschluss.vk)}</b> · DB <b class="${p.abschluss.vk - p.abschluss.cost >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(p.abschluss.vk - p.abschluss.cost)} (${ktPct(p.abschluss.dbPct)})</b></div>
+        <div class="muted">abgeschlossen ${fmt(p.abschluss.date)}</div>` : `
+      <div class="muted" style="margin-top:8px">Checkliste ${ck.done}/${ck.total} · ${ck.pct}%</div>
       <div class="progress"><div style="width:${ck.pct}%"></div></div>
-      ${ktKarte(p)}
+      ${ktKarte(p)}`}
     </div>`; }).join('')}</div>`
     : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
 }
@@ -1828,17 +1883,28 @@ function neuesProjekt() {
 }
 
 // ---------- Projektansicht ----------
+// abgeschlossenes Projekt: effektiver Erlös, Kosten und DB, auf Wunsch wieder öffnen
+function abschlussBanner(p) {
+  const a = p.abschluss;
+  if (!a) return '';
+  const db = a.vk - a.cost, plan = ktMitDaten(p) ? ktCalc(p.ktr, null).dbPlan : null, kl = plan == null ? (db >= 0 ? '' : 'x') : ktClassify(db, plan);
+  return `<div class="frei ok"><div class="row" style="justify-content:space-between"><span>✓ Abgeschlossen am <b>${fmt(a.date)}</b> · Erlös ${ktChf(a.vk)} · Kosten ${ktChf(a.cost)} ·
+    DB <b class="${KT_TXT[kl]}">${ktChf(db)} (${ktPct(a.dbPct)})</b>${plan == null ? '' : ` · <span class="${KT_TXT[kl]}">${ktSgnChf(db - plan)} zu Verkauf</span>`}</span>
+    <button class="sec sm" onclick="ktWiederOeffnen('${p.id}')">Wieder öffnen</button></div></div>`;
+}
 function viewProjekt(p) {
   return `
   <div class="row" style="justify-content:space-between;margin-bottom:14px">
     <button class="sec sm" onclick="nav('projekte')">← Alle Projekte</button>
-    <button onclick="pdf('${p.id}')">Terminplan als PDF</button>
+    <div class="row">${p.abschluss ? '' : `<button class="sec" onclick="ktAbschlussDialog('${p.id}')">✓ Projekt abschliessen</button>`}
+      <button onclick="pdf('${p.id}')">Terminplan als PDF</button></div>
   </div>
-  <div class="card${ktGlow(p)}" style="border-left:5px solid ${p.farbe}">
+  <div class="card${p.abschluss ? '' : ktGlow(p)}" style="border-left:5px solid ${p.farbe}">
     <div class="row"><span class="pnum">${esc(p.nummer)}</span>${artBadge(p)}${badge(p)}</div>
     <h2 style="margin:8px 0 2px">${esc(p.name)}</h2>
     <div class="muted">${p.ort ? esc(p.ort) + ' · ' : ''}Projektleiter: ${esc(S().name)}</div>
   </div>
+  ${abschlussBanner(p)}
   ${freigabeHinweis(p)}
   <div class="tabs">
     ${[['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', `Checkliste (${chkStats(p).done}/${chkStats(p).total})`], ['controlling', ktTabTitel(p)], ['dokumente', 'Dokumente'], ['gewerke', 'Gewerke'], ['info', 'Projektdaten']].map(([k, l]) =>
@@ -3738,9 +3804,10 @@ function kalenderMonat(monat, showPl) {
   const gridStart = addDays(first, -((first.getUTCDay() + 6) % 7));
   const gridEnd = addDays(last, 6 - ((last.getUTCDay() + 6) % 7));
   const today = todayIso();
-  const spans = state.projects.map(p => ({ p, s: span(p) })).filter(x => x.s).sort((a, b) => a.s.start.localeCompare(b.s.start));
-  const plTag = {};
+  const spans = offenP().map(p => ({ p, s: span(p) })).filter(x => x.s).sort((a, b) => a.s.start.localeCompare(b.s.start));
+  const plTag = {}, bsTag = {};
   meineEinsaetze().forEach(e => (plTag[e.t.start] = plTag[e.t.start] || []).push(e));
+  spans.filter(x => projektArt(x.p) !== 'service').forEach(x => (bsTag[x.s.start] = bsTag[x.s.start] || []).push(x.p));
 
   let weeks = '';
   for (let ws = gridStart; ws <= gridEnd; ws = addDays(ws, 7)) {
@@ -3752,14 +3819,16 @@ function kalenderMonat(monat, showPl) {
       const d = addDays(ws, i), di = isoOf(d);
       const cls = [d.getUTCMonth() !== m - 1 && 'out', i >= 5 && 'we', di === today && 'today'].filter(Boolean).join(' ');
       const pls = showPl ? (plTag[di] || []).map(({ p, t }) =>
-        `<b class="cal-pl" title="Ich vor Ort: ${esc(p.nummer)} ${esc(p.name)} – ${esc(t.titel)}${t.plZeit ? ' ab ' + t.plZeit : ''}" onclick="openProjekt('${p.id}')">${t.plZeit || 'PL'} ${esc(p.nummer)}</b>`).join('') : '';
+        `<b class="cal-pl" title="Ich vor Ort: ${esc(p.nummer)} ${esc(p.name)} – ${esc(t.titel)}${t.plZeit ? ' ab ' + t.plZeit : ''}" onclick="openProjekt('${p.id}')">📍 ${t.plZeit || 'vor Ort'} ${esc(p.nummer)}</b>`).join('') : '';
+      const bss = (bsTag[di] || []).map(p =>
+        `<b class="cal-bs" style="--c:${p.farbe}" title="Baustart: ${esc(p.nummer)} ${esc(p.name)}" onclick="openProjekt('${p.id}')">▶ Baustart ${esc(p.nummer)}</b>`).join('');
       cells += `<div class="cal-day ${cls}" style="grid-column:${i + 1}"></div>
-        <div class="cal-num ${cls}" style="grid-column:${i + 1}"><span>${d.getUTCDate()}</span>${pls}</div>`;
+        <div class="cal-num ${cls}" style="grid-column:${i + 1}"><span>${d.getUTCDate()}</span>${bss}${pls}</div>`;
     }
     const bars = segs.map(({ p, s }, lane) => {
       const a = s.start > wsI ? s.start : wsI, b = s.ende < weI ? s.ende : weI;
       const l = s.start < wsI ? '0' : '5px', r = s.ende > weI ? '0' : '5px';
-      return `<div class="cal-bar" style="grid-column:${diffDays(wsI, a) + 1} / span ${diffDays(a, b) + 1};grid-row:${lane + 2};background:${p.farbe};border-radius:${l} ${r} ${r} ${l}"
+      return `<div class="cal-bar" style="grid-column:${diffDays(wsI, a) + 1} / span ${diffDays(a, b) + 1};grid-row:${lane + 2};--c:${p.farbe};background:${p.farbe};border-radius:${l} ${r} ${r} ${l}"
         title="${esc(p.nummer)} ${esc(p.name)}: ${fmt(s.start)} – ${fmt(s.ende)}" onclick="openProjekt('${p.id}')">${ktAmpel(p)}${esc(p.nummer)} · ${esc(p.name)}</div>`;
     }).join('');
     weeks += `<div class="cal-week" style="grid-template-rows:${rows}">${cells}${bars}</div>`;
@@ -4589,7 +4658,12 @@ function ktMigrate(d) {
   const k = d.settings.ktr = d.settings.ktr || {};
   if (!Array.isArray(k.rates) || k.rates.length !== 3) k.rates = [120, 85, 70];
   if (!Array.isArray(k.gewerke)) k.gewerke = KT_GEWERKE.map(name => ({ name, price: 0 }));
-  d.projects.forEach(p => { if (p.ktr && !Array.isArray(p.ktr.weeks)) p.ktr.weeks = []; });
+  d.projects.forEach(p => {
+    if (p.ktr && !Array.isArray(p.ktr.weeks)) p.ktr.weeks = [];
+    // Projektabschluss (p.abschluss) und Controlling-Abschluss (p.ktr.closed) sind immer gleich
+    if (p.ktr && p.ktr.closed && !p.abschluss) p.abschluss = { ...p.ktr.closed };
+    if (p.ktr && p.abschluss && !p.ktr.closed) p.ktr.closed = { ...p.abschluss };
+  });
 }
 const ktNum = v => { const n = parseFloat(String(v ?? '').replace(/['’\s]/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
 const ktFmt = n => Math.round(n).toLocaleString('de-CH');
@@ -4807,7 +4881,10 @@ function ktEntfernen(pid) {
   if (!confirm(`Controlling von «${p.nummer} ${p.name}» mit allen Erfassungen löschen? Das Projekt selbst bleibt bestehen.`)) return;
   delete p.ktr; save(); render(); toast('Controlling entfernt.');
 }
-function ktWiederOeffnen(pid) { delete findP(pid).ktr.closed; save(); render(); toast('Controlling wieder geöffnet.'); }
+function ktWiederOeffnen(pid) {
+  const p = findP(pid); delete p.abschluss; if (p.ktr) delete p.ktr.closed;
+  save(); render(); toast('Projekt wieder geöffnet.');
+}
 
 // ---------- Controlling: Wochen-Erinnerung und Durchgehen ----------
 // einmal pro Kalenderwoche (ab Montag) beim ersten Öffnen, wenn Projekte zu kontrollieren sind
@@ -4849,16 +4926,20 @@ function ktTourBanner(p) {
 }
 
 // ---------- Controlling: Projektabschluss ----------
+// gilt für Projekt und Controlling gemeinsam: abschliessen setzt beides, wieder öffnen hebt beides auf
+const ktMitDaten = p => !!(p.ktr && p.ktr.weeks.length);
 function ktAbschlussDialog(pid) {
-  const k = findP(pid).ktr, c = ktCalc(k, ktLatest(k)), d = $('dlg');
+  const p = findP(pid), c = ktMitDaten(p) ? ktCalc(p.ktr, ktLatest(p.ktr)) : null, ck = chkStats(p), d = $('dlg');
   d.innerHTML = `
     <h2>Projekt abschliessen</h2>
-    <p class="muted" style="margin-top:-6px">Schlussabrechnung erfassen. Das Controlling wird danach unter «Abgeschlossen» geführt.</p>
+    <p class="muted" style="margin-top:-6px">Effektiven Verkauf und effektive Kosten aus der Schlussabrechnung eintragen. Projekt und Controlling werden zusammen abgeschlossen;
+      das Projekt verschwindet aus Dashboard und Kalender und bleibt unter «Projekte → Abgeschlossen» abrufbar.</p>
+    ${ck.total && ck.done < ck.total ? `<div class="note" style="margin-bottom:10px">Checkliste: noch ${ck.total - ck.done} von ${ck.total} Punkten offen.</div>` : ''}
     <div class="grid" style="grid-template-columns:1fr 1fr">
       <div><label>Abschlussdatum</label><input type="date" id="kt-m-date" value="${todayIso()}"></div>
-      <div><label>Schluss-VK inkl. Nachträge (CHF)</label><input id="kt-m-vk" class="kt-num" inputmode="decimal" value="${ktFmt(c.vk)}" oninput="ktAbUpd('${pid}')"></div>
-      <div><label>Endkosten (CHF)</label><input id="kt-m-cost" class="kt-num" inputmode="decimal" value="${ktFmt(c.eac)}" oninput="ktAbUpd('${pid}')"></div>
-      <div><label>End-DB (%)</label><input id="kt-m-pct" class="kt-num" inputmode="decimal" oninput="ktAbUpd('${pid}','pct')"></div>
+      <div><label>Effektiver VK / Erlös inkl. Nachträge (CHF)</label><input id="kt-m-vk" class="kt-num" inputmode="decimal" value="${c ? ktFmt(c.vk) : ''}" oninput="ktAbUpd('${pid}')"></div>
+      <div><label>Effektive Kosten EK (CHF)</label><input id="kt-m-cost" class="kt-num" inputmode="decimal" value="${c ? ktFmt(c.eac) : ''}" oninput="ktAbUpd('${pid}')"></div>
+      <div><label>DB effektiv (%)</label><input id="kt-m-pct" class="kt-num" inputmode="decimal" oninput="ktAbUpd('${pid}','pct')"></div>
     </div>
     <div class="kt-hint" id="kt-m-info"></div>
     <div class="row" style="margin-top:16px;justify-content:flex-end">
@@ -4871,13 +4952,17 @@ function ktAbUpd(pid, src) {
   const vk = ktNum($('kt-m-vk').value); let cost = ktNum($('kt-m-cost').value), pc = ktNum($('kt-m-pct').value);
   if (src === 'pct') { cost = vk * (1 - pc / 100); $('kt-m-cost').value = ktFmt(cost); }
   else $('kt-m-pct').value = (vk ? (vk - cost) / vk * 100 : 0).toFixed(1);
-  const base = ktCalc(findP(pid).ktr, null), k = ktClassify(vk - cost, base.dbPlan);
-  $('kt-m-info').innerHTML = `End-DB <b>${ktChf(vk - cost)}</b> · DB Verkauf ${ktPct(base.dbPlanPct)} (${ktChf(base.dbPlan)}) · <b class="${KT_TXT[k]}">${KT_LBL[k]}, ${ktSgnChf(vk - cost - base.dbPlan)}</b>`;
+  const p = findP(pid), db = vk - cost;
+  if (!ktMitDaten(p)) { $('kt-m-info').innerHTML = `DB effektiv <b class="${db >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(db)}</b>`; return; }
+  const base = ktCalc(p.ktr, null), k = ktClassify(db, base.dbPlan);
+  $('kt-m-info').innerHTML = `DB effektiv <b>${ktChf(db)}</b> · DB Verkauf ${ktPct(base.dbPlanPct)} (${ktChf(base.dbPlan)}) · <b class="${KT_TXT[k]}">${KT_LBL[k]}, ${ktSgnChf(db - base.dbPlan)}</b>`;
 }
 function ktAbschluss(pid) {
-  const k = findP(pid).ktr, vk = ktNum($('kt-m-vk').value), cost = ktNum($('kt-m-cost').value);
-  k.closed = { date: $('kt-m-date').value || todayIso(), vk, cost, dbPct: vk ? (vk - cost) / vk * 100 : 0 };
-  $('dlg').close(); save(); render(); toast('Projekt abgeschlossen – End-DB ' + ktPct(k.closed.dbPct));
+  const p = findP(pid), vk = ktNum($('kt-m-vk').value), cost = ktNum($('kt-m-cost').value);
+  if (!vk) return toast('Bitte den effektiven VK eintragen.');
+  p.abschluss = { date: $('kt-m-date').value || todayIso(), vk, cost, dbPct: vk ? (vk - cost) / vk * 100 : 0 };
+  if (p.ktr) p.ktr.closed = { ...p.abschluss };
+  $('dlg').close(); save(); render(); toast(`${p.nummer} abgeschlossen – DB ${ktChf(vk - cost)} (${ktPct(p.abschluss.dbPct)})`);
 }
 
 // ---------- Controlling: Ansicht im Projekt ----------
@@ -4905,11 +4990,8 @@ function viewKtProjekt(p) {
   const zonen = plan > 0 ? [{ from: 0, to: plan / 2, c: KT_TH.st.b }, { from: plan / 2, to: plan, c: KT_TH.st.w }, { from: plan, to: gMax, c: KT_TH.st[''] }] : [];
   const sgnCls = v => v == null || !isFinite(v) ? '' : v >= 0 ? 'kt-pos' : 'kt-neg';
   let kopf;
-  if (zu) {
-    const e = k.closed.vk - k.closed.cost, kl = ktClassify(e, c.dbPlan);
-    kopf = `<div class="frei ok"><div class="row"><span>✓ Abgeschlossen am <b>${fmt(k.closed.date)}</b> · End-DB <b class="${KT_TXT[kl]}">${ktPct(k.closed.dbPct)}</b> (${ktChf(e)}) · <span class="${KT_TXT[kl]}">${KT_LBL[kl]}, ${ktSgnChf(e - c.dbPlan)} zu Verkauf</span></span>
-      <button class="sec sm" onclick="ktWiederOeffnen('${id}')">Wieder öffnen</button></div></div>`;
-  } else kopf = `<div class="frei ${{ '': 'kt-gut', w: 'warn', n: 'warn', b: 'kt-rot', x: 'kt-verlust' }[st.cls]}"><span class="kt-dot ${st.cls}"></span>${st.cls === 'x' ? '⚠ ' : ''}${esc(st.txt)}</div>`;
+  if (zu) kopf = p.abschluss ? '' : `<div class="frei ok">✓ Controlling abgeschlossen · End-DB ${ktPct(k.closed.dbPct)}</div>`; // Banner steht über den Tabs
+  else kopf = `<div class="frei ${{ '': 'kt-gut', w: 'warn', n: 'warn', b: 'kt-rot', x: 'kt-verlust' }[st.cls]}"><span class="kt-dot ${st.cls}"></span>${st.cls === 'x' ? '⚠ ' : ''}${esc(st.txt)}</div>`;
   const faellig = !zu && ktDue(p) ? `<div class="note"><div class="row" style="justify-content:space-between">
     <span>Letzte Erfassung KW ${ktKw(last.date)} (${fmt(last.date)}, ${ktLetzte(last)}). Ist-Kosten und kommende Rechnungen für diese Woche erfassen.</span>
     <button class="sm" onclick="ktNeueWoche('${id}')">Erfassung KW ${ktKw(todayIso())} starten</button></div></div>` : '';
@@ -4954,7 +5036,7 @@ function viewKtProjekt(p) {
         <div><label>Aufgelaufene Kosten Ist (CHF)</label><input ${ktIn(w.ist, `ktSet('${id}','ist',this.value)`)}></div>
       </div>
       <div style="margin-top:14px">
-        <div class="row" style="justify-content:space-between"><b style="font-weight:600">Fortschritt</b><span class="kt-big">${c.prog}<small>%</small></span></div>
+        <div class="row" style="justify-content:space-between"><b style="font-weight:600">Leistungsfortschritt <span class="muted" style="font-weight:400;font-size:12px">· eigener Wert, unabhängig von der Checkliste (${chkStats(p).pct}%)</span></b><span class="kt-big">${c.prog}<small>%</small></span></div>
         <input type="range" class="kt-slider" min="0" max="100" step="1" value="${c.prog}" oninput="ktSet('${id}','progress',this.value)">
         <div class="kt-scale"><span>Start</span><span>Hälfte</span><span>Abschluss</span></div>
       </div>
@@ -5014,7 +5096,8 @@ function ktUebersicht(p) {
       <div><label>DB Verkauf</label><b>${ktPct(c.dbPlanPct)}</b></div>
       <div><label>Δ zu Verkauf</label><b class="${c.deltaChf >= 0 ? 'kt-pos' : 'kt-neg'}">${ktSgnChf(c.deltaChf)}</b></div>
       <div><label>Endkosten</label><b>${ktChf(c.eac)}</b></div>
-      <div><label>Fortschritt</label><b>${c.prog}%</b></div>
+      <div><label>Leistungsfortschritt</label><b>${c.prog}%</b></div>
+      <div><label>Checkliste</label><b>${chkStats(p).pct}%</b></div>
     </div>
   </div>`;
 }
@@ -5022,7 +5105,7 @@ function ktKarte(p) {
   if (!p.ktr || !p.ktr.weeks.length) return '';
   const x = ktInfo(p);
   if (p.ktr.closed) return `<div class="muted" style="margin-top:8px"><span class="kt-dot g"></span>Controlling abgeschlossen · End-DB ${ktPct(p.ktr.closed.dbPct)}</div>`;
-  return `<div class="muted" style="margin-top:8px"><span class="kt-dot ${x.st.cls}"></span>DB ${ktPct(x.c.dbProgPct)} · ${x.st.lbl}${x.due ? ' · <span class="rot-txt">Controlling fällig</span>' : ''}</div>`;
+  return `<div class="muted" style="margin-top:8px"><span class="kt-dot ${x.st.cls}"></span>DB ${ktPct(x.c.dbProgPct)} · ${x.st.lbl} · Leistung ${x.c.prog}%${x.due ? ' · <span class="rot-txt">Controlling fällig</span>' : ''}</div>`;
 }
 function ktKpi() {
   const n = state.projects.filter(ktDue).length;
@@ -5032,24 +5115,27 @@ function ktKpi() {
 // ---------- Controlling: Übersicht aller Projekte ----------
 function viewControlling() {
   const today = todayIso(), F = ui.ktF || 'run';
-  const mit = state.projects.filter(p => p.ktr && p.ktr.weeks.length).map(ktInfo);
-  const act = mit.filter(x => !x.k.closed), zu = mit.filter(x => x.k.closed), due = act.filter(x => x.due), n = ktCount(act);
-  const ohne = state.projects.filter(p => !p.ktr || !p.ktr.weeks.length), bereit = act.filter(x => ktAbschlussBereit(x.p));
+  const act = state.projects.filter(ktAktiv).map(ktInfo), due = act.filter(x => x.due), n = ktCount(act);
+  // abgeschlossen = alle abgeschlossenen Projekte, auch solche ohne Controlling-Erfassungen
+  const zu = state.projects.filter(p => p.abschluss).map(p => ({ p, a: p.abschluss, db: p.abschluss.vk - p.abschluss.cost, plan: ktMitDaten(p) ? ktCalc(p.ktr, null).dbPlan : null }));
+  const ohne = offenP().filter(p => !ktMitDaten(p)), bereit = act.filter(x => ktAbschlussBereit(x.p));
   const vk = act.reduce((s, x) => s + x.c.vk, 0), dbPlan = act.reduce((s, x) => s + x.c.dbPlan, 0), dbProg = act.reduce((s, x) => s + x.c.dbProg, 0);
   const pp = vk ? dbProg / vk * 100 : null, pl = vk ? dbPlan / vk * 100 : null, pk = ktClassify(dbProg, dbPlan);
+  const zErl = zu.reduce((s, x) => s + x.a.vk, 0), zKo = zu.reduce((s, x) => s + x.a.cost, 0), zDb = zErl - zKo;
+  const mitPlan = zu.filter(x => x.plan != null), zDelta = mitPlan.reduce((s, x) => s + x.db - x.plan, 0);
+  const zeileZu = x => { const kl = KT_TXT[x.plan == null ? (x.db >= 0 ? '' : 'x') : ktClassify(x.db, x.plan)];
+    return `<div class="li" onclick="ui.tab='${ktMitDaten(x.p) ? 'controlling' : 'uebersicht'}';nav('projekt/${x.p.id}')"><span class="kt-dot g"></span>
+      <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">abgeschlossen ${fmt(x.a.date)} · Erlös ${ktFmt(x.a.vk)} · Kosten ${ktFmt(x.a.cost)}</div></div>
+      <div class="kt-v"><div class="${kl}">${ktChf(x.db)}</div><div class="muted">${ktPct(x.a.dbPct)}${x.plan == null ? '' : ' · ' + ktSgnChf(x.db - x.plan)}</div></div></div>`; };
   const zeile = x => {
-    if (x.k.closed) { const cd = x.k.closed, e = cd.vk - cd.cost, kl = KT_TXT[ktClassify(e, x.c.dbPlan)];
-      return `<div class="li" onclick="ktKontrollieren('${x.p.id}')"><span class="kt-dot g"></span>
-        <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">abgeschlossen ${fmt(cd.date)} · VK ${ktFmt(cd.vk)}</div></div>
-        <div class="kt-v"><div class="${kl}">${ktPct(cd.dbPct)}</div><div class="muted">${ktSgnChf(e - x.c.dbPlan)}</div></div></div>`; }
     return `<div class="li${ktGlow(x.p)}" onclick="ktKontrollieren('${x.p.id}')"><span class="kt-dot ${x.st.cls}"></span>
       <div style="flex:1;min-width:0"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}
-        <div class="muted">${x.due ? '<span class="rot-txt">fällig</span> · ' : ''}${x.st.lbl} · Fortschritt ${x.c.prog}% · erfasst ${ktLetzte(x.w)}</div>
-        <div class="progress"><div style="width:${x.c.prog}%"></div></div></div>
+        <div class="muted">${x.due ? '<span class="rot-txt">fällig</span> · ' : ''}${x.st.lbl} · Leistung ${x.c.prog}% · Checkliste ${chkStats(x.p).pct}% · erfasst ${ktLetzte(x.w)}</div>
+        <div class="progress kt-prog" title="Leistungsfortschritt (Controlling)"><div style="width:${x.c.prog}%"></div></div></div>
       <div class="kt-v"><div class="${KT_TXT[x.st.cls]}">${ktPct(x.c.dbProgPct)}</div><div class="muted">${ktSgnChf(x.c.deltaChf)}</div></div></div>`;
   };
   const sortRisk = (a, b) => KT_RANK[a.st.cls] - KT_RANK[b.st.cls] || a.c.deltaChf - b.c.deltaChf;
-  const liste = F === 'done' ? zu.sort((a, b) => b.k.closed.date.localeCompare(a.k.closed.date)).map(zeile).join('') || '<div class="empty">Noch kein Projekt abgeschlossen.</div>'
+  const liste = F === 'done' ? zu.sort((a, b) => b.a.date.localeCompare(a.a.date)).map(zeileZu).join('') || '<div class="empty">Noch kein Projekt abgeschlossen.</div>'
     : F === 'ohne' ? ohne.map(p => `<div class="li" onclick="ktKontrollieren('${p.id}')"><span class="pdot" style="background:${p.farbe}"></span>
         <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">${PROJEKT_ARTEN[projektArt(p)]} · ${badge(p)}</div></div>
         <button class="sec sm" onclick="event.stopPropagation();ktKontrollieren('${p.id}')">Controlling starten</button></div>`).join('') || '<div class="empty">Alle Projekte haben ein Controlling.</div>'
@@ -5059,12 +5145,17 @@ function viewControlling() {
     <div><h1>Controlling</h1><div class="muted" style="margin-top:4px">Kosten und DB-Prognose · ${fmtLong(today)} · KW ${kw(toDate(today))}</div></div>
     <div class="row"><button class="sec" onclick="ktGesamtPdf()">Gesamt-PDF</button><button class="sec" onclick="ui.setTab='controlling';nav('einstellungen')">Stundenansätze & Import</button></div>
   </div>
-  <div class="kpis">
+  ${F === 'done' ? `<div class="kpis">
+    <div class="kpi"><b data-zahl="${zu.length}">${zu.length}</b><span>abgeschlossene Projekte</span></div>
+    <div class="kpi"><b style="font-size:24px">${ktChf(zErl)}</b><span>Erlös total</span><span class="kt-kpi-s">Kosten ${ktChf(zKo)}</span></div>
+    <div class="kpi"><b style="font-size:24px" class="${zDb >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(zDb)}</b><span>DB effektiv</span><span class="kt-kpi-s">Ø ${zErl ? ktPct(zDb / zErl * 100) : '–'}</span></div>
+    <div class="kpi"><b style="font-size:24px" class="${zDelta >= 0 ? 'kt-pos' : 'kt-neg'}">${mitPlan.length ? ktSgnChf(zDelta) : '–'}</b><span>Δ zu Verkauf</span><span class="kt-kpi-s">${mitPlan.length} mit Controlling</span></div>
+  </div>` : `<div class="kpis">
     <div class="kpi"><b data-zahl="${act.length}">${act.length}</b><span>laufende Projekte</span><span class="kt-kpi-s ${n.x || n.b ? 'kt-neg' : n.w ? 'kt-wrn' : ''}">${ktRisk(n) || 'alle Projekte gut'}</span></div>
     <div class="kpi"><b style="font-size:24px">${ktChf(vk)}</b><span>Auftragsvolumen VK</span><span class="kt-kpi-s">DB Verkauf ${ktChf(dbPlan)}</span></div>
     <div class="kpi"><b class="${pp == null ? '' : KT_TXT[pk]}">${ktPct(pp)}</b><span>Ø DB Prognose</span><span class="kt-kpi-s">Verkauf ${ktPct(pl)} · ${ktSgnChf(dbProg - dbPlan)}</span></div>
     <div class="kpi" onclick="ui.ktF='run';render()"><b class="${due.length ? 'kt-wrn' : 'kt-pos'}" data-zahl="${due.length}">${due.length}</b><span>zu kontrollieren</span><span class="kt-kpi-s">${due.length ? 'Ist & kommende Rechnungen erfassen' : 'alles kontrolliert'}</span></div>
-  </div>
+  </div>`}
   <div class="cols">
     <div class="card">
       <div class="ck-head"><h3 style="margin:0">Zu kontrollieren · KW ${kw(toDate(today))}</h3>${due.length > 1 ? '<button class="sm" onclick="ktTourStart()">Nacheinander durchgehen →</button>' : ''}</div>
@@ -5184,7 +5275,7 @@ function ktImportOk() {
     if (Array.isArray(s.rates) && s.rates.length === 3) S().ktr.rates = s.rates.map(ktNum);
     if (Array.isArray(s.gewerke)) S().ktr.gewerke = s.gewerke.map(g => ({ name: g.name || '', price: ktNum(g.price) }));
   }
-  ktImp = null; $('dlg').close(); save(); ui.ktF = 'run'; nav('controlling');
+  ktImp = null; $('dlg').close(); save(); nav('controlling');
   toast(`${n} Controlling(s) übernommen${neu ? ` · ${neu === 1 ? '1 neues Projekt' : neu + ' neue Projekte'} angelegt` : ''}.`);
 }
 
