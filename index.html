@@ -182,6 +182,10 @@
   .tag-oder { font-size: 11px; padding: 1px 8px; border-radius: 99px; background: #eef4ff; color: #2c5a9e; border: 1px solid #d3e1f7; }
   .ck-notiz-btn { font-size: 12px; white-space: nowrap; flex-shrink: 0; }
   .ck-notiz-btn.hat { color: var(--brand); }
+  .ck-del { opacity: 0; flex-shrink: 0; }
+  .ck-row:hover .ck-del, .ck-del:focus { opacity: 1; }
+  .ck-del:hover { color: var(--danger) !important; }
+  @media (hover: none) { .ck-del { opacity: .6; } }
   .ck-btn { background: none; border: none; color: var(--muted); padding: 0 4px; font-size: 14px; }
   .ck-btn:hover { color: var(--brand); }
   .ck-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -2039,7 +2043,8 @@ function viewCheckliste(p) {
       ? `<button class="sec sm" onclick="chkDatum('${p.id}',${i},'${sp.start}')">aus Terminplan: ${fmt(sp.start)}</button>` : '';
     const rot = fg.kritisch && pflicht.has(n.key);
     return `<div class="ck-row lvl${lvl} ${ok ? 'done' : ''} ${rot ? 'rot' : ''} ${ui.pop === n.key ? 'pop' : ''}" style="padding-left:${lvl * 28 + 4}px">
-      ${pfeil}<input type="checkbox" ${ok ? 'checked' : ''} ${haupt ? `disabled class="ck-auto" title="Wird automatisch abgehakt, sobald ${n.oder ? 'einer der Unterpunkte' : 'alle Unterpunkte'} erledigt ${n.oder ? 'ist' : 'sind'}"` : ''} onchange="chkSet('${p.id}',${i},this.checked,this)">
+      ${pfeil}<input type="checkbox" ${ok ? 'checked' : ''} ${haupt && n.oder ? `disabled class="ck-auto" title="Wird abgehakt, sobald einer der Unterpunkte erledigt ist – dort auswählen"`
+        : haupt ? `title="Abhaken hakt alle Unterpunkte ab · wird auch automatisch abgehakt, wenn alle Unterpunkte erledigt sind"` : ''} onchange="chkSet('${p.id}',${i},this.checked,this)">
       <div class="ck-txt"><span>${esc(n.text)}</span>${sub}${rot ? '<span class="tag-warn">Baustart gefährdet</span>' : n.wichtig ? '<span class="tag-wichtig">vor Baustart</span>' : ''}
         ${n.mail ? `<button class="sec sm" onclick="mailDialog('${p.id}',${i})">✉ Mail</button>` : ''}
         ${DOKS[n.dok] ? `<button class="sec sm" onclick="${DOKS[n.dok].fn}('${p.id}')">📄 ${n.dok === 'ibn' ? rapportName(p) : DOKS[n.dok].label}${DOKS[n.dok].hat(p) ? ' bearbeiten' : ' ausfüllen'}</button>` : ''}
@@ -2054,6 +2059,7 @@ function viewCheckliste(p) {
           : st.notiz ? `<div class="ck-notiz" title="Klicken zum Bearbeiten" onclick="chkNotiz('${p.id}',${i})">${esc(st.notiz)}</div>` : ''}
       </div>
       <button class="ck-btn ck-notiz-btn ${st.notiz ? 'hat' : ''}" title="${st.notiz ? 'Notiz bearbeiten' : 'Notiz hinzufügen'}" onclick="chkNotiz('${p.id}',${i})">✎${st.notiz ? '' : ' Notiz'}</button>
+      <button class="ck-btn ck-del" title="Punkt aus diesem Projekt entfernen (die Vorlage bleibt)" onclick="event.stopPropagation();chkLoeschen('${p.id}',${i})">✕</button>
     </div>${zu ? '' : n.children.map(c => node(c, lvl + 1)).join('')}`;
   };
   return `
@@ -2085,12 +2091,18 @@ function viewCheckliste(p) {
 }
 // chkKeys: Knoten der aktuell angezeigten Checklisten-Punkte (Index wird in onclick verwendet)
 const chkState = (p, i) => p.chk[chkKeys[i].key] = p.chk[chkKeys[i].key] || {};
+// Unterpunkte eines Hauptpunkts zum gemeinsamen Abhaken; [oder]-Gruppen nur beim Aufheben (dort entscheidet man selbst)
+const chkBlaetter = (n, alle) => n.children.flatMap(c => !c.children.length ? [c] : (c.oder && !alle) ? [] : chkBlaetter(c, alle));
 function chkSet(pid, i, v, el) {
-  const p = findP(pid), key = chkKeys[i].key, st = chkState(p, i);
+  const p = findP(pid), n = chkKeys[i], key = n.key;
   const phase = parseCheckliste(p.checkliste).find(ph => key.startsWith(ph.titel.toLowerCase() + ' › '));
   const phaseFertig = () => phase ? phase.items.every(n => chkDone(p, n)) : false;
   const vorher = phaseFertig(), allesVorher = chkStats(p).done === chkStats(p).total;
-  st.ok = v; st.am = v ? todayIso() : '';
+  // Hauptpunkt: alle Unterpunkte mit abhaken bzw. wieder öffnen
+  const ziele = (n.children || []).length ? chkBlaetter(n, !v) : [n];
+  if (v && !ziele.length) { toast('Bitte bei den «oder»-Unterpunkten eine Auswahl abhaken.'); return render(); }
+  if (!v && ziele.length > 1 && !confirm(`Alle ${ziele.length} Unterpunkte von «${n.text}» wieder öffnen?`)) return render();
+  ziele.forEach(z => { const st = p.chk[z.key] = p.chk[z.key] || {}; if (!!st.ok !== v) { st.ok = v; st.am = v ? todayIso() : ''; } });
   if (v) {
     ui.pop = key; // kurz aufleuchten lassen
     const nachher = phaseFertig(), alles = chkStats(p).done === chkStats(p).total;
@@ -2117,6 +2129,19 @@ function funken(el, anzahl) {
   }
 }
 function chkDatum(pid, i, v) { const p = findP(pid); chkState(p, i).datum = v; save(); render(); }
+// Punkt (mit seinen Unterpunkten) nur aus diesem Projekt entfernen; Vorlage und andere Projekte bleiben unverändert
+function chkLoeschen(pid, i) {
+  const p = findP(pid), n = chkKeys[i];
+  const anz = (function z(x) { return x.children.reduce((s, c) => s + 1 + z(c), 0); })(n);
+  if (!confirm(`«${n.text}»${anz ? ` mit ${anz} Unterpunkt${anz > 1 ? 'en' : ''}` : ''} aus diesem Projekt entfernen?\nDie Vorlage und andere Projekte bleiben unverändert.`)) return;
+  const L = zeilenMitKey(p.checkliste), k = L.findIndex(z => z.key === n.key);
+  if (k < 0) return;
+  let e = k + 1;
+  while (e < L.length && L[e].typ === 'item' && L[e].lvl > L[k].lvl) e++;
+  L.splice(k, e - k);
+  p.checkliste = textAusZeilen(L);
+  save(); render(); toast(`«${n.text}» entfernt. Wiederherstellen: «Checkliste anpassen» › «Standard-Vorlage laden».`);
+}
 // Notiz direkt unter dem Punkt bearbeiten (mehrzeilig)
 function chkNotiz(pid, i) {
   ui.notizKey = ui.notizKey === chkKeys[i].key ? null : chkKeys[i].key;
@@ -3672,14 +3697,12 @@ function viewKontakte() {
     const l = liste.filter(c => c.art === art).sort(nachName);
     if (!l.length) return '';
     return `<div class="card"><h3>${titel} <span class="muted" style="font-weight:400">· ${l.length}</span></h3><div class="table-wrap"><table>
-      <tr><th>Name</th><th>Firma</th><th>${art === 'kunde' ? 'Info' : 'Gewerk / Rolle'}</th><th>Telefon</th><th>E-Mail</th><th>Ort / Adresse</th><th>Projekte</th></tr>
+      <tr><th>Name</th><th>Firma</th><th>${art === 'kunde' ? 'Info' : 'Gewerk / Rolle'}</th><th>Telefon</th><th>E-Mail</th><th>Ort / Adresse</th></tr>
       ${l.map(c => {
-        const pr = kontaktProjekte(c.id);
         return `<tr class="click" onclick="kontaktDialog('${c.id}')">
           <td><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="avatar klein" style="background:${avatarFarbe(c)}">${initialen(kontaktName(c))}</span><b>${markiere(kontaktName(c), woerter)}</b></div></td>
           <td>${markiere(kontaktFirma(c), woerter)}</td><td class="muted">${markiere(c.gewerk || c.notiz || '', woerter)}</td>
-          <td style="white-space:nowrap">${telLink(c.telefon)}</td><td>${mailLink(c.email)}</td><td class="muted">${markiere(c.adresse, woerter)}</td>
-          <td>${pr.map(x => `<span class="pnum" style="cursor:pointer;margin:1px" onclick="event.stopPropagation();openProjekt('${x.id}')" title="${esc(x.name)}">${esc(x.nummer)}</span>`).join('') || '<span class="muted">–</span>'}</td></tr>`;
+          <td style="white-space:nowrap">${telLink(c.telefon)}</td><td>${mailLink(c.email)}</td><td class="muted">${markiere(c.adresse, woerter)}</td></tr>`;
       }).join('')}
     </table></div></div>`;
   }).join('')}`;
@@ -3691,7 +3714,6 @@ function kontaktDialog(cid, opt = {}) {
   const c = cid ? kontaktById(cid) : null, d = $('dlg');
   const art = c ? c.art : (opt.art || 'extern');
   ui.kDlg = { cid, art, danach: opt.danach || '' };
-  const pr = c ? kontaktProjekte(c.id) : [];
   d.style.width = 'min(720px, calc(100vw - 24px))';
   d.innerHTML = `<h2>${c ? 'Kontakt bearbeiten' : 'Neuer Kontakt'}</h2>
     <div style="margin-bottom:12px"><label>Kategorie</label><div class="seg seg-breit" id="k-art">${KONTAKT_ARTEN.map(([k, l]) =>
@@ -3705,7 +3727,6 @@ function kontaktDialog(cid, opt = {}) {
       <div><label>Ort / Adresse</label><input id="k-adr" value="${esc(c?.adresse || '')}" placeholder="Strasse, PLZ Ort"></div>
     </div>
     <div style="margin-top:12px"><label>Notiz</label><textarea id="k-notiz" rows="2">${esc(c?.notiz || '')}</textarea></div>
-    ${pr.length ? `<div class="muted" style="margin-top:10px">Verknüpft mit ${pr.length} Projekt${pr.length > 1 ? 'en' : ''}: ${pr.map(x => esc(x.nummer + ' ' + x.name)).join(', ')} – Änderungen gelten dort sofort.</div>` : ''}
     <div class="row" style="margin-top:16px;justify-content:space-between">
       <div>${c ? `<button class="danger sm" onclick="kontaktLoeschen('${c.id}')">Löschen</button>` : ''}</div>
       <div class="row"><button class="sec" onclick="$('dlg').close()">Abbrechen</button><button onclick="kontaktSpeichern()">${c ? 'Speichern' : 'Anlegen'}</button></div>
