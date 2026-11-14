@@ -261,6 +261,18 @@
   .next .big { font-weight: 600; letter-spacing: -0.02em; }
   .next button { background: var(--ink); color: #fff; border-color: var(--ink); }
   .next-grid { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  /* Projektliste: Nummer oben, Adresse als Titel, Name klein, Stand unten abgetrennt */
+  .pk2 { display: flex; flex-direction: column; }
+  .pk2-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .pk2-nr { font-size: 13px; letter-spacing: .02em; }
+  .pk2-adr { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin-top: 10px; line-height: 1.25; }
+  .pk2-ort { font-size: 14px; color: var(--text); min-height: 18px; }
+  .pk2-name { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .pk2-luft { flex: 1; min-height: 12px; }
+  .pk2-fuss { padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; }
+  .pk2-zeile { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 6px; }
+  .pk2-zeile b { color: var(--text); }
+  .pk2 .progress { margin-top: 0; }
   /* Projektkarten im Dashboard: Checkliste gross, Controlling und Fortschritt klein darunter */
   .dp-karte { cursor: pointer; }
   .dp-anz { display: flex; flex-direction: column; align-items: center; gap: 2px; }
@@ -447,6 +459,12 @@
   .avatar.klein { width: 26px; height: 26px; font-size: 10.5px; }
   .ueb-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; }
   .ueb-grid > .card { margin-bottom: 18px; }
+  .ueb-infos { width: 100%; min-height: 150px; resize: vertical; line-height: 1.45; }
+  /* Produkte als kurze Liste: Bauteil links, Details rechts */
+  .prod-liste { display: grid; gap: 2px; font-size: 13.5px; }
+  .prod-liste > div { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; gap: 10px; padding: 4px 0; border-bottom: 1px solid #eef1f5; }
+  .prod-liste > div:last-child { border-bottom: none; }
+  .prod-liste span { color: var(--muted); }
   .ueb-kunde { margin-bottom: 8px; }
   .personen { display: grid; gap: 2px; }
   .person { display: flex; gap: 12px; align-items: center; padding: 9px 8px; border-radius: 12px; }
@@ -1434,13 +1452,13 @@ ICONS.controlling = '<path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/><circle cx
 const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Wochenplan'], ['termine', 'Alle Termine'], ['einstellungen', 'Einstellungen']];
 
 function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
-function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (h === 'projekte') ui.pZu = false; if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
+function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (h === 'projekte') { ui.pZu = false; ui.pSort = 'nr'; } if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
 function openProjekt(id) { ui.tab = 'uebersicht'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
 window.addEventListener('hashchange', () => {
   // beim Hingehen immer zuerst die laufenden / offenen Projekte zeigen
   const pg = route().page;
   if (pg === 'controlling') ui.ktF = 'run';
-  if (pg === 'projekte') ui.pZu = false;
+  if (pg === 'projekte') { ui.pZu = false; ui.pSort = 'nr'; }
   render({ nachOben: true });
 });
 
@@ -1827,7 +1845,7 @@ function dashProjekte(today) {
     </div>
     <div class="dp-anz">${gauge(ck.pct, 'Checkliste erledigt')}
       <div class="dp-mini">
-        <div onclick="event.stopPropagation();ui.tab='controlling';openProjekt('${id}')">${ct}</div>
+        <div onclick="event.stopPropagation();ui.tab='controlling';nav('projekt/${id}')">${ct}</div>
         <div>${gauge(prog, progL, { mini: true, farbe: '#3d6fb6' })}</div>
       </div></div>
     </div></div>`;
@@ -1888,31 +1906,42 @@ function dashKalender() {
 
 // ---------- Projekte ----------
 function viewProjekte() {
-  const zuN = state.projects.filter(p => p.abschluss).length, zeigeZu = ui.pZu && zuN;
+  const zuN = state.projects.filter(p => p.abschluss).length, zeigeZu = ui.pZu && zuN, nachTermin = ui.pSort === 'termin';
+  // Standard: nach Projektnummer aufsteigend; wahlweise nach Baustart (Projekte ohne Termine am Schluss)
+  const nr = (a, b) => a.nummer.localeCompare(b.nummer, 'de', { numeric: true });
+  const start = p => (span(p) || {}).start || '9999';
   const list = state.projects.filter(p => !p.abschluss === !zeigeZu)
-    .sort((a, b) => zeigeZu ? b.abschluss.date.localeCompare(a.abschluss.date) : b.nummer.localeCompare(a.nummer, 'de', { numeric: true }));
+    .sort((a, b) => nachTermin ? start(a).localeCompare(start(b)) || nr(a, b) : nr(a, b));
   return `
   <div class="page-head">
     <h1>Projekte</h1>
     <div class="row">
       <div class="seg"><button class="${zeigeZu ? '' : 'on'}" onclick="ui.pZu=false;render()">Offen (${state.projects.length - zuN})</button><button class="${zeigeZu ? 'on' : ''}" onclick="ui.pZu=true;render()">Abgeschlossen (${zuN})</button></div>
+      <div class="seg" title="Sortierung"><button class="${nachTermin ? '' : 'on'}" onclick="ui.pSort='nr';render()">Nach Nummer</button><button class="${nachTermin ? 'on' : ''}" onclick="ui.pSort='termin';render()">Nach Terminen</button></div>
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input placeholder="Projekt suchen…" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)"></div>
+        <input placeholder="Nummer, Adresse, Name …" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)"></div>
       <button class="plus" title="Neues Projekt" onclick="neuesProjektDialog()">+</button>
     </div>
   </div>
-  ${list.length ? `<div class="projects">${list.map(p => { const s = span(p), ck = chkStats(p); return `
-    <div class="pcard${p.abschluss ? '' : ktGlow(p)}" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
-      <div class="row" style="justify-content:space-between"><span class="pnum">${esc(p.nummer)}</span>
-        <div class="row" style="gap:4px">${freigabe(p).kritisch ? '<span class="tag-warn" style="margin:0">Freigabe fehlt</span>' : ''}${artBadge(p)}${badge(p)}</div></div>
-      <h3 style="margin:8px 0 4px">${esc(p.name)}</h3>
-      <div class="muted">${esc(p.ort || '–')}</div>
-      <div class="muted" style="margin-top:6px">${s ? fmt(s.start) + ' – ' + fmt(s.ende) : 'noch keine Termine'} · ${p.termine.length} Termine</div>
-      ${p.abschluss ? `<div style="margin-top:8px">Erlös <b>${ktChf(p.abschluss.vk)}</b> · DB <b class="${p.abschluss.vk - p.abschluss.cost >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(p.abschluss.vk - p.abschluss.cost)} (${ktPct(p.abschluss.dbPct)})</b></div>
-        <div class="muted">abgeschlossen ${fmt(p.abschluss.date)}</div>` : `
-      <div class="muted" style="margin-top:8px">Checkliste ${ck.done}/${ck.total} · ${ck.pct}%</div>
-      <div class="progress"><div style="width:${ck.pct}%"></div></div>
-      ${ktKarte(p)}`}
+  ${list.length ? `<div class="projects">${list.map(p => { const s = span(p), ck = chkStats(p);
+    // Adresse als Titel (Strasse gross, PLZ/Ort darunter); ohne Adresse der Projektname
+    const [strasse, ...rest] = (p.ort || '').split(',').map(x => x.trim()).filter(Boolean);
+    return `
+    <div class="pcard pk2${p.abschluss ? '' : ktGlow(p)}" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
+      <div class="pk2-kopf"><b class="pk2-nr">${esc(p.nummer)}</b>
+        <div class="row" style="gap:4px">${artBadge(p)}${badge(p)}</div></div>
+      <div class="pk2-adr">${strasse ? esc(strasse) : esc(p.name)}</div>
+      <div class="pk2-ort">${rest.length ? esc(rest.join(', ')) : strasse ? '' : '<span class="muted">Adresse fehlt</span>'}</div>
+      ${strasse ? `<div class="pk2-name">${esc(p.name)}</div>` : ''}
+      <div class="pk2-luft"></div>
+      <div class="pk2-fuss">
+        <div class="pk2-zeile"><span>📅 ${s ? `${fmt(s.start)} – ${fmt(s.ende)}` : 'noch keine Termine'}</span>${freigabe(p).kritisch ? '<span class="tag-warn" style="margin:0">Freigabe fehlt</span>' : ''}</div>
+        ${p.abschluss ? `<div class="pk2-zeile"><span>Erlös <b>${ktChf(p.abschluss.vk)}</b></span><span>DB <b class="${p.abschluss.vk - p.abschluss.cost >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(p.abschluss.vk - p.abschluss.cost)} (${ktPct(p.abschluss.dbPct)})</b></span></div>
+          <div class="muted klein">abgeschlossen ${fmt(p.abschluss.date)}</div>` : `
+        <div class="pk2-zeile"><span>Checkliste ${ck.done}/${ck.total}</span><b>${ck.pct}%</b></div>
+        <div class="progress"><div style="width:${ck.pct}%"></div></div>
+        ${ktKarte(p)}`}
+      </div>
     </div>`; }).join('')}</div>`
     : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
 }
@@ -2002,8 +2031,7 @@ function viewProjekt(p) {
     <button class="sec sm" onclick="nav('projekte')">← Alle Projekte</button>
     <div class="row">
       ${p.abschluss ? '' : `<button class="sec" onclick="ktAbschlussDialog('${p.id}')">✓ Projekt abschliessen</button>`}
-      <button class="sec ${einst ? 'aktiv-knopf' : ''}" onclick="ui.tab=${einst ? "'uebersicht'" : "'einstellungen'"};render()" title="Projektdaten, Kunde, Auftragsort und Gewerke">⚙ Projekt-Einstellungen</button>
-      <button onclick="pdf('${p.id}')">Terminplan als PDF</button>
+      <button class="sec ${einst ? 'aktiv-knopf' : ''}" onclick="ui.tab=${einst ? "'uebersicht'" : "'einstellungen'"};render()" title="Projektdaten, Kunde, Auftragsort, Produkte und Gewerke">⚙ Projekt-Einstellungen</button>
     </div>
   </div>
   <div class="card pk-kopf${p.abschluss ? '' : ktGlow(p)}" style="border-left:5px solid ${p.farbe}">
@@ -2025,13 +2053,148 @@ function viewProjekt(p) {
 }
 // ---------- Projekt-Einstellungen: Projektdaten und Gewerke ----------
 function viewEinstellungenProjekt(p) {
-  const t = ui.einst === 'gewerke' ? 'gewerke' : 'info';
+  const t = ['gewerke', 'produkte'].includes(ui.einst) ? ui.einst : 'info';
   return `<div class="card pk-einst-kopf">
-      <div><h3 style="margin:0">⚙ Projekt-Einstellungen</h3><span class="muted">Stammdaten und Beteiligte dieses Projekts</span></div>
-      <div class="seg">${[['info', 'Projektdaten'], ['gewerke', `Gewerke (${p.gewerke.length})`]].map(([k, l]) =>
+      <div><h3 style="margin:0">⚙ Projekt-Einstellungen</h3><span class="muted">Stammdaten, Produkte und Beteiligte dieses Projekts</span></div>
+      <div class="seg">${[['info', 'Projektdaten'], ['produkte', `Produkte (${produkte(p).filter(x => x.text.trim()).length})`], ['gewerke', `Gewerke (${p.gewerke.length})`]].map(([k, l]) =>
         `<button class="${t === k ? 'on' : ''}" onclick="ui.einst='${k}';render()">${l}</button>`).join('')}</div>
     </div>
-    ${t === 'gewerke' ? viewGewerke(p) : viewInfo(p)}`;
+    ${t === 'gewerke' ? viewGewerke(p) : t === 'produkte' ? viewProdukte(p) : viewInfo(p)}`;
+}
+
+// ---------- Produkte der Anlage ----------
+// einmal im Projekt erfassen; erscheinen in Zwischenabnahme und Abnahmeprotokoll (Punkt 1) und im IBN-Rapport.
+// Änderungen in den Protokollen fliessen ebenfalls hierher zurück.
+function produkte(p) {
+  if (!Array.isArray(p.produkte)) {
+    const quelle = p.zwischen?.gegenstand || p.abnahme?.gegenstand || S().abnahmeVorlage.gegenstand;
+    p.produkte = quelle.map(x => ({ text: x.text || '', hint: x.hint || '', detail: x.detail || '' }));
+  }
+  return p.produkte;
+}
+// Produkte in Punkt 1 beider Protokolle schreiben; Häkchen bleiben am gleichen Bauteil (bzw. an gleicher Stelle beim Umbenennen)
+function produkteSpiegeln(p) {
+  ['zwischen', 'abnahme'].forEach(k => {
+    const a = p[k];
+    if (!a) return;
+    const alt = a.gegenstand || [];
+    a.gegenstand = produkte(p).map((x, i) => ({ ...x, ok: !!(alt.find(y => gleicherText(y, x)) || alt[i] || {}).ok }));
+  });
+}
+const produkteGefuellt = p => produkte(p).filter(x => x.text.trim() && x.detail.trim());
+function viewProdukte(p) {
+  return `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Produkte der Anlage</h3>
+      <span class="muted klein">erscheinen im ${rapportName(p)}, in der Zwischenabnahme und im Abnahmeprotokoll</span></div>
+    <div class="muted klein" style="margin-bottom:8px">Links das Bauteil, rechts Hersteller, Typ, Anzahl usw. Leere Details bleiben im Protokoll eine Linie zum Ausfüllen.</div>
+    <div class="ab-liste" id="prod-liste">${produktZeilen(p)}</div>
+  </div>`;
+}
+function produktZeilen(p) {
+  return produkte(p).map((x, i) => `<div class="ab-pkt">
+      <input class="ab-text" value="${esc(x.text)}" placeholder="Bauteil" oninput="prodSet('${p.id}',${i},'text',this.value)">
+      <input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Hersteller, Typ, Anzahl')}" oninput="prodSet('${p.id}',${i},'detail',this.value)">
+      <button class="ck-btn" title="Produkt entfernen" onclick="prodSet('${p.id}',${i},'del')">✕</button></div>`).join('')
+    + `<button class="sec sm" onclick="prodSet('${p.id}',0,'add')">+ Produkt</button>`;
+}
+function prodSet(pid, i, op, v) {
+  const p = findP(pid), L = produkte(p);
+  if (op === 'del') L.splice(i, 1);
+  else if (op === 'add') L.push({ text: '', hint: '', detail: '' });
+  else L[i][op] = v;
+  produkteSpiegeln(p); save();
+  if (op !== 'del' && op !== 'add') return;
+  const box = $('prod-liste');
+  box.innerHTML = produktZeilen(p);
+  if (op === 'add') { const t = box.querySelectorAll('.ab-text'); t[t.length - 1].focus(); }
+}
+// ---------- Export: Checkliste (PDF / Excel) und Bemerkungen / Infos (PDF) ----------
+const dateiName = (art, p, endung) => `${art}_${p.nummer}_${p.name}`.replace(/[\\/:*?"<>|\s]+/g, '_') + '.' + endung;
+// Checkliste als flache Liste: Phasen-Zeilen und Punkte mit Ebene, Stand, Datum und Notiz
+function chkZeilen(p) {
+  const R = [];
+  parseCheckliste(p.checkliste).forEach(ph => {
+    R.push({ phase: true, text: ph.titel, stand: `${ph.items.filter(n => chkDone(p, n)).length} / ${ph.items.length}`, wichtig: ph.wichtig });
+    const walk = (n, lvl) => {
+      const st = p.chk[n.key] || {};
+      // Datum: bei Datumspunkten das eingetragene Datum, sonst wann abgehakt
+      R.push({ lvl, text: n.text + (n.oder ? ' (eines davon)' : ''), ok: chkDone(p, n), haupt: n.children.length > 0,
+        datum: n.datum && st.datum ? st.datum : st.ok && st.am ? st.am : '', notiz: st.notiz || '' });
+      n.children.forEach(c => walk(c, lvl + 1));
+    };
+    ph.items.forEach(n => walk(n, 0));
+  });
+  return R;
+}
+function chkPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), st = chkStats(p), R = chkZeilen(p), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const M = 14;
+  let y = pdfAaKopf(doc, p.nummer, [['Stand', fmt(todayIso())], ['Erledigt', `${st.done} / ${st.total} (${st.pct}%)`]], `Checkliste: ${p.name}`);
+  if (p.ort) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(90); doc.text(p.ort, M, y - 3); y += 3; }
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M, top: 16, bottom: 14 }, theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 1.6, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30, valign: 'middle' },
+    headStyles: { fillColor: [240, 239, 234], textColor: 30, fontStyle: 'bold' },
+    head: [['', 'Punkt', 'Datum', 'Notiz']],
+    body: R.map(r => r.phase
+      ? [{ content: `${r.text}${r.wichtig ? '  (vor Baustart)' : ''}     ${r.stand} erledigt`, colSpan: 4, styles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold', fontSize: 10 } }]
+      : ['', { content: r.text, styles: { cellPadding: { left: 1.6 + r.lvl * 5, right: 1.6, top: 1.6, bottom: 1.6 }, fontStyle: r.lvl === 0 ? 'bold' : 'normal', textColor: r.ok ? 120 : 30 } },
+        r.datum ? fmt(r.datum) : '', r.notiz]),
+    columnStyles: { 0: { cellWidth: 8 }, 2: { cellWidth: 22 }, 3: { cellWidth: 60 } },
+    didDrawCell: d => {
+      const r = R[d.row.index];
+      if (d.section === 'body' && d.column.index === 0 && r && !r.phase) pdfKaestchen(doc, d.cell.x + 2.4, d.cell.y + (d.cell.height - 3.2) / 2, r.ok);
+    }
+  });
+  doc.save(dateiName('Checkliste', p, 'pdf'));
+  toast('Checkliste als PDF gespeichert.');
+}
+// Bibliothek erst laden, wenn sie gebraucht wird (Excel)
+const skriptLaden = src => new Promise((ok, fehler) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fehler; document.head.appendChild(s); });
+async function chkExcel(pid) {
+  try { if (!window.XLSX) await skriptLaden('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'); }
+  catch (e) { return toast('Excel-Bibliothek nicht geladen (Internetverbindung?).'); }
+  const p = findP(pid), st = chkStats(p), R = chkZeilen(p);
+  const kopf = ['Phase', 'Punkt', 'Ebene', 'Erledigt', 'Datum', 'Notiz'];
+  const aoa = [[`Checkliste ${p.nummer} – ${p.name}`], [p.ort || ''], [`Stand ${fmt(todayIso())} · ${st.done} / ${st.total} Hauptpunkte erledigt (${st.pct}%)`], [], kopf];
+  let phase = '';
+  R.forEach(r => { if (r.phase) { phase = r.text; return; } aoa.push([phase, '    '.repeat(r.lvl) + r.text, r.lvl + 1, r.ok ? 'ja' : 'nein', r.datum ? fmt(r.datum) : '', r.notiz]); });
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 36 }, { wch: 52 }, { wch: 7 }, { wch: 9 }, { wch: 12 }, { wch: 50 }];
+  ws['!autofilter'] = { ref: `A5:F${aoa.length}` };
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Checkliste');
+  XLSX.writeFile(wb, dateiName('Checkliste', p, 'xlsx'));
+  toast('Checkliste als Excel gespeichert.');
+}
+function infosPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, M = 14, B = W - 2 * M;
+  let y = pdfAaKopf(doc, p.nummer, [['Stand', fmt(todayIso())]], `Bemerkungen / Infos: ${p.name}`);
+  y = pdfSpalten(doc, y, [['kunde', 'Kunde', kundeText(p)], ['objekt', 'Objekt', objektText(p)]]);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('Bemerkungen / Infos', M, y);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40);
+  y += 6;
+  const L = (p.infos || '').trim() ? pdfAbsatz(doc, p.infos, B) : ['(keine Bemerkungen erfasst)'];
+  L.forEach(l => { if (y > H - 18) { doc.addPage(); y = 18; } doc.text(l, M, y); y += 4.6; });
+  const prod = produkteGefuellt(p);
+  if (prod.length) {
+    y += 6; if (y > H - 40) { doc.addPage(); y = 18; }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('Produkte', M, y);
+    doc.autoTable({ startY: y + 2.5, margin: { left: M, right: M }, theme: 'grid',
+      styles: { fontSize: 9.5, cellPadding: 1.8, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30 },
+      headStyles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold' },
+      head: [['Bauteil', 'Hersteller, Typ, Anzahl']], body: prod.map(x => [x.text, x.detail]), columnStyles: { 0: { cellWidth: 62, fontStyle: 'bold' } } });
+  }
+  doc.save(dateiName('Infos', p, 'pdf'));
+  toast('Bemerkungen / Infos als PDF gespeichert.');
+}
+// Produkte als kurze Liste (Übersicht und IBN-Rapport)
+function produktListeHtml(p, leer) {
+  const L = produkteGefuellt(p);
+  return L.length ? `<div class="prod-liste">${L.map(x => `<div><b>${esc(x.text)}</b><span>${esc(x.detail)}</span></div>`).join('')}</div>` : leer;
 }
 
 // ---------- Dokumente eines Projekts an einem Ort ----------
@@ -2139,7 +2302,15 @@ function viewUebersicht(p) {
       ${offen || '<div class="empty" style="padding:14px">Alle Punkte bis Baustart sind erledigt. 🎉</div>'}
       <div style="margin-top:10px"><a href="#" onclick="event.preventDefault();ui.tab='checkliste';render()">Zur ganzen Checkliste →</a></div>
     </div>
-    ${dieseWoche(p)}
+    <div class="card">
+      <div class="ck-head"><h3 style="margin:0">Bemerkungen / Infos</h3>
+        <div class="row"><span class="muted klein">wird automatisch gespeichert</span><button class="sec sm" onclick="infosPdf('${p.id}')">📄 PDF</button></div></div>
+      <textarea class="ueb-infos" rows="8" placeholder="z.B. Schlüssel beim Hauswart, Zufahrt über Hinterhof, Kunde ab 17 Uhr erreichbar, Auflagen aus TAG / IA …"
+        oninput="findP('${p.id}').infos=this.value;save()">${esc(p.infos || '')}</textarea>
+      <div class="ck-head" style="margin:14px 0 6px"><b>Produkte</b>
+        <a href="#" onclick="event.preventDefault();ui.tab='einstellungen';ui.einst='produkte';render()">bearbeiten →</a></div>
+      ${produktListeHtml(p, `<div class="muted klein">Noch keine Produkte erfasst. <a href="#" onclick="event.preventDefault();ui.tab='einstellungen';ui.einst='produkte';render()">Jetzt erfassen →</a></div>`)}
+    </div>
   </div>
   <div class="ueb-grid ueb-eins">
     <div class="card">
@@ -2152,7 +2323,6 @@ function viewUebersicht(p) {
       <div style="margin-top:10px"><label>Person hinzufügen</label>${kontaktPicker('personHinzu', { platzhalter: 'Aus Kontakten (CRM) suchen …' })}</div>
     </div>
   </div>
-  ${ktUebersicht(p)}
   <div class="card">
     <div class="ck-head"><h3 style="margin:0">Terminplan</h3>
       <div class="row"><button class="sec sm" onclick="pdf('${p.id}')">PDF (A3)</button><button class="sm" onclick="ui.tab='termine';ui.ganttScroll=true;render()">Zum Terminplan →</button></div></div>
@@ -2222,6 +2392,8 @@ function viewCheckliste(p) {
         <button class="sec sm" onclick="chkAlleZu('${p.id}',false)">Alle aufklappen</button>
         <button class="sec sm" onclick="chkAlleZu('${p.id}',true)">Alle zuklappen</button>
         <button class="sec sm" onclick="chkEditor('${p.id}')">Checkliste anpassen</button>
+        <button class="sm" onclick="chkPdf('${p.id}')">📄 PDF</button>
+        <button class="sm" onclick="chkExcel('${p.id}')">📊 Excel</button>
       </div>
     </div>
     <div class="progress" style="height:10px"><div style="width:${pct}%"></div></div>
@@ -2283,7 +2455,51 @@ function funken(el, anzahl) {
     f.addEventListener('animationend', () => f.remove());
   }
 }
-function chkDatum(pid, i, v) { const p = findP(pid); chkState(p, i).datum = v; save(); render(); }
+function chkDatum(pid, i, v) { const p = findP(pid); chkState(p, i).datum = v; if (chkKeys[i].datum) serviceTermin(p, v, undefined, 'chk'); save(); render(); }
+
+// ---------- Service-Auftrag: Datum aus Checkliste oder Service-Rapport plant den Einsatz im Terminplan ----------
+// Nur bei Service-Aufträgen. Der Termin bleibt danach im Terminplan frei anpassbar (z.B. länger);
+// ein neues Datum verschiebt ihn mit gleicher Dauer. Checkliste, Rapport und Terminplan zeigen immer dasselbe Datum.
+function serviceDatumKnoten(p) {
+  let f = null;
+  const w = n => { if (!f && n.datum) f = n; n.children.forEach(w); };
+  parseCheckliste(p.checkliste).forEach(ph => ph.items.forEach(w));
+  return f;
+}
+function serviceGewerk(p) {
+  const G = p.gewerke.map(x => gewerk(p, x.id));
+  return G.find(g => /service/i.test(g.name)) || G.find(g => /ibn/i.test(g.name)) || G.find(g => g.eigen) || G[0];
+}
+// quelle: 'chk' (Checkliste), 'ibn' (Rapport) – die jeweils andere wird nachgeführt
+function serviceTermin(p, datum, zeit, quelle) {
+  if (projektArt(p) !== 'service' || !datum) return;
+  let t = p.termine.find(x => x.auto === 'service');
+  if (!t) {
+    const g = serviceGewerk(p);
+    if (!g) return;
+    t = { id: uid(), gewerkId: g.id, titel: 'Service-Einsatz', start: datum, ende: datum, bemerkung: 'aus Checkliste / Service-Rapport', meilenstein: false,
+      pl: false, plZeit: '', zeitVon: zeit || '', zeitBis: '', nach: '', abstand: 0, auto: 'service' };
+    p.termine.push(t);
+    toast(`Service-Einsatz am ${fmt(datum)} im Terminplan eingetragen.`);
+  } else {
+    if (t.start !== datum) { const dauer = diffDays(t.start, t.ende); t.start = datum; t.ende = isoOf(addDays(toDate(datum), dauer)); }
+    if (zeit != null) t.zeitVon = zeit;
+  }
+  if (quelle !== 'chk') { const n = serviceDatumKnoten(p); if (n) (p.chk[n.key] = p.chk[n.key] || {}).datum = datum; }
+  if (quelle !== 'ibn' && p.ibn) { p.ibn.termin = datum; if (zeit != null) p.ibn.zeit = zeit; }
+  verschiebeAbhaengige(p);
+}
+// bestehende Service-Aufträge mit Datum, aber ohne Einsatz im Terminplan: einmalig nachtragen
+function serviceTermineNachtragen() {
+  let n = 0;
+  state.projects.filter(p => projektArt(p) === 'service' && !p.abschluss && !p.svcTermin).forEach(p => {
+    p.svcTermin = true;
+    if (p.termine.some(x => x.auto === 'service')) return;
+    const k = serviceDatumKnoten(p), datum = p.ibn?.termin || (k && p.chk[k.key]?.datum);
+    if (datum && !p.termine.length) { serviceTermin(p, datum, p.ibn?.zeit || undefined, 'nachtrag'); n++; }
+  });
+  return n;
+}
 // Punkt (mit seinen Unterpunkten) nur aus diesem Projekt entfernen; Vorlage und andere Projekte bleiben unverändert
 function chkLoeschen(pid, i) {
   const p = findP(pid), n = chkKeys[i];
@@ -2487,6 +2703,9 @@ function ibnDialog(pid) {
     <div class="aa-schalter"><span class="muted">Im Dokument:</span>${[['mitElektriker', 'Spalte Elektriker'], ['mitPendent', 'Pendente Arbeiten'], ['stunden', 'Stundenrapport']].map(([k, l]) =>
       `<label class="aa-std"><input type="checkbox" ${r[k] ? 'checked' : ''} onchange="findP(ibnPid).ibn.${k}=this.checked;save();ibnDialog(ibnPid)"> ${l}</label>`).join('')}</div>
     <div class="aa-3 ${r.mitElektriker ? '' : 'aa-2sp'}">${spalte('kunde', 'Kunde', 'Name, Adresse, E-Mail, Telefon')}${spalte('objekt', 'Objekt', 'Adresse der Anlage')}${r.mitElektriker ? spalte('elektriker', 'Elektriker', 'Firma, Name, Telefon') : ''}</div>
+    <h4 class="aa-h">Anlage <span class="muted">– aus den Produkten des Projekts</span></h4>
+    ${produktListeHtml(p, '<div class="muted klein">Noch keine Produkte mit Details erfasst – erscheint dann hier und im PDF.</div>')}
+    <div style="margin:4px 0 6px"><a href="#" onclick="event.preventDefault();$('dlg').close();ui.tab='einstellungen';ui.einst='produkte';nav('projekt/${p.id}')">Produkte bearbeiten →</a></div>
     <h4 class="aa-h">Auszuführende Arbeiten <span class="muted">– was der Monteur erledigen muss</span></h4>
     ${ta('arbeiten', 5, '- IBN und Einbindung …\n- …')}
     <h4 class="aa-h">Hinweise für den Monteur <span class="muted">– optional, z.B. Auflagen aus TAG / IA</span></h4>
@@ -2518,7 +2737,10 @@ function aaStundenHtml() {
     <div class="muted" style="font-size:12px;margin-top:4px">füllt der Monteur aus</div>`;
 }
 function ibnSet(el) {
-  findP(ibnPid).ibn[el.dataset.f] = el.value;
+  const p = findP(ibnPid), f = el.dataset.f;
+  p.ibn[f] = el.value;
+  // Service-Rapport: Termin und Zeit planen den Einsatz im Terminplan
+  if (f === 'termin' || f === 'zeit') serviceTermin(p, p.ibn.termin, p.ibn.zeit, 'ibn');
   save();
 }
 function aaVorlageLaden() {
@@ -2581,6 +2803,8 @@ function ibnPdf(pid) {
     absatz(text, B).forEach(l => { platz(5); doc.text(l, M, y); y += 4.4; });
     y += 5;
   };
+  const prod = produkteGefuellt(p);
+  if (prod.length) abschnitt('Anlage', prod.map(x => `${x.text}: ${x.detail}`).join('\n'));
   abschnitt('Auszuführende Arbeiten', r.arbeiten);
   if ((r.hinweise || '').trim()) abschnitt('Hinweise für den Monteur', r.hinweise);
   // Pendente Arbeiten: Bekanntes eingetragen, darunter Linien, auf denen der Monteur Offenes notiert
@@ -2663,7 +2887,7 @@ function abnahmeDefaults(p, art = 'abnahme') {
   return { v: 1, datum: '', zeit: '', titel: projektArt(p) === 'batterie' ? 'Batteriespeicher' : v.titel,
     kunde: kundeText(p), objekt: objektText(p), ersteller: [S().firma, S().name, S().telefon].filter(Boolean).join('\n'),
     // Punkt 1 vom anderen Protokoll übernehmen; die Abnahme übernimmt zudem die Häkchen der Funktionsprüfung aus der Zwischenabnahme
-    gegenstand: anderesProtokoll(p, art)?.gegenstand ? vorlageKopie(anderesProtokoll(p, art).gegenstand) : v.gegenstand,
+    gegenstand: anderesProtokoll(p, art)?.gegenstand ? vorlageKopie(anderesProtokoll(p, art).gegenstand) : produkte(p).map(x => ({ ...x, ok: false })),
     pruefung: art === 'abnahme' && p.zwischen ? v.pruefung.map(x => ({ ...x, ok: p.zwischen.pruefung.some(z => z.ok && gleicherText(z, x)) })) : v.pruefung,
     erklaerung: art === 'zwischen' ? (v.erklaerungZwischen || ERKLAERUNG_ZWISCHEN) : v.erklaerung,
     maengelZeilen: 5, maengelListe: [] };
@@ -2741,7 +2965,12 @@ function abL(ctx, key, op, i, v) {
   if (op === 'del') L.splice(i, 1);
   else if (op === 'add') L.push({ text: '', hint: '', detail: '', ok: false });
   else L[i][op] = v;
-  if (ctx === 'r') protokolleAbgleichen(findP(abPid), abArt);
+  if (ctx === 'r') {
+    const p = findP(abPid);
+    // Punkt 1 im Protokoll geändert: zurück in die Produkte des Projekts (und von dort ins andere Protokoll)
+    if (key === 'gegenstand') p.produkte = p[abArt].gegenstand.map(({ text, hint, detail }) => ({ text: text || '', hint: hint || '', detail: detail || '' }));
+    protokolleAbgleichen(p, abArt);
+  }
   save();
   if (op !== 'del' && op !== 'add') return;
   const box = docBereich(ctx).querySelector('#ab-' + key);
@@ -2752,7 +2981,8 @@ const zwischenDialog = pid => abnahmeDialog(pid, 'zwischen');
 const zwischenPdf = pid => abnahmePdf(pid, 'zwischen');
 function abnahmeDialog(pid, art = 'abnahme') {
   const p = findP(pid), d = $('dlg'), T = AB_ARTEN[art];
-  if (!p[art]) { p[art] = abnahmeDefaults(p, art); save(); }
+  if (!p[art]) p[art] = abnahmeDefaults(p, art);
+  produkteSpiegeln(p); save(); // Produkte aus den Projekt-Einstellungen übernehmen
   abPid = pid; abArt = art;
   const a = p[art];
   if (!Array.isArray(a.maengelListe)) a.maengelListe = [];
@@ -2808,7 +3038,8 @@ function abSet(el) { findP(abPid)[abArt][el.dataset.a] = el.value; save(); }
 function abnahmePdf(pid, art = 'abnahme') {
   if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
   const p = findP(pid), T = AB_ARTEN[art];
-  if (!p[art]) { p[art] = abnahmeDefaults(p, art); save(); }
+  if (!p[art]) p[art] = abnahmeDefaults(p, art);
+  produkteSpiegeln(p); save();
   const a = p[art], E = abEintraege(a), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const W = 210, H = 297, M = 14, B = W - 2 * M;
   let y = pdfAaKopf(doc, p.nummer, [['Datum', a.datum ? fmt(a.datum) : ''], ['Zeit', a.zeit ? a.zeit + ' Uhr' : '']], `${T.name}: ${a.titel || ''}`);
@@ -3353,6 +3584,7 @@ function viewTermine(p) {
       <div class="row">
         <div class="seg"><button class="${ui.zoom !== 'woche' ? 'on' : ''}" onclick="ui.zoom='tag';ui.ganttScroll=true;render()">Tage</button><button class="${ui.zoom === 'woche' ? 'on' : ''}" onclick="ui.zoom='woche';ui.ganttScroll=true;render()">Wochen</button></div>
         <button class="sec sm" onclick="ui.ganttScroll=true;render()">Heute</button>
+        ${termine.length ? `<button class="sm" onclick="pdf('${p.id}')">📄 PDF (A3)</button>` : ''}
       </div>
     </div>
     ${termine.length ? gantt(p, termine) : '<div class="empty">Noch keine Termine erfasst.</div>'}
@@ -3529,7 +3761,16 @@ function speichereTermin(pid) {
   if (!d.gewerkId) { toast('Bitte ein Gewerk aus der Liste wählen oder neu anlegen.'); return $('t-gw-suche').focus(); }
   if (!d.titel || !d.start || !d.ende) return toast('Bitte Tätigkeit, Start und Ende ausfüllen.');
   if (d.ende < d.start) return toast('Das Ende liegt vor dem Start.');
-  if (ui.editTermin) Object.assign(p.termine.find(x => x.id === ui.editTermin), d);
+  if (ui.editTermin) {
+    const t = p.termine.find(x => x.id === ui.editTermin);
+    Object.assign(t, d);
+    // Service-Einsatz im Terminplan verschoben: Datum und Zeit in Checkliste und Rapport nachführen
+    if (t.auto === 'service' && projektArt(p) === 'service') {
+      const n = serviceDatumKnoten(p);
+      if (n) (p.chk[n.key] = p.chk[n.key] || {}).datum = t.start;
+      if (p.ibn) { p.ibn.termin = t.start; if (t.zeitVon) p.ibn.zeit = t.zeitVon; }
+    }
+  }
   else p.termine.push({ id: uid(), ...d });
   const n = verschiebeAbhaengige(p);
   ui.editTermin = null; ui.formNr = (ui.formNr || 0) + 1; // Formular danach leeren
@@ -5632,6 +5873,7 @@ function cloudStart() {
     }
     cloudAbonnieren();
     document.body.classList.remove('gesperrt');
+    if (serviceTermineNachtragen()) save();
     render();
     ktErinnerung();
   });
