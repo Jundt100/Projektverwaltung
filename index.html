@@ -165,6 +165,30 @@
   .schalter.an::after { transform: translateX(18px); }
   .thema input { position: absolute; left: 0; top: 0; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
   .thema input:focus-visible + .schalter { outline: 2px solid var(--brand); outline-offset: 2px; }
+  /* Materialliste */
+  .mat-wahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 14px; }
+  .mat-wahl button { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; padding: 12px 14px; white-space: normal; height: auto; }
+  .mat-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; max-height: 58vh; overflow-y: auto; }
+  .mat-tab { width: 100%; min-width: 1160px; border-collapse: collapse; font-size: 13px; }
+  .mat-tab th { position: sticky; top: 0; z-index: 1; background: #f4f3ee; text-align: left; font-size: 12px; padding: 7px 6px; border-bottom: 1px solid var(--line); }
+  .mat-tab td { padding: 3px 4px; border-bottom: 1px solid #eef1f5; vertical-align: middle; }
+  .mat-tab input:not([type=checkbox]), .mat-tab select { width: 100%; min-width: 0; padding: 5px 7px; font-size: 13px; height: 30px; }
+  .mat-tab tr.mat-leer td input, .mat-tab tr.mat-leer td select { color: #8a8a82; }
+  .mat-tab tr.mat-leer td:nth-child(3) input { background: #fffdf3; }
+  .mat-abschnitt td { background: #2f3a2b; padding: 5px 6px; }
+  .mat-abschnitt input { background: transparent !important; border: none !important; color: #fff !important; font-weight: 700; font-size: 13.5px; }
+  .mat-abschnitt .ck-btn { color: #fff; }
+  .mat-hinweis td { color: var(--muted); font-style: italic; font-size: 12.5px; padding: 6px 8px; background: #fbfaf5; }
+  .mat-prot { display: flex; align-items: center; gap: 6px; }
+  .mat-prot input { flex: none; width: 17px; height: 17px; }
+  .mat-chip { font-size: 12px; padding: 3px 9px; border-radius: 20px; background: #eceae3; }
+  select.mat-st-reserviert, .mat-chip.mat-st-reserviert { background: #fff3d6; }
+  select.mat-st-bestellt, .mat-chip.mat-st-bestellt { background: #e1ecfb; }
+  select.mat-st-geliefert, .mat-chip.mat-st-geliefert { background: #dff3e4; }
+  .bau-ab { margin-top: 14px; }
+  .bau-ab > label { font-size: 14.5px; font-weight: 700; color: var(--text); }
+  .bau-ab textarea { width: 100%; resize: vertical; line-height: 1.5; }
+  .mat-vtext { width: 100%; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; line-height: 1.5; }
   .pk-kpi { text-align: left; background: #f6f6f2; border: 1px solid transparent; border-radius: 14px; padding: 10px 14px; color: var(--text); display: flex; flex-direction: column; gap: 1px; cursor: pointer; }
   .pk-kpi:hover { border-color: var(--line); background: #fff; }
   .pk-kpi.aktiv { border-color: var(--ink, #18181b); background: #fff; }
@@ -1012,6 +1036,189 @@ const ABNAHME_VORLAGE = {
   erklaerung: 'Die Anlage wird in betriebsbereitem Zustand übernommen.'
 };
 const vorlageKopie = v => JSON.parse(JSON.stringify(v));
+// Materiallisten-Vorlagen je Montagesystem (aus «Vorlage-Klemmsysteme.xlsx»): # Abschnitt · ! Hinweis · Art.-Nr. | Bezeichnung
+const MATERIAL_VORLAGEN = [
+  { name: 'MFH Flachdach mit ABS', text: `# Montagematerial
+135723 | Abstützung hoch K2 Dome 6.10 Peak
+135724 | Abstützung tief K2 Dome 6.10 Peak
+135771 | Einlegemutter K2 M8
+135820 | Inbusschraube K2 M8x20 mm
+140750 | Schiene K2 BasicRail 22 5.95 m
+135923 | Schienenver. Set K2 D-/S-Dome
+135744 | Betonschraube K2 MultiMonti TX 7.5x40 mm
+135874 | Mittelklemme K2 MiniRail 30-50 mm
+135776 | Endklemme K2 MiniRail 30-50 mm
+135968 | Windabweiser K2 S-Dome 1448-1799 mm
+135938 | Selbstbohrschraube K2 SK 6x25 mm
+135909 | Schiene K2 CrossRail 36/160 4.4 m
+135843 | Kreuzverbinder-Set K2 Climber 36/50
+137390 | Kabel H1Z2Z2-K sw 1x6 mm2
+137391 | Kabel H1Z2Z2-K rt 1x6 mm2
+137393 | Kabel H07V-K gnge 1x16 mm2
+137394 | Stecker + Stäubli MC4 PV-KBT4-EVO2/6I-UR
+137395 | Stecker + Stäubli MC4 PV-KST4-EVO2/6I-UR
+137469 | Pflasterstein CB Classic 80x100x200 mm
+136605 | Trasse OBO RKS TFVZ 60x50x3000 mm
+136604 | Trasse OBO RKS TFVZ 35x50x3000 mm
+136458 | Deckel gelocht OBO AZDMD BVZ 53x3000 mm
+140903 | PV-Modul AIKO Neostar 2P A470-MAH54Mw G2
+# Blitzschutzmaterial
+137372 | Aludraht Flury 8 mm
+135749 | Blitzschutzklemme K2 Multi Halbteil
+! Wenn Blitzschutz aus Kupfer besteht dann auch diese Klemmen dazu reservieren
+137377 | Kontaktklemme Dehn Inox M8x35 6-10mm
+# Zusätzliches Material` },
+  { name: 'EFH Schrägdach Klemmsystem mit Schneefangsystem', text: `# Montagematerial
+140903 | PV-Modul AIKO Neostar 2P A470-MAH54Mw G2
+136158 | GAK Taru 1 IN/1 OUT 2 MPPT 2ÜS MC4 1.1 kV
+135843 | Kreuzverbinder-Set K2 Climber 36/50
+135759 | Dachhakenschraube K2 TX 8x120 mm
+135760 | Dachhakenschraube K2 TX 8x160 mm
+135756 | Dachhaken K2 SingleHook 3S
+140748 | Schiene K2 SingleRail 36 5.95 m
+135925 | Schienenver. Set K2 SingleRail 36
+136040 | XS-Mittelklemme K2 sw 30-33 mm
+135779 | Endklemme K2 Standard sw 30-31 mm
+135720 | Abdeckkappe K2 Cross-/SingleRail 36
+137390 | Kabel H1Z2Z2-K sw 1x6 mm2
+137391 | Kabel H1Z2Z2-K rt 1x6 mm2
+137393 | Kabel H07V-K gnge 1x16 mm2
+137394 | Stecker + Stäubli MC4 PV-KBT4-EVO2/6I-UR
+137395 | Stecker + Stäubli MC4 PV-KST4-EVO2/6I-UR
+! Wenn Schneefang auf die UK montiert wird
+135820 | Inbusschraube K2 M8x20 mm
+135829 | Karosseriescheibe K2 8.4x30x1.5 mm
+135771 | Einlegemutter K2 M8
+136560 | Pot schien Grau Innen
+136561 | Pot Schiene Grau aussen
+# Zusätzliches Material` },
+  { name: 'EFH Schrägdach Einlegesystem', text: `# Montagematerial
+135754 | Dachhaken K2 CrossHook 3S+
+135817 | Hammerkopfschraube K2 M10x30 mm
+135943 | Sperrzahnmutter K2 M10
+135760 | Dachhakenschraube K2 TX8x160 mm
+135763 | Dachhakenschraube K2 TX8x50 mm
+140747 | Schiene K2 SolidRail Light 37 5.95 m
+135927 | Schienenver. Set K2 SolidRail
+135773 | Einlegesch. K2 Insertion Rail 30 sw 5.4 m
+135841 | Kreuzverbinder K2 Insertion Rail
+135721 | Abdeckkappe K2 SolidRail Light
+135785 | Erdungsklemme K2 Terragrif S
+135902 | Randanschlag K2 Insertion Rail sw
+135937 | Seitlicher Anschlag K2 Insertion Rail
+135775 | Einlegeschienenver. K2 Insertion Rail
+139858 | PV-Modul LONGi Hi-MOX6 S LR5-54HTH-445M
+! Wenn Schneefang auf die UK montiert wird
+135820 | Inbusschraube K2 M8x20 mm
+135829 | Karosseriescheibe K2 8.4x30x1.5 mm
+135771 | Einlegemutter K2 M8
+# Zusätzliches Material` },
+  { name: 'Gewerbe Flachdach mit PE-Platten', text: `# Montagematerial
+135831 | Basisplatte K2 600x800 mm
+141077 | PV-Modul Jinko Ti. N JKM450N-54HL4R-V BF
+137394 | Stecker+ Stäubli MC4 PV-KBT4-EVO2/6I-UR
+137395 | Stecker- Stäubli MC4 PV-KST4-EVO2/6I-UR
+137390 | Kabel H1Z2Z2-K sw 1x6mm2
+137391 | Kabel H1Z2Z2-K rt 1x6mm2
+137393 | Kabel H07V-K gnge 1x16mm2
+136197 | Kabelbinder-Clip Novotegra 1-3 mm
+140289 | Kabelbinder Ty-Met Ball-Lock YLS4.6-200A
+136613 | Trasse OBO RKSM TFVZ 60x100x3050 mm
+136459 | Deckel gelocht OBO DRL DD BVZ 100x3000 mm
+136605 | Trasse OBO RKS TFVZ 60x50x3000 mm
+136458 | Deckel gelocht OBO AZDMD BVZ 53x3000 mm
+135968 | Windabweiser K2 S-Dome 1448-1799 mm
+140918 | Komm. Schnittstelle Huawei Dongle A05Wla
+135723 | Abstützung hoch K2 Dome 6.10 Peak
+135724 | Abstützung tief K2 Dome 6.10 SD
+135820 | Inbusschraube K2 M8x20 mm
+135909 | Schiene K2 CrossRail 36/160 4.4 m
+135843 | Kreuzverbinder-Set K2 Climber 36/50
+135771 | Einlegemutter K2 M8
+136560 | Potentialausgleichsschiene OBO gr
+140750 | Schiene K2 BasicRail 22 5.95 m
+# Blitzschutzmaterial
+137372 | Aludraht Flury 8 mm
+135749 | Blitzschutzklemme K2 Multi Halbteil
+# Multi Monti Material
+137473 | Schwerlaststein CB VS 5 108x300x300 mm
+135744 | Betonschraube K2 MultiMonti TX7.5x40 mm
+137469 | Pflasterstein CB Classic 80x100x200 mm
+# Zusätzliches Material` },
+  { name: 'Flachdach mit Multi Monti', text: `# Montagematerial
+140903 | PV-Modul AIKO Neostar 2P A470-MAH54Mw G2
+200191 | Hateway CKE PV Manager Connect 2
+135723 | Abstützung hoch K2 Dome 6.10 Peak
+135724 | Abstützung tief K2 Dome 6.10 SD
+140750 | Schiene K2 BasicRail 22 5.95 m
+135874 | Mittelklemme K2 MiniRail 30-50 mm
+135776 | Endklemme K2 MiniRail 30-50 mm
+137390 | Kabel H1Z2Z2-K sw 1x6mm2
+137391 | Kabel H1Z2Z2-K rt 1x6mm2
+137393 | Kabel H07V-K gnge 1x16mm2
+137394 | Stecker + Stäubli MC4 PV-KBT4-EVO2/6I-UR
+137395 | Stecker + Stäubli MC4 PV-KST4-EVO2/6I-UR
+135771 | Einlegemutter K2 M8
+135820 | Inbusschraube K2 M8x20 mm
+135923 | Schienenver. Set K2 D-/S-Dome
+135968 | Windabweiser K2 S-Dome 1448-1799 mm
+135938 | Selbstbohrschraube K2 SK6x25 mm
+135843 | Kreuzverbinder-Set K2 Climber 36/50
+136604 | Trasse OBO RKS TFVZ 35x50x3000 mm
+136458 | Deckel gelocht OBO AZDMD BVZ 53x3000 mm
+135909 | Schiene K2 CrossRail 36/160 4.4 m
+# Blitzschutzmaterial
+137372 | Aludraht Flury 8 mm
+135749 | Blitzschutzklemme K2 Multi Halbteil
+# Multi Monti Material
+137469 | Pflasterstein CB Classic 80x100x200 mm
+135744 | Betonschraube K2 MultiMonti TX7.5x40 mm
+# Zusätzliches Material` },
+  { name: 'Flachdach mit Sun Ballast 11°.2 KG 44', text: `# Montagematerial
+135723 | Abstützung hoch K2 Dome 6.10 Peak
+135771 | Einlegemutter K2 M8
+2001729 | Zylinderkopfschraube mit Sperrverzahnung M8x20
+135724 | Abstützung tief K2 Dome 6.10 SD
+140750 | Schiene K2 BasicRail 22 5.95 m
+135874 | Mittelklemme K2 MiniRail 30-50 mm
+135776 | Endklemme K2 MiniRail 30-50 mm
+PV-Modul Jinko Tiger Neo JKM445N54HL4R-V
+Huawei SUN2000-40KTL-M3
+EB-Sicherungselement D II 25A 1LN m PPK
+AP-NH-Lasttrennschalter DIN 00 160A SILAS S00R
+Kabel FE05 Cca hf 5x16
+Kabel FE05 Cca hf 5x6
+Kabel FE05 Cca hf 5x2.5
+Kabel FE05 Cca hf 3x1.5
+AP-Anlageschalter ETN 63/500 4L 0-1, N-vorauseilend
+Teltonika Router inkl. SIM Karte komplett M+A+IBN
+Schwachstrom-Ltg -8 adrig -10m Decke UP/HD Wand UP/AP
+# Trasse/Kabelkanal Material
+Kanal Is hf LFH 110x60 Formstücke/RA Ausschnitte
+Kabelkanal s-verz -0.9 -600x60 Ausleger, Deckenstütze -500 Formstücke/RA Zubehör
+Kabelkanal s-verz -0.9 -300x60 Ausleger, Deckenstütze -500 Formstücke/RA Zubehör
+# Ballastierungs Material
+135744 | Betonschraube K2 MultiMonti TX7.5x40 mm
+Sunballast Steine 11°.2 KG 44
+# Zusätzliches Material` },
+  { name: 'Flachdach mit Tapezblech, Stossofen', text: `# Montagematerial
+135771 | Einlegemutter K2 M8
+135820 | Inbusschraube K2 M8x20 mm
+135829 | Karosseriescheibe K2 8.4x30x1.5 mm
+Sungrow SG125CX-P2
+136197 | Kabelbinder-Clip Novotegra 1-3 mm
+136461 | Deckel gelocht OBO DRL DD BVZ 300x3000 mm
+136462 | Deckel gelocht OBO DRL DD BVZ 400x3000 mm
+136615 | Trasse OBO RKSM TFVZ 60x300x3050 mm
+136616 | Trasse OBO RKSM TFVZ 60x400x3050 mm
+136716 | Installationsrohr Plica UV-Flex sw M32
+137393 | Kabel H07V-K gnge 1x16 mm2
+137394 | Stecker+ Stäubli MC4 PV-KBT4-EVO2/6I-UR
+137395 | Stecker- Stäubli MC4 PV-KST4-EVO2/6I-UR
+140197 | Trasse OBO RKSM TFVZ 60x600x3050 mm
+140198 | Deckel gelocht OBO DRL DD BVZ 600x3000 mm
+# Zusätzliches Material` }
+];
 const rapVorlage = art => S().rapportVorlagen[art];
 
 // Anfrage ans Meldewesen (TAG / IA und IBN)
@@ -1234,6 +1441,8 @@ function migrate(d) {
     if (typeof d.settings.rapportVorlagen[art][k] !== 'boolean') d.settings.rapportVorlagen[art][k] = std[k];
   }));
   if (!d.settings.abnahmeVorlage) d.settings.abnahmeVorlage = vorlageKopie(ABNAHME_VORLAGE);
+  // uid() ist hier noch nicht definiert (migrate läuft schon beim Laden)
+  if (!Array.isArray(d.settings.materialVorlagen)) d.settings.materialVorlagen = MATERIAL_VORLAGEN.map((v, i) => ({ id: 'mv' + i + Math.random().toString(36).slice(2, 7), ...v }));
   d.settings.checklisteService = d.settings.checklisteService.replace(/^IBN-Rapport erstellt/m, 'Service-Rapport erstellt');
   if (!Array.isArray(d.settings.mailvorlagen)) d.settings.mailvorlagen = MAIL_VORLAGEN.map(m => ({ ...m }));
   // Version 3: ältere Checklisten bekommen Mail-/Dokument-Verknüpfungen und "vor Baustart"-Markierungen der Standardvorlage,
@@ -2209,12 +2418,15 @@ function viewProdukte(p) {
 function produktZeilen(p) {
   return produkte(p).map((x, i) => `<div class="ab-pkt">
       <input class="ab-text" value="${esc(x.text)}" placeholder="Bauteil" oninput="prodSet('${p.id}',${i},'text',this.value)">
-      <input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Hersteller, Typ, Anzahl')}" oninput="prodSet('${p.id}',${i},'detail',this.value)">
+      ${x.mat ? `<input class="ab-detail" value="${esc(x.detail)}" readonly title="Kommt aus der Materialliste – dort Menge ändern oder Häkchen «→ Protokolle» entfernen" onclick="materialDialog('${p.id}')" style="cursor:pointer;background:#f4f8f1">`
+        : `<input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Hersteller, Typ, Anzahl')}" oninput="prodSet('${p.id}',${i},'detail',this.value)">`}
       <button class="ck-btn" title="Produkt entfernen" onclick="prodSet('${p.id}',${i},'del')">✕</button></div>`).join('')
     + `<button class="sec sm" onclick="prodSet('${p.id}',0,'add')">+ Produkt</button>`;
 }
 function prodSet(pid, i, op, v) {
   const p = findP(pid), L = produkte(p);
+  // Produkt aus der Materialliste entfernt: dort das Häkchen «→ Protokolle» ebenfalls wegnehmen
+  if (op === 'del' && L[i].mat) { const z = (p.material?.zeilen || []).find(x => x.id === L[i].mat); if (z) z.prot = false; }
   if (op === 'del') L.splice(i, 1);
   else if (op === 'add') L.push({ text: '', hint: '', detail: '' });
   else L[i][op] = v;
@@ -2224,6 +2436,324 @@ function prodSet(pid, i, op, v) {
   box.innerHTML = produktZeilen(p);
   if (op === 'add') { const t = box.querySelectorAll('.ab-text'); t[t.length - 1].focus(); }
 }
+// ---------- Materialliste (Dokument) ----------
+// Start mit einer Vorlage je Montagesystem (Einstellungen › Dokumente › Materiallisten). Pro Artikel: Menge, Wo (Lager / Lieferant),
+// Status, Datum bestellt/reserviert und Lieferung. Angehakte Artikel («→ Protokolle») erscheinen beim gewählten Bauteil in den Produkten
+// und damit in Zwischenabnahme, Abnahmeprotokoll und IBN-/Service-Rapport.
+const MAT_WO = ['Lager', 'Krannich', 'Solar Markt', 'Häuselmann', 'Contec'];
+const MAT_STATUS = ['offen', 'reserviert', 'bestellt', 'geliefert'];
+const matVorlagen = () => S().materialVorlagen;
+function matParse(text) {
+  return String(text || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    if (l[0] === '#') return { typ: 'abschnitt', text: l.slice(1).trim() };
+    if (l[0] === '!') return { typ: 'hinweis', text: l.slice(1).trim() };
+    const m = l.match(/^([^|]*)\|(.*)$/);
+    return m ? { typ: 'artikel', nr: m[1].trim(), text: m[2].trim() } : { typ: 'artikel', nr: '', text: l };
+  });
+}
+const matZeile = (x = {}) => ({ id: uid(), typ: x.typ || 'artikel', nr: x.nr || '', text: x.text || '', menge: '', wo: '', status: '', bestellt: '', lieferung: '', prot: false, bauteil: '' });
+// alle bekannten Artikel (Vorlagen und Materiallisten der Projekte) für die Suche beim Hinzufügen
+function matKatalog() {
+  const m = new Map();
+  const add = x => { if (x.typ !== 'artikel' || !x.text.trim()) return; const k = x.nr ? 'n' + x.nr : 't' + x.text.trim().toLowerCase(); if (!m.has(k)) m.set(k, { nr: x.nr || '', text: x.text.trim() }); };
+  matVorlagen().forEach(v => matParse(v.text).forEach(add));
+  state.projects.forEach(p => (p.material?.zeilen || []).forEach(add));
+  return [...m.values()].sort((a, b) => a.text.localeCompare(b.text, 'de'));
+}
+const matArtikel = p => (p.material?.zeilen || []).filter(x => x.typ === 'artikel');
+const matBenoetigt = p => matArtikel(p).filter(x => String(x.menge).trim());
+function matStand(p) {
+  const L = matBenoetigt(p), n = s => L.filter(x => (x.status || 'offen') === s).length;
+  return { total: L.length, offen: n('offen'), reserviert: n('reserviert'), bestellt: n('bestellt'), geliefert: n('geliefert') };
+}
+// Bauteil (Zeile in den Produkten) aus der Bezeichnung erraten
+function matBauteilVorschlag(p, text) {
+  const t = text.toLowerCase(), B = produkte(p).map(x => x.text.trim()).filter(Boolean);
+  const regeln = [[/pv-modul|modul /, /modul/], [/batter|speicher|luna/, /batter|speicher/], [/wechselrichter|sun2000|sungrow|fronius|solaredge|kostal|sma /, /wechselrichter/],
+    [/ladestation|wallbox/, /lade/], [/kabel|stecker|mc4|sicherung|schalter|gak|trasse|kanal|deckel|rohr|potential|pot /, /verkabelung|kabel|absicherung/],
+    [/schiene|klemme|haken|abstützung|rail|schraube|basisplatte|mutter|stein|ballast|windabweiser|kreuzverbinder|anschlag|kappe|scheibe/, /unterkonstruktion|befestigung/]];
+  for (const [w, b] of regeln) if (w.test(t + ' ')) { const f = B.find(x => b.test(x.toLowerCase())); if (f) return f; }
+  return B[0] || 'Weitere Produkte';
+}
+const matDetail = x => { const m = String(x.menge || '').trim(); return [x.text.trim(), m ? (/^\d+([.,]\d+)?$/.test(m) ? m + ' Stk.' : m) : ''].filter(Boolean).join(', '); };
+// angehakte Artikel in die Produkte schreiben (je Artikel eine Zeile beim Bauteil; leere Bauteil-Zeile wird zuerst gefüllt)
+function materialSpiegeln(p) {
+  const L = produkte(p), Z = matArtikel(p).filter(x => x.prot && x.text.trim()), ids = new Set(Z.map(x => x.id));
+  const loesen = e => { const i = L.indexOf(e); if (L.some(y => y !== e && gleicherText(y, e))) L.splice(i, 1); else { e.detail = ''; delete e.mat; } };
+  L.filter(x => x.mat && !ids.has(x.mat)).forEach(loesen);
+  Z.forEach(z => {
+    const bt = z.bauteil || (z.bauteil = matBauteilVorschlag(p, z.text));
+    let e = L.find(x => x.mat === z.id);
+    if (e && !gleicherText(e, { text: bt })) { loesen(e); e = null; }
+    if (!e) {
+      e = L.find(x => !x.mat && gleicherText(x, { text: bt }) && !x.detail.trim());
+      if (!e) { e = { text: bt, hint: '', detail: '' }; let k = -1; L.forEach((y, j) => { if (gleicherText(y, e)) k = j; }); L.splice(k < 0 ? L.length : k + 1, 0, e); }
+      e.mat = z.id;
+    }
+    e.detail = matDetail(z);
+  });
+  produkteSpiegeln(p);
+}
+let matPid = null;
+function materialDialog(pid) {
+  const d = $('dlg');
+  matPid = pid;
+  d.style.width = 'min(1240px, calc(100vw - 24px))';
+  d.innerHTML = `<div id="mat">${matInhalt(findP(pid))}</div>`;
+  d.onkeydown = null;
+  if (!d.open) d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; d.innerHTML = ''; matPid = null; render(); }, { once: true });
+}
+const matNeuZeichnen = () => { const box = $('mat'); if (box) box.innerHTML = matInhalt(findP(matPid)); };
+function matInhalt(p) {
+  const kopf = (unter) => `<div class="bz-kopf"><div><div class="muted">${esc(p.nummer)} · ${esc(p.name)}</div><h2>Materialliste</h2>${unter}</div><span class="pnum">${esc(p.nummer)}</span></div>`;
+  if (!p.material) return `${kopf('<p class="muted" style="margin:0">Mit welcher Vorlage starten? Artikel kannst du danach entfernen, ergänzen und Mengen eintragen.</p>')}
+    <div class="mat-wahl">${matVorlagen().map(v => { const n = matParse(v.text).filter(x => x.typ === 'artikel').length;
+      return `<button class="sec" onclick="matStart('${v.id}')"><b>${esc(v.name)}</b><span class="muted klein">${n} Artikel</span></button>`; }).join('')}
+      <button class="sec" onclick="matStart('')"><b>Leere Liste</b><span class="muted klein">Artikel selbst zusammenstellen</span></button></div>
+    <div class="muted klein" style="margin-top:10px">Vorlagen anpassen: Einstellungen › Dokumente › Materiallisten.</div>
+    <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="sec" onclick="$('dlg').close()">Schliessen</button></div>`;
+  const st = matStand(p), prot = matArtikel(p).filter(x => x.prot).length;
+  const chips = st.total ? [['offen', st.offen], ['reserviert', st.reserviert], ['bestellt', st.bestellt], ['geliefert', st.geliefert]]
+    .map(([k, n]) => `<span class="mat-chip mat-st-${k}">${n} ${k}</span>`).join('') : '';
+  return `${kopf(`<div class="muted">${p.material.vorlage ? 'Vorlage: ' + esc(p.material.vorlage) + ' · ' : ''}${st.total} von ${matArtikel(p).length} Artikeln mit Menge${prot ? ` · ${prot} in den Protokollen` : ''}</div>`)}
+    <div class="row" style="margin:4px 0 10px">${chips}
+      ${st.offen ? `<button class="sec sm" style="margin-left:auto" onclick="matAlleBestellt()" title="Alle offenen Artikel mit Menge auf «bestellt» (heute) setzen">Alle offenen als bestellt markieren</button>` : ''}</div>
+    <div class="mat-scroll"><table class="mat-tab"><thead><tr><th style="width:84px">Art.-Nr.</th><th>Bezeichnung</th><th style="width:72px">Stk. / m</th><th style="width:122px">Wo?</th>
+      <th style="width:112px">Status</th><th style="width:132px">Bestellt / reserviert</th><th style="width:132px">Lieferung</th>
+      <th style="width:190px" title="Angehakte Artikel erscheinen in Zwischenabnahme, Abnahmeprotokoll und ${rapportName(p)}">→ Protokolle</th><th style="width:30px"></th></tr></thead>
+      <tbody>${p.material.zeilen.map(z => matZeileHtml(p, z)).join('')}</tbody></table></div>
+    <div class="row" style="margin-top:10px">
+      <input list="mat-kat" id="mat-suche" style="flex:1;min-width:220px" placeholder="+ Artikel hinzufügen: Art.-Nr. oder Bezeichnung suchen (oder eigenen Text) und Enter"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();matHinzu(this)}" onchange="if(this.value.includes(' | '))matHinzu(this)">
+      <datalist id="mat-kat">${matKatalog().map(k => `<option value="${esc(k.nr ? k.nr + ' | ' + k.text : k.text)}">`).join('')}</datalist>
+      <button class="sec sm" onclick="matHinzu($('mat-suche'))">Hinzufügen</button>
+      <button class="sec sm" onclick="matAbschnitt()">+ Abschnitt</button>
+    </div>
+    <div class="muted klein" style="margin-top:6px">Im PDF und Excel erscheinen nur Artikel mit Menge. «→ Protokolle» anhaken, was in Zwischenabnahme, Abnahme und ${rapportName(p)} stehen soll (z.B. Module, Wechselrichter).</div>
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <button class="danger sm" onclick="matNeuBeginnen()">Neu beginnen</button>
+      <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button class="sec" onclick="materialExcel('${p.id}')">Excel</button><button onclick="materialPdf('${p.id}')">Als PDF speichern</button></div>
+    </div>`;
+}
+function matZeileHtml(p, z) {
+  const del = `<td><button class="ck-btn" title="Zeile entfernen" onclick="matSet('${z.id}','del')">✕</button></td>`;
+  if (z.typ === 'abschnitt') return `<tr class="mat-abschnitt"><td colspan="8"><input value="${esc(z.text)}" oninput="matSet('${z.id}','text',this.value)"></td>${del}</tr>`;
+  if (z.typ === 'hinweis') return `<tr class="mat-hinweis"><td colspan="8">ⓘ ${esc(z.text)}</td>${del}</tr>`;
+  const st = z.status || 'offen', B = [...new Set([...produkte(p).map(x => x.text.trim()).filter(Boolean), z.bauteil].filter(Boolean))];
+  const opt = (L, v, leer) => (leer ? `<option value="">${leer}</option>` : '') + L.map(x => `<option ${x === v ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  return `<tr class="${String(z.menge).trim() ? '' : 'mat-leer'}">
+    <td><input value="${esc(z.nr)}" placeholder="–" oninput="matSet('${z.id}','nr',this.value)"></td>
+    <td><input value="${esc(z.text)}" placeholder="Bezeichnung" oninput="matSet('${z.id}','text',this.value)"></td>
+    <td><input value="${esc(z.menge)}" inputmode="decimal" oninput="matSet('${z.id}','menge',this.value);this.closest('tr').classList.toggle('mat-leer',!this.value.trim())"></td>
+    <td><select onchange="matSet('${z.id}','wo',this.value)">${opt(MAT_WO, z.wo, '–')}</select></td>
+    <td><select class="mat-st-${st}" onchange="matSet('${z.id}','status',this.value)">${opt(MAT_STATUS, st)}</select></td>
+    <td><input type="date" value="${esc(z.bestellt)}" onchange="matSet('${z.id}','bestellt',this.value)"></td>
+    <td><input type="date" value="${esc(z.lieferung)}" onchange="matSet('${z.id}','lieferung',this.value)"></td>
+    <td><div class="mat-prot"><input type="checkbox" ${z.prot ? 'checked' : ''} title="In Zwischenabnahme, Abnahme und Rapport übernehmen" onchange="matSet('${z.id}','prot',this.checked)">
+      ${z.prot ? `<select title="Bei welchem Bauteil?" onchange="matSet('${z.id}','bauteil',this.value)">${opt(B, z.bauteil)}</select>` : ''}</div></td>
+    ${del}</tr>`;
+}
+function matStart(vid) {
+  const p = findP(matPid), v = matVorlagen().find(x => x.id === vid);
+  p.material = { vorlage: v ? v.name : '', erstellt: todayIso(), zeilen: v ? matParse(v.text).map(matZeile) : [matZeile({ typ: 'abschnitt', text: 'Material' })] };
+  save(); matNeuZeichnen();
+}
+function matSet(id, k, v) {
+  const p = findP(matPid), Z = p.material.zeilen, i = Z.findIndex(x => x.id === id), z = Z[i];
+  if (!z) return;
+  let neu = true;
+  if (k === 'del') Z.splice(i, 1);
+  else {
+    z[k] = v;
+    neu = ['wo', 'status', 'prot', 'bauteil'].includes(k);
+    // Datum automatisch: reserviert/bestellt → heute bestellt, geliefert → heute Lieferung; Lager → reserviert
+    if (k === 'status' && v !== 'offen' && !z.bestellt) z.bestellt = todayIso();
+    if (k === 'status' && v === 'geliefert' && !z.lieferung) z.lieferung = todayIso();
+    if (k === 'wo' && v === 'Lager' && (z.status || 'offen') === 'offen') { z.status = 'reserviert'; if (!z.bestellt) z.bestellt = todayIso(); }
+    if (k === 'prot' && v && !z.bauteil) z.bauteil = matBauteilVorschlag(p, z.text);
+  }
+  if (k === 'del' || k === 'prot' || k === 'bauteil' || z.prot) materialSpiegeln(p);
+  save();
+  if (neu) matNeuZeichnen();
+}
+function matHinzu(el) {
+  const t = el.value.trim();
+  if (!t) return;
+  const p = findP(matPid), m = t.match(/^([^|]*)\|(.*)$/), kat = matKatalog();
+  const x = m ? { nr: m[1].trim(), text: m[2].trim() } : kat.find(k => k.nr === t || k.text.toLowerCase() === t.toLowerCase()) || { nr: '', text: t };
+  p.material.zeilen.push(matZeile(x));
+  save(); matNeuZeichnen();
+  const s = $('mat-suche'); if (s) s.focus();
+  const L = $('mat').querySelectorAll('.mat-tab tbody tr'); L[L.length - 1]?.scrollIntoView({ block: 'nearest' });
+}
+function matAbschnitt() {
+  const t = prompt('Name des Abschnitts', 'Zusätzliches Material');
+  if (!t) return;
+  findP(matPid).material.zeilen.push(matZeile({ typ: 'abschnitt', text: t.trim() }));
+  save(); matNeuZeichnen();
+}
+function matAlleBestellt() {
+  const p = findP(matPid);
+  matBenoetigt(p).filter(x => (x.status || 'offen') === 'offen').forEach(x => { x.status = 'bestellt'; if (!x.bestellt) x.bestellt = todayIso(); });
+  save(); matNeuZeichnen();
+}
+function matNeuBeginnen() {
+  if (!confirm('Materialliste löschen und mit einer Vorlage neu beginnen? Artikel in den Protokollen werden dort ebenfalls entfernt.')) return;
+  const p = findP(matPid);
+  p.material = null; materialSpiegeln(p); delete p.material;
+  save(); matNeuZeichnen();
+}
+// Export: nur Artikel mit Menge; Abschnitte und Hinweise nur, wenn danach ein solcher Artikel folgt
+function matExportZeilen(p) {
+  const R = []; let ab = null, hin = null;
+  (p.material?.zeilen || []).forEach(z => {
+    if (z.typ === 'abschnitt') { ab = z; hin = null; }
+    else if (z.typ === 'hinweis') hin = z;
+    else if (String(z.menge).trim()) { if (ab) R.push(ab); if (hin) R.push(hin); ab = hin = null; R.push(z); }
+  });
+  return R;
+}
+function materialPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid);
+  if (!p.material) return materialDialog(pid);
+  const R = matExportZeilen(p), st = matStand(p), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' }), M = 14;
+  let y = pdfAaKopf(doc, p.nummer, [['Stand', fmt(todayIso())], ['Artikel', st.total]], `Materialliste: ${p.name}`);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(90);
+  const unter = [p.ort, p.material.vorlage].filter(Boolean).join(' · ');
+  if (unter) { doc.text(unter, M, y - 3); y += 3; }
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M, top: 16, bottom: 14 }, theme: 'grid',
+    styles: { fontSize: 8.6, cellPadding: 1.5, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30, valign: 'middle' },
+    headStyles: { fillColor: [240, 239, 234], textColor: 30, fontStyle: 'bold' },
+    head: [['Art.-Nr.', 'Bezeichnung', 'Stk. / m', 'Wo?', 'Status', 'Bestellt', 'Lieferung']],
+    body: R.length ? R.map(z => z.typ === 'abschnitt' ? [{ content: z.text, colSpan: 7, styles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold', fontSize: 9.5 } }]
+      : z.typ === 'hinweis' ? [{ content: z.text, colSpan: 7, styles: { fontStyle: 'italic', textColor: 110 } }]
+      : [z.nr, z.text, z.menge, z.wo, z.status || 'offen', z.bestellt ? fmt(z.bestellt) : '', z.lieferung ? fmt(z.lieferung) : ''])
+      : [[{ content: 'Noch keine Mengen eingetragen.', colSpan: 7 }]],
+    columnStyles: { 0: { cellWidth: 17 }, 2: { cellWidth: 15, halign: 'right' }, 3: { cellWidth: 22 }, 4: { cellWidth: 18 }, 5: { cellWidth: 18 }, 6: { cellWidth: 18 } }
+  });
+  doc.save(dateiName('Materialliste', p, 'pdf'));
+  toast('Materialliste als PDF gespeichert.');
+}
+async function materialExcel(pid) {
+  try { if (!window.XLSX) await skriptLaden('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'); }
+  catch (e) { return toast('Excel-Bibliothek nicht geladen (Internetverbindung?).'); }
+  const p = findP(pid), R = matExportZeilen(p);
+  const aoa = [[`Materialliste ${p.nummer} – ${p.name}`], [[p.ort, p.material?.vorlage].filter(Boolean).join(' · ')], [`Stand ${fmt(todayIso())}`], [],
+    ['Art. Nr.', 'Bezeichnung', 'Stk. / m', 'WO ?', 'Status', 'Wann bestellt / reserviert', 'Lieferung']];
+  R.forEach(z => aoa.push(z.typ === 'artikel' ? [z.nr, z.text, /^\d+([.,]\d+)?$/.test(String(z.menge).trim()) ? Number(String(z.menge).replace(',', '.')) : z.menge, z.wo, z.status || 'offen',
+    z.bestellt ? fmt(z.bestellt) : '', z.lieferung ? fmt(z.lieferung) : ''] : [z.typ === 'hinweis' ? '  ' + z.text : z.text.toUpperCase()]));
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 10 }, { wch: 48 }, { wch: 9 }, { wch: 13 }, { wch: 11 }, { wch: 22 }, { wch: 12 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Materialliste');
+  XLSX.writeFile(wb, dateiName('Materialliste', p, 'xlsx'));
+  toast('Materialliste als Excel gespeichert.');
+}
+// Einstellungen › Dokumente › Materiallisten: Vorlagen als Text bearbeiten
+function viewMatVorlagen() {
+  const V = matVorlagen(), v = V.find(x => x.id === ui.matV) || V[0];
+  return `<div class="card">
+    <div class="ck-head"><h3 style="margin:0">Materiallisten-Vorlagen</h3><span class="muted klein">eine Vorlage je Montagesystem</span></div>
+    <p class="muted" style="margin-top:4px">Wird beim Erstellen einer Materialliste gewählt. Eine Zeile pro Artikel: <b>Art.-Nr. | Bezeichnung</b> (Art.-Nr. darf fehlen) ·
+      <b># Abschnitt</b> · <b>! Hinweis</b>. Änderungen gelten für neue Materiallisten.</p>
+    <div class="seg seg-breit" style="margin-bottom:12px">${V.map(x => `<button class="${x === v ? 'on' : ''}" onclick="ui.matV='${x.id}';render()">${esc(x.name)}</button>`).join('')}</div>
+    ${v ? `<div><label>Name</label><input value="${esc(v.name)}" onchange="matVSet('${v.id}','name',this.value)"></div>
+      <div style="margin-top:10px"><label>Artikel (${matParse(v.text).filter(x => x.typ === 'artikel').length})</label>
+        <textarea class="mat-vtext" rows="22" spellcheck="false" onchange="matVSet('${v.id}','text',this.value)">${esc(v.text)}</textarea></div>` : '<div class="empty">Keine Vorlage vorhanden.</div>'}
+    <div class="row" style="margin-top:14px;justify-content:space-between">
+      <div class="row"><button class="sec" onclick="matVNeu()">+ Neue Vorlage</button>${v ? `<button class="sec" onclick="matVNeu('${v.id}')">Kopieren</button>` : ''}</div>
+      <div class="row">${v ? `<button class="danger sm" onclick="matVSet('${v.id}','del')">Vorlage löschen</button>` : ''}
+        <button class="sec" onclick="if(confirm('Alle Materiallisten-Vorlagen auf den Stand der Excel-Vorlage zurücksetzen?')){S().materialVorlagen=MATERIAL_VORLAGEN.map(x=>({id:uid(),...x}));ui.matV='';save();render()}">Standard laden</button></div>
+    </div>
+  </div>`;
+}
+function matVSet(id, k, v) {
+  const V = matVorlagen(), i = V.findIndex(x => x.id === id);
+  if (k === 'del') { if (!confirm(`Vorlage «${V[i].name}» löschen?`)) return; V.splice(i, 1); ui.matV = ''; save(); return render(); }
+  V[i][k] = k === 'name' ? v.trim() || 'Ohne Name' : v;
+  save(); render(); toast('Vorlage gespeichert.');
+}
+function matVNeu(von) {
+  const q = matVorlagen().find(x => x.id === von), n = { id: uid(), name: q ? q.name + ' (Kopie)' : 'Neue Vorlage', text: q ? q.text : '# Montagematerial\n\n# Zusätzliches Material' };
+  matVorlagen().push(n); ui.matV = n.id; save(); render();
+}
+
+// ---------- Bauprotokoll (für den Chef): Verlauf und Probleme je Phase, selbst geschrieben; eine Zeile = ein Punkt ----------
+const BAU_ABSCHNITTE = [['planung', 'Planungsphase'], ['ausfuehrung', 'Ausführungsphase'], ['abschluss', 'Abschlussphase'], ['diverses', 'Diverses / Besonderes']];
+// Leitfragen und Beispiele: Verlauf und Probleme des Projekts in eigenen Worten
+const BAU_FRAGEN = {
+  planung: 'Wie lief die Planung? Was hat sich verzögert oder war unklar (Bewilligung, Statik, Material, Kunde)?',
+  ausfuehrung: 'Wie lief die Montage? Welche Probleme gab es auf der Baustelle (Wetter, Lieferung, Gewerke, Mehraufwand)?',
+  abschluss: 'Wie liefen IBN und Abnahme? Was war am Schluss noch offen oder schwierig?',
+  diverses: 'Was sollte der Chef sonst wissen? Was machen wir beim nächsten Projekt anders?' };
+const BAU_BEISPIEL = {
+  planung: 'z.B. Statik musste nachgereicht werden, Baustart 2 Wochen verschoben',
+  ausfuehrung: 'z.B. Module einen Tag zu spät geliefert, Montage ohne Mehrkosten nachgeholt',
+  abschluss: 'z.B. Abnahme ohne Mängel, Kunde sehr zufrieden',
+  diverses: 'z.B. Gerüstbauer künftig früher aufbieten' };
+const bauPunkte = t => String(t || '').split('\n').map(l => l.replace(/^\s*[•\-*]\s*/, '').trim()).filter(Boolean);
+let bauPid = null;
+function bauprotokollDialog(pid) {
+  const p = findP(pid), d = $('dlg');
+  if (!p.bauprotokoll) { p.bauprotokoll = { datum: todayIso(), planung: '', ausfuehrung: '', abschluss: '', diverses: '' }; save(); }
+  bauPid = pid;
+  const b = p.bauprotokoll;
+  d.style.width = 'min(820px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="bz">
+    <div class="bz-kopf"><div><div class="muted">${esc(p.name)}</div><h2>Bauprotokoll</h2><div class="muted">${esc([p.nummer, p.ort].filter(Boolean).join(', '))}</div></div><span class="pnum">${esc(p.nummer)}</span></div>
+    <div style="margin-bottom:6px"><label>Stand</label><input type="date" value="${esc(b.datum)}" onchange="bauSet('datum',this.value)"></div>
+    <div class="muted klein" style="margin-bottom:8px">Halte fest, wie das Projekt gelaufen ist und welche Probleme es in jeder Phase gab. Eine Zeile = ein Aufzählungspunkt. Leere Abschnitte erscheinen im PDF nicht.</div>
+    ${BAU_ABSCHNITTE.map(([k, l]) => `<div class="bau-ab"><label>${l}</label><div class="muted klein" style="margin:-2px 0 4px">${BAU_FRAGEN[k]}</div>
+      <textarea id="bau-${k}" rows="${Math.max(3, bauPunkte(b[k]).length + 1)}" placeholder="${BAU_BEISPIEL[k]}"
+        oninput="bauSet('${k}',this.value);this.rows=Math.max(3,this.value.split('\\n').length+1)">${esc(b[k])}</textarea></div>`).join('')}
+  </div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="danger sm" onclick="if(confirm('Bauprotokoll leeren?')){findP(bauPid).bauprotokoll=null;bauprotokollDialog(bauPid)}">Leeren</button>
+    <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button onclick="bauprotokollPdf(bauPid)">Als PDF speichern</button></div>
+  </div>`;
+  d.onkeydown = null;
+  if (!d.open) { d.showModal(); d.addEventListener('close', () => { d.style.width = ''; d.innerHTML = ''; render(); }, { once: true }); }
+}
+function bauSet(k, v) { findP(bauPid).bauprotokoll[k] = v; save(); }
+function bauprotokollPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid);
+  if (!p.bauprotokoll) return bauprotokollDialog(pid);
+  const b = p.bauprotokoll, { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const H = 297, M = 14, B = 210 - 2 * M;
+  let y = pdfAaKopf(doc, p.nummer, [['Projektleiter', S().name], ['Stand', fmt(b.datum || todayIso())]], 'Bauprotokoll');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...AA_TXT);
+  const zeile = doc.splitTextToSize([p.nummer, p.ort].filter(Boolean).join(', '), B);
+  doc.text(zeile, M, y - 4); y += zeile.length * 5.5;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(90);
+  doc.text(p.name, M, y - 3); y += 7;
+  const platz = h => { if (y + h > H - 16) { doc.addPage(); y = 20; } };
+  const A = BAU_ABSCHNITTE.filter(([k]) => bauPunkte(b[k]).length);
+  if (!A.length) { doc.setTextColor(120); doc.text('(noch keine Einträge)', M, y + 4); }
+  A.forEach(([k, l]) => {
+    platz(16);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text(l + ':', M, y);
+    doc.setDrawColor(215); doc.setLineWidth(0.3); doc.line(M, y + 1.8, M + B, y + 1.8);
+    y += 7.5;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(40);
+    bauPunkte(b[k]).forEach(t => {
+      const L = doc.splitTextToSize(t, B - 9);
+      platz(L.length * 4.8 + 1);
+      doc.setFillColor(...AA_TXT); doc.circle(M + 4, y - 1.2, 0.75, 'F');
+      doc.text(L, M + 8, y); y += L.length * 4.8 + 1.4;
+    });
+    y += 6;
+  });
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
+    doc.text(`${S().firma || ''} · Bauprotokoll ${p.nummer}`, M, H - 8); doc.text(`Seite ${i} / ${n}`, 210 - M, H - 8, { align: 'right' }); }
+  doc.save(dateiName('Bauprotokoll', p, 'pdf'));
+  toast('Bauprotokoll als PDF gespeichert.');
+}
+
 // ---------- Export: Checkliste (PDF / Excel) und Bemerkungen / Infos (PDF) ----------
 const dateiName = (art, p, endung) => `${art}_${p.nummer}_${p.name}`.replace(/[\\/:*?"<>|\s]+/g, '_') + '.' + endung;
 // Checkliste als flache Liste: Phasen-Zeilen und Punkte mit Ebene, Stand, Datum und Notiz
@@ -2320,6 +2850,8 @@ const DOK_ICONS = {
   zwischen: '<path d="M21 12a9 9 0 1 1-9-9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
   abnahme: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8 5.2-5.8"/>',
   blitz: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  material: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  bau: '<path d="M2 18h20M4 18v-3a8 8 0 0 1 16 0v3"/><path d="M10 7.5V5h4v2.5"/>',
   maengel: '<path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
   termine: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'
 };
@@ -2342,6 +2874,10 @@ function viewDokumente(p) {
 function dokListe(p) {
   const id = p.id, service = projektArt(p) === 'service', nT = p.termine.length;
   return [
+    { icon: 'material', titel: 'Materialliste', info: p.material?.vorlage ? p.material.vorlage : 'Material aus Lager und Bestellung, Vorlage je Montagesystem', dok: 'material', da: !!p.material,
+      auf: `materialDialog('${id}')`, pdf: p.material ? `materialPdf('${id}')` : '', xls: p.material ? `materialExcel('${id}')` : '',
+      stand: (s => !s.total ? '' : s.offen ? `<span class="tag-warn">${s.offen} noch nicht bestellt</span> <span class="muted klein">${s.total - s.offen} von ${s.total} bestellt/reserviert</span>`
+        : s.geliefert === s.total ? `<span class="tag-ok">✓ alle ${s.total} geliefert</span>` : `<span class="tag-sub">alles bestellt</span> <span class="muted klein">${s.geliefert} von ${s.total} geliefert</span>`)(matStand(p)) },
     { icon: 'rapport', titel: rapportName(p), info: 'Arbeitsauftrag für den Monteur', dok: 'ibn', da: !!p.ibn, auf: `ibnDialog('${id}')`, pdf: `ibnPdf('${id}')` },
     ...(service ? [] : [
       { icon: 'zwischen', titel: 'Zwischenabnahmeprotokoll', info: 'Teile der Anlage abnehmen und Mängel festhalten', dok: 'zwischen', da: !!p.zwischen, auf: `zwischenDialog('${id}')`, pdf: `zwischenPdf('${id}')`,
@@ -2350,6 +2886,9 @@ function dokListe(p) {
       { icon: 'blitz', titel: 'Checkliste Blitzschutz', info: 'Bestellung der Abnahme bei LASOLTEC', dok: 'blitz', da: !!p.blitz, auf: `blitzDialog('${id}')`, pdf: `blitzPdf('${id}')` }]),
     { icon: 'maengel', titel: 'Mängelliste', info: 'Was der Monteur beheben muss, mit Bildern', dok: 'maengel', da: !!p.maengel, auf: `maengelDialog('${id}')`, pdf: `maengelPdf('${id}')`,
       stand: (st => st.total ? (st.offen ? `<span class="tag-warn">${st.offen} offen</span> <span class="muted klein">${st.total - st.offen} erledigt</span>` : `<span class="tag-ok">✓ alle ${st.total} erledigt</span>`) : '')(maengelStand(p)) },
+    { icon: 'bau', titel: 'Bauprotokoll', info: 'Für den Chef: wie das Projekt gelaufen ist und welche Probleme es gab', dok: 'bauprotokoll', da: !!p.bauprotokoll,
+      auf: `bauprotokollDialog('${id}')`, pdf: p.bauprotokoll ? `bauprotokollPdf('${id}')` : '',
+      stand: p.bauprotokoll ? (n => n ? `<span class="tag-sub">${n} Punkte</span> <span class="muted klein">Stand ${fmt(p.bauprotokoll.datum)}</span>` : '')(BAU_ABSCHNITTE.reduce((a, [k]) => a + bauPunkte(p.bauprotokoll[k]).length, 0)) : '' },
     { icon: 'termine', titel: 'Terminplan', info: nT ? `${nT} Termin${nT > 1 ? 'e' : ''} · PDF auf A3 quer` : 'noch keine Termine erfasst', da: nT > 0, auf: `ui.tab='termine';ui.ganttScroll=true;render()`, aufL: 'Zum Terminplan', pdf: nT ? `pdf('${id}')` : '' }
   ];
 }
@@ -2361,7 +2900,7 @@ function dokKarten(p, L) {
       <div class="dok-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${DOK_ICONS[x.icon]}</svg></div>
       <div style="flex:1;min-width:0"><b>${x.titel}</b><div class="muted klein">${x.info}</div><div style="margin-top:6px">${x.dok ? status : ''}</div></div>
       <div class="dok-knoepfe"><button class="sm" onclick="${x.auf}">${x.aufL || (x.da ? 'Bearbeiten' : 'Ausfüllen')}</button>
-        ${x.pdf ? `<button class="sec sm" onclick="${x.pdf}">PDF</button>` : ''}</div>
+        ${x.pdf ? `<button class="sec sm" onclick="${x.pdf}">PDF</button>` : ''}${x.xls ? `<button class="sec sm" onclick="${x.xls}">Excel</button>` : ''}</div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -3087,7 +3626,7 @@ function abL(ctx, key, op, i, v) {
   if (ctx === 'r') {
     const p = findP(abPid);
     // Punkt 1 im Protokoll geändert: zurück in die Produkte des Projekts (und von dort ins andere Protokoll)
-    if (key === 'gegenstand') p.produkte = p[abArt].gegenstand.map(({ text, hint, detail }) => ({ text: text || '', hint: hint || '', detail: detail || '' }));
+    if (key === 'gegenstand') p.produkte = p[abArt].gegenstand.map(({ text, hint, detail, mat }) => ({ text: text || '', hint: hint || '', detail: detail || '', ...(mat ? { mat } : {}) }));
     protokolleAbgleichen(p, abArt);
   }
   save();
@@ -4428,10 +4967,11 @@ function viewEinstellungen() {
 
 // Vorlagen für Arbeitsauftrag und Abnahmeprotokoll: jedes neue Dokument startet damit
 function viewRapportVorlage() {
-  const wahl = ['service', 'abnahme'].includes(ui.aaArt) ? ui.aaArt : 'ibn';
-  const seg = `<div class="seg seg-breit" style="margin-bottom:14px">${[['ibn', 'IBN-Rapport'], ['service', 'Service-Rapport'], ['abnahme', '(Zwischen-)Abnahme']].map(([k, l]) =>
+  const wahl = ['service', 'abnahme', 'material'].includes(ui.aaArt) ? ui.aaArt : 'ibn';
+  const seg = `<div class="seg seg-breit" style="margin-bottom:14px">${[['ibn', 'IBN-Rapport'], ['service', 'Service-Rapport'], ['abnahme', '(Zwischen-)Abnahme'], ['material', 'Materiallisten']].map(([k, l]) =>
       `<button class="${wahl === k ? 'on' : ''}" onclick="ui.aaArt='${k}';render()">${l}</button>`).join('')}</div>`;
   if (wahl === 'abnahme') return seg + viewAbnahmeVorlage();
+  if (wahl === 'material') return seg + viewMatVorlagen();
   const art = wahl, v = rapVorlage(art);
   return `${seg}
   <div class="card aa">
