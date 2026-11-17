@@ -155,6 +155,22 @@
   .pk-fakten { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
   .pk-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
   /* Themen ein-/ausschalten (Projekt-Einstellungen) */
+  .dp-leiste { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 4px 2px 10px; }
+  button.dp-pfeil.dp-pfeil { background: none; border: 0; border-radius: 0; padding: 2px 6px; margin: 0 4px 0 -6px; color: var(--muted); font-size: 20px; font-weight: 400; line-height: 1; cursor: pointer; display: inline-block; transition: transform .15s; box-shadow: none; min-height: 0; width: auto; height: auto; }
+  button.dp-pfeil.dp-pfeil.auf { transform: rotate(90deg); }
+  button.dp-pfeil.dp-pfeil:hover { color: var(--ink); background: none; transform: none; }
+  button.dp-pfeil.dp-pfeil.auf:hover { transform: rotate(90deg); }
+  .dp-klein { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; border-left: 5px solid var(--pf); }
+  .dp-klein-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .dp-klein-txt b, .dp-klein-txt span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dp-klein-txt span { font-size: 13px; }
+  .dp-klein-chk { position: relative; width: 64px; height: 22px; border-radius: 11px; background: #eef1f5; overflow: hidden; flex: none; }
+  .dp-klein-chk i { position: absolute; left: 0; top: 0; bottom: 0; background: #cfe8d6; }
+  .dp-klein-chk b { position: relative; display: block; text-align: center; font-size: 12px; line-height: 22px; }
+  .mv-kopf { display: flex; align-items: center; gap: 4px; }
+  .mv-betreff { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .mv-karte:not(.auf) { padding-top: 12px; padding-bottom: 12px; }
+  .mv-inhalt { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eef1f5; }
   .leute-gr { margin-top: 12px; }
   .leute-gr:first-of-type { margin-top: 4px; }
   .leute-titel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted, #6b7280); padding-bottom: 4px; margin-bottom: 6px; border-bottom: 1px solid #eef1f5; }
@@ -2133,11 +2149,21 @@ function dashProjekte(today) {
     .sort((a, b) => (a.s.ende < today) - (b.s.ende < today) || a.s.start.localeCompare(b.s.start));
   if (!L.length) return `<div class="card next"><div class="muted">Projekte</div><div class="big">Noch kein Projekt mit Terminen</div>
     <div class="muted">Lege ein Projekt an und erfasse Termine im Terminplan.</div><button onclick="neuesProjektDialog()">+ Neues Projekt</button></div>`;
-  const ersterGeplant = L.find(x => x.s.start > today);
-  return L.map(x => {
+  const ersterGeplant = L.find(x => x.s.start > today), zu = dpZu(), nZu = L.filter(x => zu[x.p.id]).length;
+  return `<div class="dp-leiste"><h3 style="margin:0">Projekte <span class="muted" style="font-weight:400">· ${L.length}</span></h3>
+      <span class="row">${nZu < L.length ? '<button class="sec sm" onclick="dpAlle(true)">Alle einklappen</button>' : ''}${nZu ? '<button class="sec sm" onclick="dpAlle(false)">Alle aufklappen</button>' : ''}</span></div>`
+    + L.map(x => {
     const { p, s } = x, ck = chkStats(p), f = freigabe(p), id = p.id;
     const lauf = s.start <= today && s.ende >= today, vorbei = s.ende < today;
     const kopf = lauf ? `Läuft · noch ${diffDays(today, s.ende)} Tage` : vorbei ? 'Bau beendet · bereit zum Abschliessen' : x === ersterGeplant ? 'Nächstes Projekt' : 'Geplant';
+    // eingeklappt: eine Zeile mit dem Wichtigsten
+    if (zu[id]) return `<div class="card dp-klein${ktGlow(p)}" style="--pf:${p.farbe}" onclick="openProjekt('${id}')">
+      <button class="dp-pfeil" title="Aufklappen" onclick="event.stopPropagation();dpKlapp('${id}')">›</button>
+      <div class="dp-klein-txt"><b>${esc(p.nummer)} · ${esc(p.name)}</b>
+        <span class="muted">${kopf} · ${fmt(s.start)} – ${fmt(s.ende)}${p.ort ? ' · ' + esc(p.ort) : ''}</span></div>
+      ${f.kritisch ? `<span class="tag-warn">⚠ ${f.offen.length} offen</span>` : ''}
+      ${modulAn(p, 'checkliste') ? `<span class="dp-klein-chk" title="Checkliste erledigt"><i style="width:${ck.pct}%"></i><b>${ck.pct}%</b></span>` : ''}
+    </div>`;
     // Controlling: Füllung = DB-Prognose im Verhältnis zum DB aus dem Verkauf
     let ct = gauge(0, modulAn(p, 'controlling') ? 'kein Controlling' : 'Controlling aus', { mini: true, wert: '–', farbe: DP_FARBE.n }), prog, progL;
     if (ktMitDaten(p) && modulAn(p, 'controlling')) {
@@ -2149,7 +2175,7 @@ function dashProjekte(today) {
       prog = vorbei ? 100 : lauf ? Math.round((diffDays(s.start, today) + 1) / (diffDays(s.start, s.ende) + 1) * 100) : 0; progL = 'Bauzeit';
     }
     return `<div class="card next dp-karte${ktGlow(p)}" onclick="openProjekt('${id}')"><div class="next-grid"><div>
-      <div class="muted">${kopf}</div>
+      <div class="muted"><button class="dp-pfeil auf" title="Einklappen" onclick="event.stopPropagation();dpKlapp('${id}')">›</button>${kopf}</div>
       <div class="big">${esc(p.nummer)} · ${esc(p.name)}</div>
       <div class="muted">${esc(p.ort || '')}</div>
       <div class="when">
@@ -2170,6 +2196,11 @@ function dashProjekte(today) {
     </div></div>`;
   }).join('');
 }
+// eingeklappte Projektkarten im Dashboard; bleibt auf diesem Gerät gespeichert
+function dpZu() { try { return JSON.parse(localStorage.getItem(KEY + '-dp-zu') || '{}') || {}; } catch (e) { return {}; } }
+function dpZuSetzen(z) { try { localStorage.setItem(KEY + '-dp-zu', JSON.stringify(z)); } catch (e) {} ui.dpZu = z; render(); }
+function dpKlapp(id) { const z = dpZu(); if (z[id]) delete z[id]; else z[id] = true; dpZuSetzen(z); }
+function dpAlle(zu) { const z = {}; if (zu) offenP().forEach(p => z[p.id] = true); dpZuSetzen(z); }
 // «Diese Woche»: heute und die nächsten 6 Tage – meine Einsätze und Baustarts stark, übrige Termine dezent
 function dashWoche(today, einsaetze) {
   const bis = isoOf(addDays(toDate(today), 6)), inWoche = d => d >= today && d <= bis, tag = {};
@@ -5181,7 +5212,17 @@ function viewMails() {
       <code>{gewerk}</code> <code>{gewerk_firma}</code> <code>{gewerk_kontakt}</code> <code>{gewerk_telefon}</code> <code>{pl}</code> <code>{pl_telefon}</code> <code>{pl_mail}</code> <code>{firma}</code> <code>{signatur}</code> <code>{baustart_datum}</code> <code>{bauende_datum}</code> <code>{ibn_datum}</code> <code>{elektriker_extern}</code>.
       <b>{termin}</b> / <b>{termine}</b> sind die Termine des verknüpften Gewerks im Terminplan. Ist «An» leer, wird die E-Mail des Gewerks verwendet.</p>
   </div>
-  ${L.map((m, i) => `<div class="card">
+  <div class="row" style="justify-content:space-between;margin:-4px 0 10px">
+    <span class="muted">${L.length} Vorlagen · zum Bearbeiten aufklappen</span>
+    <span class="row"><button class="sec sm" onclick="mailKlappAlle(true)">Alle aufklappen</button><button class="sec sm" onclick="mailKlappAlle(false)">Alle einklappen</button></span>
+  </div>
+  ${L.map((m, i) => { const auf = !!(ui.mailAuf || {})[i]; return `<div class="card mv-karte${auf ? ' auf' : ''}">
+    <div class="mv-kopf klapp-kopf" onclick="mailKlapp(${i})">
+      <span class="klapp-pfeil ${auf ? 'auf' : ''}">›</span>
+      <div style="flex:1;min-width:0"><b>✉ ${esc(m.name || 'Ohne Namen')}</b>
+        <div class="muted klein mv-betreff">${m.gewerk ? `<span class="tag-sub" style="margin:0 6px 0 0">${esc(m.gewerk)}</span>` : ''}${esc(m.betreff || '')}</div></div>
+    </div>
+    ${auf ? `<div class="mv-inhalt">
     <div class="grid">
       <div><label>Name</label><input value="${esc(m.name)}" onchange="updMail(${i},'name',this.value)"></div>
       <div><label>Gewerk (für Termine & Adresse)</label><select onchange="updMail(${i},'gewerk',this.value)"><option value="">– keines –</option>
@@ -5190,9 +5231,10 @@ function viewMails() {
     </div>
     <div style="margin-top:10px"><label>Betreff</label><input value="${esc(m.betreff)}" onchange="updMail(${i},'betreff',this.value)"></div>
     <div style="margin-top:10px"><label>Text</label><textarea style="min-height:200px;line-height:1.45" onchange="updMail(${i},'text',this.value)">${esc(m.text)}</textarea></div>
-    <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="danger sm" onclick="delMail(${i})">Vorlage löschen</button></div>
-  </div>`).join('')}
-  <div class="row"><button onclick="S().mailvorlagen.push({name:'Neue Vorlage',gewerk:'',an:'',betreff:'{projektnummer} {projekt}',text:'Guten Tag\\n\\n'});save();render()">+ Mailvorlage</button>
+    <div class="row" style="margin-top:10px;justify-content:space-between"><button class="sec sm" onclick="mailKlapp(${i})">Einklappen</button><button class="danger sm" onclick="delMail(${i})">Vorlage löschen</button></div>
+  </div>` : ''}
+  </div>`; }).join('')}
+  <div class="row"><button onclick="S().mailvorlagen.push({name:'Neue Vorlage',gewerk:'',an:'',betreff:'{projektnummer} {projekt}',text:'Guten Tag\\n\\n'});(ui.mailAuf=ui.mailAuf||{})[S().mailvorlagen.length-1]=true;save();render()">+ Mailvorlage</button>
     <button class="sec" onclick="if(confirm('Mailvorlagen auf die Standardvorlagen zurücksetzen?')){state.settings.mailvorlagen=MAIL_VORLAGEN.map(m=>({...m}));save();render()}">Standard laden</button></div>`;
 }
 function updMail(i, k, v) {
@@ -5207,10 +5249,14 @@ function updMail(i, k, v) {
     [...state.settings.standardGewerke, ...state.projects.flatMap(p => p.gewerke)].forEach(g => { if (g.mailvorlage === alt) g.mailvorlage = m.name; });
   }
   save(); toast('Vorlage gespeichert.');
+  if (k === 'name' || k === 'gewerk' || k === 'betreff') render();
 }
+// Mailvorlagen einklappen: standardmässig alle zu, nur die gerade bearbeitete offen
+function mailKlapp(i) { const a = ui.mailAuf = ui.mailAuf || {}; a[i] = !a[i]; render(); }
+function mailKlappAlle(auf) { ui.mailAuf = {}; if (auf) S().mailvorlagen.forEach((_, i) => ui.mailAuf[i] = true); render(); }
 function delMail(i) {
   if (!confirm(`Mailvorlage «${S().mailvorlagen[i].name}» löschen?`)) return;
-  S().mailvorlagen.splice(i, 1); save(); render();
+  S().mailvorlagen.splice(i, 1); ui.mailAuf = {}; save(); render();
 }
 
 // ---------- App installieren (PWA) ----------
@@ -5716,7 +5762,8 @@ function pdfTerminplan(p, termine, f) {
     body: rows.map(r => {
       if (r.gr) {
         const g = r.gr.g;
-        return [{ content: `${g.name}${g.firma ? '  –  ' + g.firma : ''}   (${ARTEN[artOf(g)]})`, colSpan: 3, styles: { fontStyle: 'bold', fillColor: mix(g.farbe, 0.72) } }, ''];
+        // intern / extern / Sub nur in der App, nicht auf dem PDF
+        return [{ content: `${g.name}${g.firma ? '  –  ' + g.firma : ''}`, colSpan: 3, styles: { fontStyle: 'bold', fillColor: mix(g.farbe, 0.72) } }, ''];
       }
       const t = r.t, fill = { fillColor: mix(r.g.farbe, 0.9) };
       return [
@@ -5805,15 +5852,15 @@ function pdfTerminplan(p, termine, f) {
   y = doc.lastAutoTable.finalY + 14 * Math.max(f, 0.7);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(13 * Math.max(f, 0.7)); doc.setTextColor(29, 39, 51);
   doc.text('Beteiligte Unternehmen', M, y);
-  const zeile = g => [g.name, ARTEN[artOf(g)], g.firma || '–', g.adresse || '',
+  const zeile = g => [g.name, g.firma || '–', g.adresse || '',
     g.eigen ? [g.kontakt, g.telefon && 'Tel. ' + g.telefon, g.kontakt !== s.name && 'PL: ' + s.name, ...kontakt].filter(Boolean).join(', ')
       : [g.kontakt, g.telefon && 'Tel. ' + g.telefon, g.email].filter(Boolean).join(', ')];
   // bei vollen Plänen zweispaltig (zwei Unternehmen pro Zeile), damit alles auf das eine A3-Blatt passt
   const zweispaltig = f < 0.75 && used.length > 3;
-  const kopf = ['Gewerk', 'Ausführung', 'Firma', 'Adresse', 'Kontakt'];
+  const kopf = ['Gewerk', 'Firma', 'Adresse', 'Kontakt'];
   const haelfte = Math.ceil(used.length / 2);
   const koerper = zweispaltig
-    ? Array.from({ length: haelfte }, (_, i) => [...zeile(used[i]), ...(used[i + haelfte] ? zeile(used[i + haelfte]) : ['', '', '', '', ''])])
+    ? Array.from({ length: haelfte }, (_, i) => [...zeile(used[i]), ...(used[i + haelfte] ? zeile(used[i + haelfte]) : ['', '', '', ''])])
     : used.map(zeile);
   doc.autoTable({
     startY: y + 3, margin: { left: M, right: M, top: 14, bottom: UNTEN }, rowPageBreak: 'avoid',
@@ -5824,14 +5871,14 @@ function pdfTerminplan(p, termine, f) {
     didParseCell: d => { const g = gwAnZelle(d); if (d.section === 'body' && g && g.eigen) d.cell.styles.fontStyle = 'bold'; },
     didDrawCell: d => {
       const g = gwAnZelle(d);
-      if (d.section === 'body' && g && d.column.index % 5 === 0) {
+      if (d.section === 'body' && g && d.column.index % 4 === 0) {
         doc.setFillColor(...hexRgb(g.farbe));
         doc.rect(d.cell.x, d.cell.y, 1.2, d.cell.height, 'F');
       }
     }
   });
   // welches Unternehmen steht in dieser Zelle (bei zweispaltig: rechte Hälfte = zweite Liste)
-  function gwAnZelle(d) { return zweispaltig ? used[d.row.index + (d.column.index >= 5 ? haelfte : 0)] : used[d.row.index]; }
+  function gwAnZelle(d) { return zweispaltig ? used[d.row.index + (d.column.index >= 4 ? haelfte : 0)] : used[d.row.index]; }
 
   // Fusszeile (bei Überlänge auf jeder Seite, normalerweise nur eine)
   const n = doc.getNumberOfPages();
