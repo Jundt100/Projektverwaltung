@@ -1647,7 +1647,7 @@ const gwKey = g => (g.name + '|' + artOf(g)).toLowerCase();
 const MODULE = [
   ['termine', 'Terminplan', 'Reiter Terminplan, Termine im Wochenplan, Kalender und Dashboard, Einsätze und Baustart-Warnungen'],
   ['checkliste', 'Checkliste', 'Reiter Checkliste, offene Punkte bis Baustart und Baufreigabe-Hinweise'],
-  ['controlling', 'Controlling', 'Reiter Controlling, wöchentliche Erinnerung, «fällig»-Hinweise und Ampel'],
+  ['controlling', 'Controlling', 'Reiter Controlling, «fällig»-Hinweise und Ampel'],
   ['dokumente', 'Dokumente', 'Reiter Dokumente (Protokolle, Rapporte) und offene Mängel im Dashboard']];
 const modulAn = (p, k) => !(p.aus && p.aus[k]);
 function modulSchalten(pid, k, ein) {
@@ -5967,26 +5967,8 @@ function ktWiederOeffnen(pid) {
   save(); render(); toast('Projekt wieder geöffnet.');
 }
 
-// ---------- Controlling: Wochen-Erinnerung und Durchgehen ----------
-// einmal pro Kalenderwoche (ab Montag) beim ersten Öffnen, wenn Projekte zu kontrollieren sind
-function ktErinnerung() {
-  const due = state.projects.filter(ktDue), woche = ktMontag(todayIso()), key = KEY + '-kt-erinnert';
-  let gesehen = null; try { gesehen = localStorage.getItem(key); } catch (e) {}
-  if (!due.length || gesehen === woche || $('dlg').open) return;
-  try { localStorage.setItem(key, woche); } catch (e) {}
-  const bereit = state.projects.filter(ktAbschlussBereit);
-  $('dlg').innerHTML = `
-    <h2>Controlling KW ${kw(toDate(todayIso()))}</h2>
-    <p class="muted" style="margin-top:-6px">${due.length === 1 ? '1 Projekt ist' : due.length + ' Projekte sind'} diese Woche zu kontrollieren: Ist-Kosten und kommende Rechnungen erfassen.</p>
-    ${due.map(p => { const x = ktInfo(p); return `<div class="li" style="cursor:default"><span class="kt-dot ${x.st.cls}"></span>
-      <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">letzte Kontrolle ${fmt(x.w.date)} · ${ktLetzte(x.w)}</div></div></div>`; }).join('')}
-    ${bereit.length ? `<div class="kt-hint">✓ Bereit zum Abschliessen: ${bereit.map(p => esc(p.nummer + ' ' + p.name)).join(', ')}</div>` : ''}
-    <div class="row" style="margin-top:16px;justify-content:flex-end">
-      <button class="sec" onclick="$('dlg').close()">Später</button>
-      <button onclick="$('dlg').close();ktTourStart()">Nacheinander durchgehen →</button>
-    </div>`;
-  $('dlg').showModal();
-}
+// ---------- Controlling: Durchgehen ----------
+// kein Fenster mehr beim Öffnen; fällige Controllings stehen nur noch als Hinweis im Dashboard und unter «Controlling»
 function ktTourStart() {
   const due = state.projects.filter(ktDue).sort((a, b) => ktLatest(a.ktr).date.localeCompare(ktLatest(b.ktr).date));
   if (!due.length) return toast('Alle laufenden Projekte sind diese Woche kontrolliert.');
@@ -6534,7 +6516,6 @@ function cloudStart() {
     document.body.classList.remove('gesperrt');
     if (serviceTermineNachtragen()) save();
     render();
-    ktErinnerung();
   });
 }
 function zeigeLogin(fehler = '', formular = true) {
