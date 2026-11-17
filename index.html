@@ -2928,6 +2928,48 @@ function leuteGruppe(name, art) {
   if (art === 'sub' || /montage|elektr|installat/.test(n)) return 'montage';
   return n ? 'gewerke' : 'weitere';
 }
+// Leute im Projekt: Projektleiter, Gewerke mit Terminen, zusätzlich zugeordnete Personen – mit Gruppe (CKW, Montage, Lieferanten …); der Kunde kommt separat
+function leuteImProjekt(p) {
+  const s = S(), pl = plVon(p), termine = p.termine;
+  const leute = [{ name: pl.name, rolle: 'Projektleiter', firma: s.firma, tel: pl.telefon, mail: pl.email, adresse: [s.strasse, s.ort].filter(Boolean).join(', '), farbe: 'var(--ink)', gruppe: 'ckw' }];
+  const gezeigt = new Set();
+  p.gewerke.map(x => gewerk(p, x.id)).filter(g => termine.some(t => t.gewerkId === g.id)).forEach(g => {
+    if (g.crm) gezeigt.add(g.crm);
+    const offen = !(g.kontakt || g.firma || g.email || g.telefon);
+    leute.push({ name: offen ? g.name : g.kontakt || g.firma, rolle: offen ? '' : g.name, firma: g.kontakt ? g.firma : '', tel: g.telefon, mail: g.email, adresse: g.adresse || '', farbe: g.farbe,
+      gruppe: (g.firma && g.firma === s.firma && !/liefer|transport|kran|kontroll|abnahme/i.test(g.name)) ? 'ckw' : leuteGruppe(g.name, artOf(g)), offen,
+      aktion: offen ? `<button class="sec sm" title="Firma / Kontakt eintragen" onclick="gewerkDialog('${p.id}','${g.id}')">＋ Kontakt</button>`
+        : effektiveVorlage(g) ? `<button class="sec sm" title="Mail an ${esc(g.name)}" onclick="gewerkMail('${p.id}','${g.id}')">✉</button>` : '' });
+  });
+  p.personen.map(kontaktById).filter(c => c && !gezeigt.has(c.id)).forEach(c => leute.push({ name: kontaktName(c), rolle: c.gewerk || (c.art === 'kunde' ? 'Kunde' : ARTEN[c.art]),
+    firma: c.name ? kontaktFirma(c) : '', tel: c.telefon, mail: c.email, adresse: c.adresse || '', farbe: avatarFarbe(c), gruppe: c.art === 'kunde' ? 'weitere' : leuteGruppe(c.gewerk || '', c.art),
+    aktion: `<button class="ck-btn" title="Kontakt bearbeiten" onclick="kontaktDialog('${c.id}')">✎</button><button class="ck-btn" title="aus dem Projekt entfernen" onclick="personEntfernen('${p.id}','${c.id}')">✕</button>` }));
+  return leute;
+}
+// Kontaktliste des Projekts als PDF (A4): Kunde, dann die Gruppen wie in der Übersicht
+function kontaktePdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const M = 14, leute = leuteImProjekt(p), kunde = kontaktById(p.kundeId);
+  let y = pdfAaKopf(doc, p.nummer, [['Projektleiter', plVon(p).name], ['Stand', fmt(todayIso())]], `Kontaktliste: ${p.name}`);
+  if (p.ort) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(90); doc.text(`Auftragsort: ${p.ort}`, M, y - 2); y += 4; }
+  const zeile = x => [{ content: x.name + (x.offen ? '\n(Firma / Kontakt noch offen)' : ''), styles: { fontStyle: 'bold' } },
+    [x.rolle, x.firma, x.adresse].filter(Boolean).join('\n'), x.tel || '', x.mail || ''];
+  const body = [];
+  const titel = (t, n) => body.push([{ content: `${t}  (${n})`, colSpan: 4, styles: { fillColor: [236, 239, 243], textColor: AA_TXT, fontStyle: 'bold', fontSize: 9.5 } }]);
+  if (kunde) { titel('Kunde', 1); body.push(zeile({ name: kontaktName(kunde), rolle: 'Kunde', firma: kunde.name ? kontaktFirma(kunde) : '', adresse: kunde.adresse, tel: kunde.telefon, mail: kunde.email })); }
+  LEUTE_GRUPPEN.forEach(([k, t]) => { const L = leuteZusammen(leute.filter(x => x.gruppe === k)); if (L.length) { titel(t, L.length); L.forEach(x => body.push(zeile(x))); } });
+  doc.autoTable({ startY: y, margin: { left: M, right: M, bottom: 16 }, theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 1.8, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30, valign: 'top' },
+    headStyles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold' },
+    head: [['Name', 'Funktion / Firma / Adresse', 'Telefon', 'E-Mail']], body,
+    columnStyles: { 0: { cellWidth: 42 }, 1: { cellWidth: 62 }, 2: { cellWidth: 30 }, 3: { cellWidth: 48 } } });
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
+    doc.text(`${S().firma || ''} · Kontaktliste ${p.nummer}`, M, 289); doc.text(`Seite ${i} / ${n}`, 196, 289, { align: 'right' }); }
+  doc.save(dateiName('Kontakte', p, 'pdf'));
+  toast('Kontaktliste als PDF gespeichert.');
+}
 // gleiche Person mehrfach (z.B. Projektleiter auch bei PV-Montage und IBN): eine Karte, Rollen zusammengefasst
 function leuteZusammen(L) {
   const out = [];
@@ -2969,21 +3011,7 @@ function viewUebersicht(p) {
   const offen = f.offen.slice(0, 8).map(o => ofZeile(p, o, f.kritisch)).join('')
     + (f.offen.length > 8 ? `<div class="muted" style="padding:4px 0 0 28px;cursor:pointer" onclick="ui.tab='checkliste';ui.nurOffen=true;render()">… und ${f.offen.length - 8} weitere</div>` : '');
   const wann = !sp ? 'Baustart noch nicht geplant' : f.tage < 0 ? `Bau läuft seit ${fmt(sp.start)}` : f.tage === 0 ? 'Baustart ist heute' : `Baustart ${fmtLong(sp.start)} · ${relTage(sp.start)}`;
-  // Leute im Projekt: Projektleiter, Kunde, Gewerke mit Terminen, zusätzlich zugeordnete Personen – nach Gruppen (CKW, Montage, Lieferanten …)
-  const kunde = kontaktById(p.kundeId), pl = plVon(p);
-  const leute = [{ name: pl.name, rolle: 'Projektleiter', firma: s.firma, tel: pl.telefon, mail: pl.email, farbe: 'var(--ink)', gruppe: 'ckw' }];
-  const gezeigt = new Set();
-  p.gewerke.map(x => gewerk(p, x.id)).filter(g => termine.some(t => t.gewerkId === g.id)).forEach(g => {
-    if (g.crm) gezeigt.add(g.crm);
-    const offen = !(g.kontakt || g.firma || g.email || g.telefon);
-    leute.push({ name: offen ? g.name : g.kontakt || g.firma, rolle: offen ? '' : g.name, firma: g.kontakt ? g.firma : '', tel: g.telefon, mail: g.email, farbe: g.farbe,
-      gruppe: (g.firma && g.firma === s.firma && !/liefer|transport|kran|kontroll|abnahme/i.test(g.name)) ? 'ckw' : leuteGruppe(g.name, artOf(g)), offen,
-      aktion: offen ? `<button class="sec sm" title="Firma / Kontakt eintragen" onclick="gewerkDialog('${p.id}','${g.id}')">＋ Kontakt</button>`
-        : effektiveVorlage(g) ? `<button class="sec sm" title="Mail an ${esc(g.name)}" onclick="gewerkMail('${p.id}','${g.id}')">✉</button>` : '' });
-  });
-  p.personen.map(kontaktById).filter(c => c && !gezeigt.has(c.id)).forEach(c => leute.push({ name: kontaktName(c), rolle: c.gewerk || (c.art === 'kunde' ? 'Kunde' : ARTEN[c.art]),
-    firma: c.name ? kontaktFirma(c) : '', tel: c.telefon, mail: c.email, farbe: avatarFarbe(c), gruppe: c.art === 'kunde' ? 'weitere' : leuteGruppe(c.gewerk || '', c.art),
-    aktion: `<button class="ck-btn" title="Kontakt bearbeiten" onclick="kontaktDialog('${c.id}')">✎</button><button class="ck-btn" title="aus dem Projekt entfernen" onclick="personEntfernen('${p.id}','${c.id}')">✕</button>` }));
+  const kunde = kontaktById(p.kundeId), leute = leuteImProjekt(p);
   const mitChk = modulAn(p, 'checkliste');
   return `
   <div class="ueb-grid${mitChk ? '' : ' ueb-eins'}">
@@ -3006,7 +3034,8 @@ function viewUebersicht(p) {
   </div>
   <div class="ueb-grid ueb-eins">
     <div class="card">
-      <div class="ck-head"><h3 style="margin:0">Leute im Projekt</h3><span class="muted">${LEUTE_GRUPPEN.reduce((n, [k]) => n + leuteZusammen(leute.filter(x => x.gruppe === k)).length, 0)}</span></div>
+      <div class="ck-head"><h3 style="margin:0">Leute im Projekt <span class="muted" style="font-weight:400">${LEUTE_GRUPPEN.reduce((n, [k]) => n + leuteZusammen(leute.filter(x => x.gruppe === k)).length, 0) + (kunde ? 1 : 0)}</span></h3>
+        <button class="sec sm" onclick="kontaktePdf('${p.id}')" title="Kunde und alle Beteiligten mit Telefon und E-Mail">📄 PDF</button></div>
       <div class="ueb-kunde">${kunde
         ? personKarte({ name: kontaktName(kunde), rolle: 'Kunde', firma: kunde.name ? kunde.firma : '', tel: kunde.telefon, mail: kunde.email, farbe: avatarFarbe(kunde),
             aktion: `<button class="ck-btn" title="Kunde bearbeiten" onclick="kontaktDialog('${kunde.id}')">✎</button><button class="ck-btn" title="anderen Kunden wählen" onclick="findP('${p.id}').kundeId='';save();render()">✕</button>` })
