@@ -155,6 +155,11 @@
   .pk-fakten { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
   .pk-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
   /* Themen ein-/ausschalten (Projekt-Einstellungen) */
+  .leute-gr { margin-top: 12px; }
+  .leute-gr:first-of-type { margin-top: 4px; }
+  .leute-titel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted, #6b7280); padding-bottom: 4px; margin-bottom: 6px; border-bottom: 1px solid #eef1f5; }
+  .leute-titel span { font-weight: 600; background: #eef1f5; border-radius: 9px; padding: 0 7px; margin-left: 4px; letter-spacing: 0; }
+  .pl-box { margin-top: 14px; padding: 12px 14px; border: 1px solid #e6eaef; border-radius: 10px; background: #fafbfc; }
   .thema { position: relative; display: flex; align-items: center; gap: 14px; padding: 12px 4px; border-bottom: 1px solid #eef1f5; cursor: pointer; }
   .thema:last-child { border-bottom: none; }
   .thema.aus b { color: var(--muted); }
@@ -1577,6 +1582,12 @@ function speichereLokal() {
   catch (e) { toast('Speichern im Browser nicht möglich – bitte Backup erstellen.'); }
 }
 const S = () => state.settings;
+// Projektleiter pro Projekt (Projekt-Einstellungen › Projektdaten); ohne Eintrag gilt der Projektleiter aus den Einstellungen (Nicola Jundt)
+function plVon(p) {
+  const s = S(), x = p && p.projektleiter, n = x && String(x.name || '').trim();
+  if (!n || n === s.name) return { name: s.name || 'Nicola Jundt', telefon: s.telefon || '', email: s.email || '', eigen: false };
+  return { name: n, telefon: x.telefon || '', email: x.email || '', eigen: true };
+}
 const uid = () => Math.random().toString(36).slice(2, 10);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $ = id => document.getElementById(id);
@@ -1633,7 +1644,7 @@ function gewerk(p, id) {
   // mit einem CRM-Kontakt verknüpft: Kontaktdaten kommen immer aktuell aus dem CRM
   const c = g.crm && kontaktById(g.crm);
   if (c) g = { ...g, kontakt: c.name, telefon: c.telefon, email: c.email, ...(g.eigen ? {} : { firma: c.firma, adresse: c.adresse }) };
-  return g.eigen ? { ...g, firma: S().firma, adresse: [S().strasse, S().ort].filter(Boolean).join(', '), kontakt: g.kontakt || S().name } : g;
+  return g.eigen ? { ...g, firma: S().firma, adresse: [S().strasse, S().ort].filter(Boolean).join(', '), kontakt: g.kontakt || plVon(p).name } : g;
 }
 const kontaktById = id => (id && (S().kontakte || []).find(c => c.id === id)) || null;
 // eigen = Montage durch uns (intern); art unterscheidet zusätzlich Subunternehmer
@@ -2350,7 +2361,7 @@ function viewProjekt(p) {
     <div class="pk-fakten muted">
       <span title="Kunde">👤 ${kunde ? esc(kontaktName(kunde)) : `<a href="#" onclick="event.preventDefault();ui.tab='einstellungen';ui.einst='info';render()">Kunde erfassen</a>`}</span>
       <span title="Auftragsort">📍 ${p.ort ? esc(p.ort) : `<a href="#" onclick="event.preventDefault();ui.tab='einstellungen';ui.einst='info';render()">Auftragsort erfassen</a>`}</span>
-      <span title="Projektleiter">🦺 ${esc(S().name)}</span>
+      <span title="Projektleiter">🦺 ${esc(plVon(p).name)}</span>
     </div>
     ${projektKpis(p)}
   </div>
@@ -2724,7 +2735,7 @@ function bauprotokollPdf(pid) {
   if (!p.bauprotokoll) return bauprotokollDialog(pid);
   const b = p.bauprotokoll, { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const H = 297, M = 14, B = 210 - 2 * M;
-  let y = pdfAaKopf(doc, p.nummer, [['Projektleiter', S().name], ['Stand', fmt(b.datum || todayIso())]], 'Bauprotokoll');
+  let y = pdfAaKopf(doc, p.nummer, [['Projektleiter', plVon(p).name], ['Stand', fmt(b.datum || todayIso())]], 'Bauprotokoll');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...AA_TXT);
   const zeile = doc.splitTextToSize([p.nummer, p.ort].filter(Boolean).join(', '), B);
   doc.text(zeile, M, y - 4); y += zeile.length * 5.5;
@@ -2906,13 +2917,35 @@ function dokKarten(p, L) {
 }
 
 // ---------- Projekt-Übersicht: offene Punkte bis Baustart, Leute im Projekt, Terminplan ----------
+// Gruppen für «Leute im Projekt»: zuerst CKW, dann Montage, Lieferanten, Kontrollen, übrige Gewerke
+const LEUTE_GRUPPEN = [['ckw', 'CKW intern'], ['montage', 'Montage & Subunternehmer'], ['liefer', 'Lieferanten, Transport & Kran'],
+  ['kontrolle', 'Kontrollen & Abnahmen'], ['gewerke', 'Weitere Gewerke'], ['weitere', 'Weitere Personen']];
+function leuteGruppe(name, art) {
+  const n = String(name || '').toLowerCase();
+  if (/liefer|transport|kran|material|grosshandel|krannich|solar ?markt|häuselmann|contec|logistik/.test(n)) return 'liefer';
+  if (/kontroll|abnahme|attest|blitzschutz|netzbetreiber|gemeinde|behörde|bewilligung|inspektor/.test(n)) return 'kontrolle';
+  if (art === 'intern') return 'ckw';
+  if (art === 'sub' || /montage|elektr|installat/.test(n)) return 'montage';
+  return n ? 'gewerke' : 'weitere';
+}
+// gleiche Person mehrfach (z.B. Projektleiter auch bei PV-Montage und IBN): eine Karte, Rollen zusammengefasst
+function leuteZusammen(L) {
+  const out = [];
+  L.forEach(x => {
+    const d = !x.offen && out.find(y => !y.offen && y.name.toLowerCase() === x.name.toLowerCase());
+    if (!d) return out.push({ ...x });
+    if (x.rolle && !d.rolle.split(' · ').includes(x.rolle)) d.rolle = [d.rolle, x.rolle].filter(Boolean).join(' · ');
+    d.tel = d.tel || x.tel; d.mail = d.mail || x.mail; d.aktion = d.aktion || x.aktion;
+  });
+  return out;
+}
 function personKarte(x) {
   const tel = x.tel ? `<a href="tel:${esc(x.tel.replace(/\s/g, ''))}">☎ ${esc(x.tel)}</a>` : '';
   const mail = x.mail ? `<a href="mailto:${esc(x.mail)}">✉ ${esc(x.mail)}</a>` : '';
   return `<div class="person">
     <span class="avatar" style="background:${x.farbe}">${initialen(x.name)}</span>
     <div class="p-info"><b>${esc(x.name)}</b><div class="muted">${esc([x.rolle, x.firma].filter(Boolean).join(' · '))}</div>
-      ${tel || mail ? `<div class="p-kontakt">${tel}${mail}</div>` : '<div class="muted klein">keine Kontaktdaten</div>'}</div>
+      ${tel || mail ? `<div class="p-kontakt">${tel}${mail}</div>` : `<div class="muted klein">${x.offen ? 'Firma / Kontakt noch offen' : 'keine Kontaktdaten'}</div>`}</div>
     <div class="p-aktion">${x.aktion || ''}</div></div>`;
 }
 // Termine dieses Projekts in der laufenden Woche (Mo–So), mit «Ich bin vor Ort»
@@ -2936,17 +2969,20 @@ function viewUebersicht(p) {
   const offen = f.offen.slice(0, 8).map(o => ofZeile(p, o, f.kritisch)).join('')
     + (f.offen.length > 8 ? `<div class="muted" style="padding:4px 0 0 28px;cursor:pointer" onclick="ui.tab='checkliste';ui.nurOffen=true;render()">… und ${f.offen.length - 8} weitere</div>` : '');
   const wann = !sp ? 'Baustart noch nicht geplant' : f.tage < 0 ? `Bau läuft seit ${fmt(sp.start)}` : f.tage === 0 ? 'Baustart ist heute' : `Baustart ${fmtLong(sp.start)} · ${relTage(sp.start)}`;
-  // Leute im Projekt: Projektleiter, Kunde, Gewerke mit Terminen, zusätzlich zugeordnete Personen
-  const kunde = kontaktById(p.kundeId);
-  const leute = [{ name: s.name, rolle: 'Projektleiter', firma: s.firma, tel: s.telefon, mail: s.email, farbe: 'var(--ink)' }];
+  // Leute im Projekt: Projektleiter, Kunde, Gewerke mit Terminen, zusätzlich zugeordnete Personen – nach Gruppen (CKW, Montage, Lieferanten …)
+  const kunde = kontaktById(p.kundeId), pl = plVon(p);
+  const leute = [{ name: pl.name, rolle: 'Projektleiter', firma: s.firma, tel: pl.telefon, mail: pl.email, farbe: 'var(--ink)', gruppe: 'ckw' }];
   const gezeigt = new Set();
-  p.gewerke.map(x => gewerk(p, x.id)).filter(g => termine.some(t => t.gewerkId === g.id) && (g.kontakt || g.firma || g.email || g.telefon)).forEach(g => {
+  p.gewerke.map(x => gewerk(p, x.id)).filter(g => termine.some(t => t.gewerkId === g.id)).forEach(g => {
     if (g.crm) gezeigt.add(g.crm);
-    leute.push({ name: g.kontakt || g.firma, rolle: g.name, firma: g.kontakt ? g.firma : '', tel: g.telefon, mail: g.email, farbe: g.farbe,
-      aktion: effektiveVorlage(g) ? `<button class="sec sm" title="Mail an ${esc(g.name)}" onclick="gewerkMail('${p.id}','${g.id}')">✉</button>` : '' });
+    const offen = !(g.kontakt || g.firma || g.email || g.telefon);
+    leute.push({ name: offen ? g.name : g.kontakt || g.firma, rolle: offen ? '' : g.name, firma: g.kontakt ? g.firma : '', tel: g.telefon, mail: g.email, farbe: g.farbe,
+      gruppe: (g.firma && g.firma === s.firma && !/liefer|transport|kran|kontroll|abnahme/i.test(g.name)) ? 'ckw' : leuteGruppe(g.name, artOf(g)), offen,
+      aktion: offen ? `<button class="sec sm" title="Firma / Kontakt eintragen" onclick="gewerkDialog('${p.id}','${g.id}')">＋ Kontakt</button>`
+        : effektiveVorlage(g) ? `<button class="sec sm" title="Mail an ${esc(g.name)}" onclick="gewerkMail('${p.id}','${g.id}')">✉</button>` : '' });
   });
   p.personen.map(kontaktById).filter(c => c && !gezeigt.has(c.id)).forEach(c => leute.push({ name: kontaktName(c), rolle: c.gewerk || (c.art === 'kunde' ? 'Kunde' : ARTEN[c.art]),
-    firma: c.name ? kontaktFirma(c) : '', tel: c.telefon, mail: c.email, farbe: avatarFarbe(c),
+    firma: c.name ? kontaktFirma(c) : '', tel: c.telefon, mail: c.email, farbe: avatarFarbe(c), gruppe: c.art === 'kunde' ? 'weitere' : leuteGruppe(c.gewerk || '', c.art),
     aktion: `<button class="ck-btn" title="Kontakt bearbeiten" onclick="kontaktDialog('${c.id}')">✎</button><button class="ck-btn" title="aus dem Projekt entfernen" onclick="personEntfernen('${p.id}','${c.id}')">✕</button>` }));
   const mitChk = modulAn(p, 'checkliste');
   return `
@@ -2970,12 +3006,14 @@ function viewUebersicht(p) {
   </div>
   <div class="ueb-grid ueb-eins">
     <div class="card">
-      <div class="ck-head"><h3 style="margin:0">Leute im Projekt</h3><span class="muted">${leute.length}</span></div>
+      <div class="ck-head"><h3 style="margin:0">Leute im Projekt</h3><span class="muted">${LEUTE_GRUPPEN.reduce((n, [k]) => n + leuteZusammen(leute.filter(x => x.gruppe === k)).length, 0)}</span></div>
       <div class="ueb-kunde">${kunde
         ? personKarte({ name: kontaktName(kunde), rolle: 'Kunde', firma: kunde.name ? kunde.firma : '', tel: kunde.telefon, mail: kunde.email, farbe: avatarFarbe(kunde),
             aktion: `<button class="ck-btn" title="Kunde bearbeiten" onclick="kontaktDialog('${kunde.id}')">✎</button><button class="ck-btn" title="anderen Kunden wählen" onclick="findP('${p.id}').kundeId='';save();render()">✕</button>` })
         : `<label>Kunde</label>${kontaktPicker('kundeSetzen', { filter: 'kunde', platzhalter: 'Kunde aus Kontakten wählen oder neu anlegen …' })}`}</div>
-      <div class="personen">${leute.map(personKarte).join('')}</div>
+      ${LEUTE_GRUPPEN.map(([k, titel]) => { const L = leuteZusammen(leute.filter(x => x.gruppe === k)); return L.length ? `<div class="leute-gr">
+        <div class="leute-titel">${titel} <span>${L.length}</span></div>
+        <div class="personen">${L.map(personKarte).join('')}</div></div>` : ''; }).join('')}
       <div style="margin-top:10px"><label>Person hinzufügen</label>${kontaktPicker('personHinzu', { platzhalter: 'Aus Kontakten (CRM) suchen …' })}</div>
     </div>
   </div>
@@ -3218,7 +3256,7 @@ function mailFuellen(p, v, gid) {
     baustart_datum: sp ? fmt(sp.start) : '', bauende_datum: sp ? fmt(sp.ende) : '', ibn_datum: ibnDatum(p),
     elektriker_extern: (() => { const e = alle.find(x => /elektr/i.test(x.name) && artOf(x) !== 'intern'); return e ? [e.firma, e.kontakt].filter(Boolean).join(', ') : ''; })(),
     gewerk: g?.name || '', gewerk_firma: g?.firma || '', gewerk_kontakt: g?.kontakt || '', gewerk_telefon: g?.telefon || '',
-    pl: s.name, pl_telefon: s.telefon, pl_mail: s.email, firma: s.firma,
+    pl: plVon(p).name, pl_telefon: plVon(p).telefon, pl_mail: plVon(p).email, firma: s.firma,
     signatur: [s.name, 'Projektleiter', s.firma, s.strasse, s.ort, s.telefon && 'Tel. ' + s.telefon, s.email].filter(Boolean).join('\n')
   };
   const fill = t => String(t || '').replace(/\{(\w+)\}/g, (m, k) => k in vars ? vars[k] : m).replace(/[ \t]+$/gm, '');
@@ -3543,7 +3581,7 @@ function abnahmeDefaults(p, art = 'abnahme') {
   const v = vorlageKopie(S().abnahmeVorlage);
   // Datum, Zeit und Unterschriften werden bei der Abnahme vor Ort eingetragen
   return { v: 1, datum: '', zeit: '', titel: projektArt(p) === 'batterie' ? 'Batteriespeicher' : v.titel,
-    kunde: kundeText(p), objekt: objektText(p), ersteller: [S().firma, S().name, S().telefon].filter(Boolean).join('\n'),
+    kunde: kundeText(p), objekt: objektText(p), ersteller: [S().firma, plVon(p).name, plVon(p).telefon].filter(Boolean).join('\n'),
     // Punkt 1 vom anderen Protokoll übernehmen; die Abnahme übernimmt zudem die Häkchen der Funktionsprüfung aus der Zwischenabnahme
     gegenstand: anderesProtokoll(p, art)?.gegenstand ? vorlageKopie(anderesProtokoll(p, art).gegenstand) : produkte(p).map(x => ({ ...x, ok: false })),
     pruefung: art === 'abnahme' && p.zwischen ? v.pruefung.map(x => ({ ...x, ok: p.zwischen.pruefung.some(z => z.ok && gleicherText(z, x)) })) : v.pruefung,
@@ -4025,7 +4063,7 @@ function blitzDefaults(p) {
   return {
     kunde: (p.ibn?.kunde || (k => k ? [k.name, k.firma, k.adresse].filter(Boolean).join('\n') : '')(kontaktById(p.kundeId))).split('\n').map(s => s.trim()).filter(Boolean).join(', '),
     projekt: [p.name, p.ort].filter(Boolean).join(', '),
-    pl: [S().name, S().telefon, S().email].filter(Boolean).join(', '),
+    pl: [plVon(p).name, plVon(p).telefon, plVon(p).email].filter(Boolean).join(', '),
     klasse: '', ohm: '',
     aufgaben: { beratung: false, besichtigung: false, planung: false, kontrolle: true },
     unterlagen: { grundriss: false, blitz: false, pv: false, feuerwehr: false, mpp: false }
@@ -4209,7 +4247,7 @@ function viewTermine(p) {
       <div><label>Gewerk *</label>
         <div class="gw-wahl">
           <input type="hidden" id="t-gw" value="${gwSel ? gwSel.id : ''}">
-          <input id="t-gw-suche" autocomplete="off" value="${esc(gwSel ? gwLabel(gwSel) : '')}" placeholder="Gewerk, Firma oder Kontakt suchen …"
+          <input id="t-gw-suche" autocomplete="off" value="${esc(gwSel ? gwLabel(gwSel) : '')}" placeholder="Gewerk suchen oder einfach eintippen (z.B. Gärtner) …"
             onfocus="this.select();gwListe(true)" oninput="$('t-gw').value='';gwListe(true)" onkeydown="gwTaste(event)" onblur="setTimeout(()=>gwListe(false),180)">
           <div class="gw-liste" id="gw-liste" hidden></div>
         </div></div>
@@ -4312,8 +4350,14 @@ function gwListe(offen) {
           <div class="muted klein">${[c.telefon && '☎ ' + hl(c.telefon), c.email && hl(c.email)].filter(Boolean).join(' · ')}</div></div></div>`;
     }).join('');
   }
+  // einfach so eintragen (z.B. «Gärtner»), ohne Firma und Kontakt – lässt sich später ergänzen
+  const roh = inp.value.trim();
+  if (q && !p.gewerke.some(g => gewerk(p, g.id).name.toLowerCase() === roh.toLowerCase())) {
+    const fi = gwTreffer.push('__frei') - 1;
+    html += `<div class="gw-opt gw-neu" data-i="${fi}" onmousedown="event.preventDefault();gwFreiWaehlen()">✓ «${esc(roh)}» so eintragen <span class="muted klein">· ohne Firma / Kontakt, später ergänzen</span></div>`;
+  }
   const neuIdx = gwTreffer.push('__neu') - 1;
-  html += `<div class="gw-opt gw-neu" data-i="${neuIdx}" onmousedown="event.preventDefault();gwNeu()">＋ Neues Gewerk${q ? ` «${esc(inp.value.trim())}»` : ''} anlegen</div>`;
+  html += `<div class="gw-opt gw-neu" data-i="${neuIdx}" onmousedown="event.preventDefault();gwNeu()">＋ Neues Gewerk${q ? ` «${esc(roh)}»` : ''} mit Firma / Kontakt anlegen</div>`;
   if (gwTreffer.length === 1) html = `<div class="muted" style="padding:10px 12px">Kein Gewerk gefunden.</div>` + html;
   L.innerHTML = html;
   gwAktiv = Math.min(gwAktiv, gwTreffer.length - 1);
@@ -4335,7 +4379,7 @@ function gwTaste(e) {
   } else if (e.key === 'Enter') {
     e.preventDefault();
     const id = gwTreffer[gwAktiv];
-    if (id === '__neu') gwNeu(); else if (id && id.startsWith('crm:')) gwAusKontakt(id.slice(4)); else if (id) gwWaehlen(id);
+    if (id === '__neu') gwNeu(); else if (id === '__frei') gwFreiWaehlen(); else if (id && id.startsWith('crm:')) gwAusKontakt(id.slice(4)); else if (id) gwWaehlen(id);
   } else if (e.key === 'Escape') L.hidden = true;
 }
 function gwWaehlen(id) {
@@ -4353,6 +4397,23 @@ function gwAusKontakt(cid) {
   p.gewerke.push(g);
   save(); render(); gwWaehlen(g.id);
   toast(`«${g.name}» aus den Kontakten ins Projekt übernommen.`);
+}
+// Gewerk nur mit Namen (gleicher Name im Projekt wird wiederverwendet); ohne CRM-Eintrag
+function gwFrei(p, name) {
+  const n = String(name || '').trim();
+  const da = p.gewerke.find(g => { const x = gewerk(p, g.id); return [x.name, gwLabel(x)].some(t => t.toLowerCase() === n.toLowerCase()); });
+  if (da) return da;
+  const g = { id: uid(), name: n, art: 'extern', eigen: false, firma: '', adresse: '', kontakt: '', telefon: '', email: '', farbe: freieFarbe(p.gewerke.map(x => x.farbe)) };
+  p.gewerke.push(g);
+  return g;
+}
+// nur vormerken: angelegt wird das Gewerk erst beim Speichern des Termins (sonst bleiben bei «Abbrechen» leere Gewerke liegen)
+function gwFreiWaehlen() {
+  const inp = $('t-gw-suche'), n = inp.value.trim();
+  if (!n) return;
+  $('t-gw').value = ''; inp.value = n; inp.dataset.frei = n;
+  $('gw-liste').hidden = true;
+  $('t-titel').focus();
 }
 function gwNeu() {
   $('gw-liste').hidden = true;
@@ -4416,9 +4477,14 @@ function speichereTermin(pid) {
   if (d.meilenstein && d.start && !d.ende) d.ende = d.start;
   // mit Abhängigkeit genügt die Dauer: fehlender Start wird berechnet
   if (d.nach && !d.start) { d.start = d.ende || todayIso(); if (!d.ende) d.ende = d.start; }
-  if (!d.gewerkId) { toast('Bitte ein Gewerk aus der Liste wählen oder neu anlegen.'); return $('t-gw-suche').focus(); }
+  // kein Gewerk aus der Liste gewählt, aber ein Name getippt (z.B. «Gärtner»): so übernehmen
+  const getippt = $('t-gw-suche').value.trim();
+  if (!d.gewerkId && !getippt) { toast('Bitte ein Gewerk wählen oder einfach den Namen eintippen (z.B. Gärtner).'); return $('t-gw-suche').focus(); }
   if (!d.titel || !d.start || !d.ende) return toast('Bitte Tätigkeit, Start und Ende ausfüllen.');
   if (d.ende < d.start) return toast('Das Ende liegt vor dem Start.');
+  let freiNeu = false;
+  if (!d.gewerkId) { const n0 = p.gewerke.length; d.gewerkId = gwFrei(p, getippt).id; freiNeu = p.gewerke.length > n0; }
+  if (freiNeu) setTimeout(() => toast(`Gewerk «${getippt}» eingetragen – Firma / Kontakt kannst du später unter Projekt-Einstellungen › Gewerke ergänzen.`), 50);
   if (ui.editTermin) {
     const t = p.termine.find(x => x.id === ui.editTermin);
     Object.assign(t, d);
@@ -4496,7 +4562,7 @@ function viewGewerke(p) {
       ${liste.map(x => `<tr class="click" onclick="gewerkDialog('${p.id}','${x.id}')">
         <td><span class="swatch" style="background:${x.farbe}"></span>${x.std ? '<span title="Standard-Gewerk" style="color:var(--bar)">★</span> ' : ''}${esc(x.name)}
           ${effektiveVorlage(x) ? `<div><span class="tag-wichtig" style="margin:0">✉ ${esc(effektiveVorlage(x))}</span></div>` : ''}</td>
-        <td>${esc(x.firma)}</td><td>${esc(x.kontakt)}</td>
+        ${x.firma || x.kontakt || x.telefon || x.email ? `<td>${esc(x.firma)}</td><td>${esc(x.kontakt)}</td>` : '<td colspan="2"><span class="tag-sub">Firma / Kontakt noch offen</span></td>'}
         <td class="muted">${x.telefon ? `<a href="tel:${esc(x.telefon)}" onclick="event.stopPropagation()">${esc(x.telefon)}</a>` : ''}${x.telefon && x.email ? '<br>' : ''}${x.email ? `<a href="mailto:${esc(x.email)}" onclick="event.stopPropagation()">${esc(x.email)}</a>` : ''}</td>
         <td class="muted">${esc(x.adresse)}</td>
         <td>${p.termine.filter(t => t.gewerkId === x.id).length}</td>
@@ -4648,6 +4714,17 @@ function viewInfo(p) {
       <div><label>Farbe im Kalender</label><input type="color" id="i-farbe" value="${p.farbe}"></div>
       <div><label>Art</label><select id="i-art">${Object.entries(PROJEKT_ARTEN).map(([k, l]) => `<option value="${k}" ${projektArt(p) === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
     </div>
+    ${(() => { const pl = plVon(p); return `<div class="pl-box">
+      <div class="ck-head" style="margin-bottom:6px"><b>🦺 Projektleiter</b>
+        ${pl.eigen ? `<button class="sec sm" onclick="plStandard('${p.id}')">Zurück auf ${esc(S().name)}</button>` : `<span class="muted klein">Standard aus den Einstellungen</span>`}</div>
+      <div class="grid">
+        <div><label>Name</label><input id="i-pl" value="${esc(pl.name)}" list="pl-namen" placeholder="${esc(S().name)}"></div>
+        <div><label>Telefon</label><input id="i-pl-tel" type="tel" value="${esc(pl.telefon)}" placeholder="+41 …"></div>
+        <div><label>E-Mail</label><input id="i-pl-mail" type="email" value="${esc(pl.email)}" placeholder="name@ckw.ch"></div>
+      </div>
+      <datalist id="pl-namen">${[...new Set([S().name, ...state.projects.map(x => x.projektleiter?.name)].filter(Boolean))].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+      <div class="muted klein" style="margin-top:4px">Erscheint im Projektkopf, auf Terminplan, Protokollen, Bauprotokoll, Controlling und in den Mailvorlagen ({pl}).</div>
+    </div>`; })()}
     <div style="margin-top:12px"><label>Bemerkung (erscheint auf dem PDF)</label><textarea id="i-bem">${esc(p.bemerkung)}</textarea></div>
     <div class="row" style="margin-top:12px;justify-content:space-between">
       <button onclick="speichereInfo('${p.id}')">Speichern</button>
@@ -4663,9 +4740,19 @@ function speichereInfo(pid) {
   const art = $('i-art').value, neueArt = art !== projektArt(p);
   if (neueArt && !confirm(`Art auf «${PROJEKT_ARTEN[art]}» ändern? Die Checkliste wird durch diese Vorlage ersetzt; abgehakte Punkte mit gleichem Text bleiben erhalten.`)) return;
   Object.assign(p, { art, nummer, name, ort: val('i-ort'), farbe: $('i-farbe').value, bemerkung: val('i-bem') });
+  // Projektleiter nur speichern, wenn er vom Standard abweicht; sonst gilt immer der aus den Einstellungen
+  const pln = val('i-pl'), vorher = plVon(p);
+  if (!pln || pln === S().name) delete p.projektleiter;
+  else {
+    // neuer Name: stehengebliebene Kontaktdaten des bisherigen Projektleiters nicht übernehmen, sondern die aus einem anderen Projekt mit diesem Projektleiter
+    const neu = pln !== vorher.name, alt = state.projects.find(x => x !== p && x.projektleiter?.name === pln)?.projektleiter || {};
+    const feld = (id, k) => { const v = val(id); return neu && (!v || v === vorher[k]) ? alt[k] || '' : v; };
+    p.projektleiter = { name: pln, telefon: feld('i-pl-tel', 'telefon'), email: feld('i-pl-mail', 'email') };
+  }
   if (neueArt) p.checkliste = vorlageFuer(art);
   save(); render(); toast('Projektdaten gespeichert.');
 }
+function plStandard(pid) { delete findP(pid).projektleiter; save(); render(); toast(`Projektleiter: ${S().name}`); }
 function loescheProjekt(pid) {
   const p = findP(pid);
   if (!confirm(`Projekt ${p.nummer} – ${p.name} wirklich löschen?`)) return;
@@ -5555,7 +5642,7 @@ function pdf(pid) {
 }
 // zeichnet den Terminplan; f skaliert Schrift und Zeilenhöhe der Tabellen
 function pdfTerminplan(p, termine, f) {
-  const s = S(), { jsPDF } = window.jspdf;
+  const s = { ...S(), ...plVon(p) }, { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
   const W = 420, H = 297, M = 14, BRAND = [24, 24, 27], UNTEN = 18;
   const ax = zeitachse(termine);
@@ -6375,7 +6462,7 @@ function ktReportHTML(p, w) {
   .rp .ft{margin-top:8px;color:#999;font-size:9.5px;border-top:1px solid #eee;padding-top:5px;display:flex;justify-content:space-between}
   </style>
   <div class="hd"><div><div class="lab">Projektcontrolling</div><h1>${esc(p.name)}</h1>
-    <div class="sub">Projekt-Nr. ${esc(p.nummer)}${p.ort ? ' · ' + esc(p.ort) : ''} · Projektleiter: ${esc(S().name || '–')}</div></div>
+    <div class="sub">Projekt-Nr. ${esc(p.nummer)}${p.ort ? ' · ' + esc(p.ort) : ''} · Projektleiter: ${esc(plVon(p).name || '–')}</div></div>
     <div class="meta"><b>KW ${ktKw(w.date)} · ${fmt(w.date)}</b>Erstellt: ${fmt(todayIso())}</div></div>
   <div class="st"><b>Status:</b> ${stTxt}</div>
   <div class="tiles">
