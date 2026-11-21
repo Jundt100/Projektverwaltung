@@ -9,6 +9,8 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="CKW Projekte">
 <meta name="apple-mobile-web-app-title" content="CKW Projekte">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -862,6 +864,102 @@
   .pk2 { padding: 20px 22px; }
   /* Termine: Umschalter Woche / Monat neben dem Titel */
   .seg-sicht button { padding: 6px 16px; }
+  /* Kontakt-Ansicht */
+  .k-ansicht-kopf { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .k-aktionen { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .k-akt { flex: 1; min-width: 100px; text-align: center; padding: 10px 12px; border-radius: 12px; background: #f1f0eb; color: var(--text); text-decoration: none; font-weight: 600; font-size: 14px; }
+  .k-akt:hover { background: #e7e6e0; }
+  .k-zeilen { border-top: 1px solid #eef1f5; }
+  .k-zeile { display: flex; gap: 12px; padding: 9px 2px; border-bottom: 1px solid #eef1f5; font-size: 14.5px; word-break: break-word; }
+  .k-ic { width: 20px; text-align: center; flex: none; color: var(--muted); }
+  .k-projekte { display: flex; flex-wrap: wrap; gap: 6px; }
+  .k-hat-notiz { font-size: 12px; opacity: .7; }
+  .k-nur-handy { display: none; }
+  /* Handy: in der Kontaktliste nur Name (mit Firma darunter) und Telefon */
+  @media (max-width: 700px) {
+    .k-tab th:not(.k-m), .k-tab td:not(.k-m) { display: none; }
+    .k-tab { min-width: 0 !important; width: 100%; }
+    .k-tab td.k-m:last-of-type, .k-tab th.k-m:last-of-type { text-align: right; }
+    .k-tab td, .k-tab th { padding-left: 4px; padding-right: 4px; }
+    .k-tab td.k-m a { font-size: 13.5px; }
+    .card:has(.k-tab) { padding-left: 14px; padding-right: 14px; }
+    .k-nur-handy { display: block; }
+  }
+  /* Knopf «App installieren» unten in der Mitte */
+  #installKnopf { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70; display: flex; gap: 6px; background: #fff; padding: 6px; border-radius: 999px; box-shadow: 0 6px 24px rgba(0,0,0,.18); }
+  #installKnopf button { border-radius: 999px; white-space: nowrap; }
+  /* ---------- Stringplan ---------- */
+  .sp-kopf { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+  .sp-kopf-l { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .sp-kopf-l .sp-f { min-width: 180px; }
+  .sp-eingaben { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 18px; align-items: start; }
+  .sp-eingaben .card { margin: 0; }
+  .sp-wr-karte { grid-column: 1 / -1; }
+  .sp-karte h3 { margin: 0 0 12px; font-size: 15px; }
+  .sp-reihe { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 10px; }
+  .sp-reihe > .sp-f { flex: 1 1 110px; }
+  .sp-reihe > .sp-breit { flex: 3 1 240px; }
+  .sp-klein > .sp-f { flex: 1 1 100px; }
+  .sp-f { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .sp-f > span:first-child { font-weight: 600; }
+  .sp-f select, .sp-f input { width: 100%; }
+  .sp-in { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 10px; background: #fff; overflow: hidden; }
+  .sp-in input { border: 0 !important; box-shadow: none !important; min-width: 0; flex: 1; background: transparent; }
+  .sp-in i { font-style: normal; color: var(--muted); padding: 0 10px 0 2px; font-size: 12.5px; }
+  .sp-zaehler button { background: var(--brand-2); color: var(--text); border: 0; border-radius: 0; padding: 8px 12px; font-weight: 700; }
+  .sp-zaehler input { text-align: center; }
+  .sp-flaeche { border-left: 4px solid var(--oc); padding-left: 10px; flex-wrap: nowrap; }
+  .sp-flaeche > .sp-f { min-width: 0; }
+  .sp-x { align-self: flex-end; margin-bottom: 6px; flex: 0 0 auto; }
+  .sp-summe { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13.5px; }
+  .sp-wr { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; background: #fcfcfa; }
+  .sp-wr .sp-reihe:last-of-type { margin-bottom: 0; }
+  .sp-banner { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid; font-size: 13.5px; }
+  .sp-banner b { font-size: 15px; }
+  .sp-ok { background: #edf7ef; border-color: #b9dfc1; color: #1d5e29; }
+  .sp-warn { background: #fdf5e6; border-color: #efd39c; color: #7a4d05; }
+  .sp-err { background: #fbecea; border-color: #eeb8b1; color: #8a2419; }
+  .sp-info { background: #f1f0eb; border-color: var(--line); color: var(--text); }
+  .sp-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .sp-kpis > div { background: #fff; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; }
+  .sp-kpis span { font-size: 12px; color: var(--muted); }
+  .sp-kpis b { font-size: 22px; line-height: 1.25; }
+  .sp-kpis small { font-size: 12px; color: var(--muted); }
+  .sp-wr-erg { background: #fff; border-radius: 18px; padding: 18px 20px; margin-bottom: 16px; }
+  .sp-wr-kopf { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .sp-wr-kopf h3 { margin: 0 0 2px; }
+  .sp-last { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .sp-last i { display: block; width: 120px; height: 8px; border-radius: 6px; background: var(--brand-2); overflow: hidden; }
+  .sp-last i b { display: block; height: 100%; background: var(--bar); }
+  .sp-last i.ueber b { background: var(--danger); }
+  .sp-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+  .sp-tile { border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; padding: 10px 12px; font-size: 13px; display: flex; flex-direction: column; gap: 3px; }
+  .sp-tile.frei { border-top-color: var(--line); color: var(--muted); align-items: center; justify-content: center; text-align: center; border-style: dashed; min-height: 80px; }
+  .sp-th { display: flex; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); }
+  .sp-th b { color: var(--c); }
+  .sp-gross { font-size: 19px; font-weight: 700; }
+  .sp-gross small { font-size: 12px; font-weight: 400; color: var(--muted); }
+  .sp-ids { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: var(--brand-2); border-radius: 6px; padding: 2px 6px; align-self: flex-start; }
+  .sp-teil { font-size: 12px; color: var(--warn); }
+  .sp-legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; margin-bottom: 12px; }
+  .sp-legende i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .sp-daecher { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .sp-dach { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .sp-dach-kopf { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+  .sp-dach-kopf i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--oc); margin-right: 6px; }
+  .sp-srow { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 4px; }
+  .sp-srow > span { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; width: 42px; flex-shrink: 0; color: var(--k); font-weight: 700; padding-top: 1px; }
+  .sp-mods { display: flex; flex-wrap: wrap; gap: 2px; }
+  .sp-mods i { width: 11px; height: 15px; border-radius: 2px; background: var(--k); }
+  .sp-fehlt > span { color: var(--danger); }
+  .sp-fehlt .sp-mods i { background: transparent; border: 1px dashed var(--danger); }
+  .sp-prob { display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 10px; margin-bottom: 8px; font-size: 13px; border: 1px solid; }
+  .sp-prob.sp-ok { background: #f3faf4; }
+  @media (max-width: 700px) {
+    .sp-wr-erg { padding: 14px; }
+    .sp-tiles { grid-template-columns: 1fr 1fr; }
+    .sp-last i { width: 70px; }
+  }
 </style>
 </head>
 <body class="gesperrt">
@@ -1713,7 +1811,8 @@ const MODULE = [
   ['termine', 'Terminplan', 'Reiter Terminplan, Termine im Wochenplan, Kalender und Dashboard, Einsätze und Baustart-Warnungen'],
   ['checkliste', 'Checkliste', 'Reiter Checkliste, offene Punkte bis Baustart und Baufreigabe-Hinweise'],
   ['controlling', 'Controlling', 'Reiter Controlling, «fällig»-Hinweise und Ampel'],
-  ['dokumente', 'Dokumente', 'Reiter Dokumente (Protokolle, Rapporte) und offene Mängel im Dashboard']];
+  ['dokumente', 'Dokumente', 'Reiter Dokumente (Protokolle, Rapporte) und offene Mängel im Dashboard'],
+  ['stringplan', 'Stringplan', 'Reiter Stringplan (Module auf Wechselrichter verteilen, PDF)']];
 const modulAn = (p, k) => !(p.aus && p.aus[k]);
 function modulSchalten(pid, k, ein) {
   const p = findP(pid);
@@ -2410,7 +2509,7 @@ function abschlussBanner(p) {
     DB <b class="${KT_TXT[kl]}">${ktChf(db)} (${ktPct(a.dbPct)})</b>${plan == null ? '' : ` · <span class="${KT_TXT[kl]}">${ktSgnChf(db - plan)} zu Verkauf</span>`}</span>
     <button class="sec sm" onclick="ktWiederOeffnen('${p.id}')">Wieder öffnen</button></div></div>`;
 }
-const PROJEKT_TABS = [['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', 'Checkliste'], ['controlling', 'Controlling'], ['dokumente', 'Dokumente']];
+const PROJEKT_TABS = [['uebersicht', 'Übersicht'], ['termine', 'Terminplan'], ['checkliste', 'Checkliste'], ['controlling', 'Controlling'], ['dokumente', 'Dokumente'], ['stringplan', 'Stringplan']];
 function viewProjekt(p) {
   // frühere Reiter «Gewerke» und «Projektdaten» liegen jetzt in den Projekt-Einstellungen
   if (ui.tab === 'gewerke' || ui.tab === 'info') { ui.einst = ui.tab; ui.tab = 'einstellungen'; }
@@ -2418,7 +2517,7 @@ function viewProjekt(p) {
   const reiter = PROJEKT_TABS.filter(([k]) => k === 'uebersicht' || modulAn(p, k));
   if (ui.tab !== 'einstellungen' && !reiter.some(([k]) => k === ui.tab)) ui.tab = 'uebersicht';
   const kunde = kontaktById(p.kundeId), einst = ui.tab === 'einstellungen';
-  const inhalt = { termine: viewTermine, checkliste: viewCheckliste, controlling: viewKtProjekt, dokumente: viewDokumente, einstellungen: viewEinstellungenProjekt }[ui.tab] || viewUebersicht;
+  const inhalt = { termine: viewTermine, checkliste: viewCheckliste, controlling: viewKtProjekt, dokumente: viewDokumente, stringplan: viewStringplan, einstellungen: viewEinstellungenProjekt }[ui.tab] || viewUebersicht;
   return `
   <div class="row" style="justify-content:space-between;margin-bottom:14px">
     <button class="sec sm" onclick="nav('projekte')">← Alle Projekte</button>
@@ -2519,6 +2618,805 @@ function prodSet(pid, i, op, v) {
   box.innerHTML = produktZeilen(p);
   if (op === 'add') { const t = box.querySelectorAll('.ab-text'); t[t.length - 1].focus(); }
 }
+// ---------- Stringplaner: Rechenkern (unverändert aus «PV Stringplaner» übernommen, gekapselt als SP) ----------
+// Modell: jeder MPPT trägt genau eine Fläche mit gleich langen Strings; geprüft wird Uoc × Kältefaktor gegen die max. DC-Spannung.
+const SP = (() => {
+// ==SOLVER-START==
+// Modell: Jeder MPPT bekommt genau EINE Ausrichtung und lauter gleich lange Strings.
+// Gesucht wird, welche MPPT zu welcher Ausrichtung gehören (Suche), danach wird je Ausrichtung
+// exakt verteilt (gleich lange Strings, ein MPPT darf weniger Eingänge belegen, damit die Summe aufgeht).
+const ORI=[
+  {k:'N',name:'Norden',y:0.6,v:'--o-n'},
+  {k:'O',name:'Osten', y:0.85,v:'--o-o'},
+  {k:'S',name:'Süden', y:1.0,v:'--o-s'},
+  {k:'W',name:'Westen',y:0.85,v:'--o-w'}
+];
+const KF_OPTIONS=[1.15,1.2,1.25];
+const W_UNPL=1e7, W_YIELD=1e5, W_STR=5e4, W_UNUSED=3e5, W_SPREAD=300, W_BALWR=6e5,W_MIX=4e5,W_EVEN=300, W_BALM=2;
+// Neigung: grobe Ertragsabschätzung (30° = Optimum), dient nur dazu, bei Platzmangel die schwächste Fläche zuerst wegzulassen
+const TILT_FACTOR=t=>Math.max(0.5,1-0.00018*Math.pow(t-30,2));
+
+function defaults(){
+  return {
+    mod:{kf:1.15,minStr:6},
+    types:[{name:'Modul A',pmax:490,uoc:40.4}],
+    useTilt:false,
+    groups:[{o:0,n:0,tilt:30,t:0},{o:1,n:52,tilt:30,t:0},{o:2,n:15,tilt:30,t:0},{o:3,n:63,tilt:30,t:0}],
+    groupsBak:null,
+    wrs:[
+      {name:'WR 1',ac:25,mppt:2,inputs:2,umax:1100,dcmax:150},
+      {name:'WR 2',ac:25,mppt:2,inputs:2,umax:1100,dcmax:150}
+    ]
+  };
+}
+// Alte Speicherstände (nur ein Modultyp, Feld "ori") in das neue Format übernehmen
+function migrate(o){
+  if(!o||!o.wrs||!o.wrs.length)return null;
+  const st=defaults();
+  st.mod.kf=KF_OPTIONS.includes(+(o.mod&&o.mod.kf))?+o.mod.kf:1.15;
+  st.mod.minStr=Math.max(1,Math.floor(+(o.mod&&o.mod.minStr))||6);
+  if(o.types&&o.types.length)st.types=o.types.map(t=>({name:String(t.name||'Modul'),pmax:+t.pmax||0,uoc:+t.uoc||0}));
+  else if(o.mod)st.types=[{name:'Modul A',pmax:+o.mod.pmax||490,uoc:+o.mod.uoc||40.4}];
+  st.useTilt=!!o.useTilt;
+  const cg=g=>({o:Math.min(3,Math.max(0,g.o|0)),n:Math.max(0,Math.floor(+g.n)||0),tilt:isFinite(+g.tilt)?+g.tilt:30,t:Math.min(st.types.length-1,Math.max(0,g.t|0))});
+  if(o.groups&&o.groups.length)st.groups=o.groups.map(cg);
+  else if(o.ori&&o.ori.length===4)st.groups=o.ori.map((n,i)=>cg({o:i,n,tilt:30,t:0}));
+  st.groupsBak=o.groupsBak?o.groupsBak.map(cg):null;
+  st.wrs=o.wrs.map((w,i)=>({name:w.name||('WR '+(i+1)),ac:+w.ac||0,mppt:+w.mppt||0,inputs:(typeof w.inputs==='string'&&/[\/,;\s]/.test(w.inputs.trim()))?w.inputs.trim():(+w.inputs||0),umax:+w.umax||0,dcmax:+w.dcmax||0}));
+  if(o.man&&Array.isArray(o.man.wr)&&o.man.ng===st.groups.length)st.man={ng:o.man.ng,wr:o.man.wr.map(a=>Array.isArray(a)?a.map(x=>(x&&x.g>=0&&x.s>0&&x.L>0)?{g:x.g|0,s:x.s|0,L:x.L|0}:null):[])};
+  return st;
+}
+const cloneSt=s=>JSON.parse(JSON.stringify(s));
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+// Eingänge je MPPT: Zahl (alle gleich) oder Liste wie "2/1/1" (je MPPT)
+function wrInputs(w){
+  const n=Math.max(0,Math.floor(+w.mppt)||0);
+  const s=String(w.inputs===undefined||w.inputs===null?'':w.inputs).trim();
+  if(/[\/,;\s]/.test(s)){const a=s.split(/[\/,;\s]+/).map(x=>Math.floor(+x)||0).filter(x=>x>0);if(a.length)return a}
+  const k=Math.floor(+s)||0;return (k>0&&n>0)?new Array(n).fill(k):[];
+}
+function buildCtx(st){
+  const m=st.mod,types=st.types,kf=m.kf;
+  const lo=Math.max(1,Math.floor(m.minStr)||1);
+  const G=st.groups.map((g,k)=>{
+    const t=types[g.t]||types[0]||{name:'?',pmax:0,uoc:0};
+    let name=ORI[g.o].name;
+    if(st.useTilt)name+=' '+Math.round(+g.tilt||0)+'°';
+    if(types.length>1)name+=' · '+t.name;
+    return {k,o:g.o,name,N:Math.max(0,Math.floor(g.n)||0),y:ORI[g.o].y*(st.useTilt?TILT_FACTOR(+g.tilt||0):1),
+      pmax:t.pmax,uoc:t.uoc,uk:t.uoc*kf,tname:t.name,tilt:+g.tilt||0,valid:t.pmax>0&&t.uoc>0};
+  });
+  const seen={};G.forEach(g=>{seen[g.name]=(seen[g.name]||0)+1});
+  const cnt={};G.forEach(g=>{if(seen[g.name]>1){cnt[g.name]=(cnt[g.name]||0)+1;g.name+=' #'+cnt[g.name]}});
+  // wr = echte Wechselrichter, vw = "virtuelle" je Wechselrichter und Eingangszahl (für die Verteilung)
+  const wr=[],vw=[];let Mtot=0;
+  st.wrs.forEach((w,wi)=>{
+    const ks=wrInputs(w);
+    const active=w.ac>0&&ks.length>0;
+    const hi=G.map(g=>g.valid?(w.umax>0?Math.floor(w.umax/g.uk):9999):0);
+    const ok=active&&hi.some(h=>h>=lo);
+    const capKW=w.dcmax>0?w.dcmax/100*w.ac:Infinity;
+    const vs=[];
+    if(ok)[...new Set(ks)].sort((a,b)=>b-a).forEach(K=>{
+      const M=ks.filter(x=>x===K).length;vs.push(vw.length);vw.push({i:vw.length,p:wi,K,M,lo,hi});Mtot+=M});
+    wr.push({i:wi,name:w.name||('WR '+(wi+1)),w,active,ok,lo,hi,ks,capKW,vs,M:ok?ks.length:0});
+  });
+  const N=G.map(g=>g.N);
+  const act=G.map(g=>g.k).filter(k=>N[k]>0);
+  const view=G.map(g=>vw.map(v=>({K:v.K,lo:v.lo,hi:v.hi[g.k]})));
+  const capG=G.map(g=>Math.max(0,...vw.filter(v=>v.hi[g.k]>=v.lo).map(v=>v.K*v.hi[g.k])));
+  const sumN=act.reduce((s,k)=>s+N[k],0);
+  const pAvg=sumN?act.reduce((s,k)=>s+N[k]*G[k].pmax,0)/sumN:500;
+  return {m,G,N,act,wr,vw,Mtot,view,capG,pAvg:pAvg||500,cache:new Map()};
+}
+const clampv=(L,lo,hi)=>L<lo?lo:(L>hi?hi:L);
+
+// Rest-MPPT (jeder mit K gleich langen Strings): Summe Nr exakt, möglichst gleiche Längen
+function fillRest(W,rest,Nr,sr){
+  const KK=w=>Math.min(sr,W[w].K);
+  if(!rest.length) return Nr===0?[]:null;
+  let sLo=0,sHi=0,maxHi=0;
+  for(const w of rest){sLo+=KK(w)*W[w].lo;sHi+=KK(w)*W[w].hi;if(W[w].hi>maxHi)maxHi=W[w].hi}
+  if(Nr<sLo||Nr>sHi) return null;
+  const f=L=>{let s=0;for(const w of rest)s+=KK(w)*clampv(L,W[w].lo,W[w].hi);return s};
+  let lo=0,hi=maxHi;
+  while(lo<hi){const mid=(lo+hi+1)>>1;if(f(mid)<=Nr)lo=mid;else hi=mid-1}
+  const L=lo,Ls=rest.map(w=>clampv(L,W[w].lo,W[w].hi));
+  const R=Nr-f(L); if(R===0) return Ls;
+  const el=[];rest.forEach((w,i)=>{if(W[w].lo<=L&&L<W[w].hi)el.push(i)});
+  const n=el.length,tab=new Uint8Array((n+1)*(R+1));tab[0]=1;
+  for(let i=0;i<n;i++){const wt=KK(rest[el[i]]);
+    for(let s=0;s<=R;s++){const idx=i*(R+1)+s; if(tab[idx]){tab[(i+1)*(R+1)+s]=1;if(s+wt<=R)tab[(i+1)*(R+1)+s+wt]=1}}}
+  if(!tab[n*(R+1)+R]) return null;
+  let s=R;
+  for(let i=n-1;i>=0;i--){
+    if(tab[i*(R+1)+s]) continue;
+    Ls[el[i]]++;s-=KK(rest[el[i]]);
+  }
+  return Ls;
+}
+// Exakte Verteilung von Nt Modulen auf die MPPT (counts je WR). Ein MPPT darf weniger Eingänge belegen.
+function bestExact(W,counts,Nt){
+  let best=null;
+  const types=[];counts.forEach((c,w)=>{if(c>0)types.push(w)});
+  for(const wp of types){
+    const Kp=W[wp].K,lop=W[wp].lo,hip=W[wp].hi;
+    const rest=[];counts.forEach((c,w)=>{const n=w===wp?c-1:c;for(let i=0;i<n;i++)rest.push(w)});
+    for(let sr=Math.max(...W.map(w=>w.K));sr>=1;sr--){
+      const KK=w=>Math.min(sr,W[w].K);
+      const restK=rest.reduce((s,w)=>s+KK(w),0);
+      for(let sp=1;sp<=Kp;sp++){
+        const ideal=Nt/(restK+sp);
+        for(let pass=0;pass<2;pass++){
+          const a=pass?lop:Math.max(lop,Math.floor(ideal)-4),b=pass?hip:Math.min(hip,Math.ceil(ideal)+4);
+          let found=false;
+          for(let Lp=a;Lp<=b;Lp++){
+            const Ls=fillRest(W,rest,Nt-sp*Lp,sr); if(!Ls) continue;
+            found=true;
+            let mn=Lp,mx=Lp,nstr=sp;const mods=[sp*Lp];
+            rest.forEach((w,i)=>{const L=Ls[i];if(L<mn)mn=L;if(L>mx)mx=L;mods.push(KK(w)*L);nstr+=KK(w)});
+            const mean=Nt/mods.length;let imb=0;for(const x of mods)imb+=(x-mean)*(x-mean);
+            const score=nstr*1e8+(mx-mn)*1e5+imb*10;
+            if(!best||score<best.score){
+              const m=[{w:wp,s:sp,L:Lp}];rest.forEach((w,i)=>m.push({w,s:KK(w),L:Ls[i]}));
+              best={score,spread:mx-mn,m};
+            }
+          }
+          if(found) break;
+        }
+      }
+    }
+    if(best) {/* weitere Typen als Teil-MPPT ebenfalls prüfen */}
+  }
+  return best;
+}
+function distribute(ctx,o,cnt){
+  const key=o+'|'+cnt.join(',');
+  let r=ctx.cache.get(key);if(r)return r;
+  r=distCompute(ctx,o,cnt);ctx.cache.set(key,r);return r;
+}
+function distCompute(ctx,o,cnt){
+  const N=ctx.N[o],W=ctx.view[o],counts=cnt.slice();
+  let dropped=0;
+  counts.forEach((c,w)=>{if(c>0&&W[w].hi<W[w].lo){dropped+=c;counts[w]=0}});
+  let total=counts.reduce((a,b)=>a+b,0);
+  if(!total) return {placed:0,m:[],spread:0,dropped};
+  const minNeed=()=>counts.reduce((s,c,w)=>s+c*W[w].lo,0);
+  while(total>0&&minNeed()>N){
+    let wb=-1;for(let w=0;w<counts.length;w++)if(counts[w]>0&&(wb<0||W[w].lo>W[wb].lo))wb=w;
+    counts[wb]--;total--;dropped++;
+  }
+  if(!total) return {placed:0,m:[],spread:0,dropped};
+  let cap=0;counts.forEach((c,w)=>cap+=c*W[w].K*W[w].hi);
+  if(N>=cap){
+    const m=[];counts.forEach((c,w)=>{for(let i=0;i<c;i++)m.push({w,s:W[w].K,L:W[w].hi})});
+    let mn=1e9,mx=0;m.forEach(e=>{mn=Math.min(mn,e.L);mx=Math.max(mx,e.L)});
+    return {placed:cap,m,spread:mx-mn,dropped};
+  }
+  for(let t=0;t<=40&&N-t>0;t++){
+    const b=bestExact(W,counts,N-t);
+    if(b) return {placed:N-t,m:b.m,spread:b.spread,dropped};
+  }
+  const w0=counts.findIndex(c=>c>0);
+  if(N>=W[w0].lo) return {placed:Math.min(N,W[w0].hi),m:[{w:w0,s:1,L:Math.min(N,W[w0].hi)}],spread:0,dropped:total-1+dropped};
+  return {placed:0,m:[],spread:0,dropped:total+dropped};
+}
+function evalState(ctx,c){
+  const N=ctx.N,W=ctx.wr,G=ctx.G;let cost=0;
+  const wrKW=new Array(W.length).fill(0);const mm=[];let used=0,nstr=0;const gKW=[],gM=[],gMod=[];
+  ctx.act.forEach((o,k)=>{
+    const cnt=c.map(row=>row[k]);
+    const r=distribute(ctx,o,cnt);
+    cost+=(N[o]-r.placed)*(W_UNPL+W_YIELD*G[o].y)+r.spread*W_SPREAD;
+    const gk=new Array(W.length).fill(0);gKW.push(gk);gM.push(r.m.length);const gmod=new Array(W.length).fill(0);gMod.push(gmod);
+    for(const e of r.m){const x=e.s*e.L;wrKW[ctx.vw[e.w].p]+=x*G[o].pmax/1000;gk[ctx.vw[e.w].p]+=x*G[o].pmax/1000;gmod[ctx.vw[e.w].p]+=x;mm.push(x);used++;nstr+=e.s}
+  });
+  cost+=(ctx.Mtot-used)*W_UNUSED+(nstr-used)*W_STR;
+  let tot=0;for(const x of mm)tot+=x;
+  const mean=ctx.Mtot?tot/ctx.Mtot:0;let v=0;for(const x of mm)v+=(x-mean)*(x-mean);v+=(ctx.Mtot-used)*mean*mean;
+  cost+=W_BALM*v;
+  let rs=0,rn=0;const ratio=[];
+  for(const w of W){if(!w.ok)continue;const ex=wrKW[w.i]-w.capKW;if(ex>1e-9)cost+=(ex*1000/ctx.pAvg)*(W_UNPL+W_YIELD*0.85);
+    const r=wrKW[w.i]/w.w.ac;ratio.push(r);rs+=r;rn++;if(r>1.2)cost+=1e6*(r-1.2)*(r-1.2)}
+  if(rn>1){ // gleichmäßig: jede Fläche anteilig zur AC-Leistung auf alle WR
+    let acs=0;for(const w of W)if(w.ok)acs+=w.w.ac;
+    gMod.forEach((gm,k)=>{const Ng=N[ctx.act[k]];for(const w of W){if(!w.ok)continue;const d=gm[w.i]-Ng*w.w.ac/acs;cost+=W_EVEN*d*d}});
+  }
+  if(rn>1){ // Mischung: jede Ausrichtung soll sich auf möglichst viele WR verteilen
+    gKW.forEach((gk,k)=>{let used=0;for(const w of W)if(w.ok&&gk[w.i]>0)used++;
+      const mp=gM[k],spread=Math.min(rn,mp);if(spread>1)cost+=W_MIX*(spread-used)/spread});
+  }
+  if(rn>1){const me=rs/rn;let q=0;for(const r of ratio)q+=(r-me)*(r-me);cost+=W_BALWR*q}
+  return cost;
+}
+function compositions(M,A){ // alle Vektoren der Länge A+1 mit Summe M
+  const out=[];const rec=(i,left,cur)=>{
+    if(i===A){out.push([...cur,left]);return}
+    for(let x=0;x<=left;x++){cur.push(x);rec(i+1,left-x,cur);cur.pop()}
+  };rec(0,M,[]);return out;
+}
+function search(ctx){
+  const A=ctx.act.length,W=ctx.vw.filter(w=>w.M>0);
+  const opts=ctx.vw.map(w=>w.M>0?compositions(w.M,A):[new Array(A+1).fill(0)]);
+  let prod=1;for(const o of opts){prod*=o.length;if(prod>1e9)break}
+  let best=null,bestC=Infinity;
+  if(prod<=120000){
+    const cur=new Array(ctx.vw.length);
+    const rec=i=>{
+      if(i===ctx.vw.length){const c=evalState(ctx,cur);if(c<bestC-1e-9){bestC=c;best=cur.map(r=>r.slice())}return}
+      for(const o of opts[i]){cur[i]=o;rec(i+1)}
+    };rec(0);return best;
+  }
+  // Simulated Annealing über die Zähler
+  const rng=mulberry32(20240607),idxW=ctx.vw.filter(w=>w.M>0).map(w=>w.i);
+  const init=()=>{
+    const c=ctx.vw.map(w=>{const r=new Array(A+1).fill(0);r[A]=w.M;return r});
+    const order=ctx.act.map((o,k)=>k).sort((a,b)=>ctx.N[ctx.act[b]]-ctx.N[ctx.act[a]]);
+    let wi=0;
+    for(const k of order){let need=Math.ceil(ctx.N[ctx.act[k]]/Math.max(1,ctx.capG[ctx.act[k]]));
+      while(need>0&&wi<idxW.length){const w=idxW[wi];if(c[w][A]>0){c[w][A]--;c[w][k]++;need--}else wi++}}
+    return c;
+  };
+  const initProp=()=>{
+    const c=ctx.vw.map(w=>{const r=new Array(A+1).fill(0);r[A]=w.M;return r});
+    ctx.vw.forEach(v=>{if(v.M<=0)return;
+      const wts=ctx.act.map((o,k)=>(v.hi[o]>=v.lo)?ctx.N[o]*ctx.G[o].pmax:0),tot=wts.reduce((a,b)=>a+b,0);if(!tot)return;
+      const raw=wts.map(x=>x/tot*v.M),fl=raw.map(Math.floor);let left=v.M-fl.reduce((a,b)=>a+b,0);
+      const ord=raw.map((x,k)=>[x-fl[k],k]).sort((a,b)=>b[0]-a[0]);
+      for(let i=0;left>0&&i<ord.length;i++,left--)fl[ord[i][1]]++;
+      fl.forEach((n,k)=>{c[v.i][k]=n;c[v.i][A]-=n});
+    });
+    return c;
+  };
+  const iters=Math.min(120000,20000+ctx.Mtot*4000),R=4;
+  for(let r=0;r<R;r++){
+    let c=r===1?init():initProp();
+    if(r>1)for(let q=0;q<ctx.Mtot*2;q++){const w=idxW[Math.floor(rng()*idxW.length)];const f=Math.floor(rng()*(A+1)),t=Math.floor(rng()*(A+1));if(c[w][f]>0&&f!==t){c[w][f]--;c[w][t]++}}
+    let cost=evalState(ctx,c);
+    for(let it=0;it<iters;it++){
+      const T=3000*Math.pow(20/3000,it/iters);
+      const w=idxW[Math.floor(rng()*idxW.length)];const f=Math.floor(rng()*(A+1)),t=Math.floor(rng()*(A+1));
+      if(f===t||c[w][f]<=0)continue;
+      if(idxW.length>1&&rng()<0.4){ // Tausch zwischen zwei Wechselrichtern: w gibt f ab und nimmt t, w2 umgekehrt
+        const w2=idxW[Math.floor(rng()*idxW.length)];
+        if(w2===w||c[w2][t]<=0||f===A||t===A)continue;
+        c[w][f]--;c[w][t]++;c[w2][t]--;c[w2][f]++;
+        const c3=evalState(ctx,c);
+        if(c3<=cost||rng()<Math.exp((cost-c3)/T))cost=c3;else{c[w][f]++;c[w][t]--;c[w2][t]++;c[w2][f]--}
+        continue;
+      }
+      c[w][f]--;c[w][t]++;
+      const c2=evalState(ctx,c);
+      if(c2<=cost||rng()<Math.exp((cost-c2)/T))cost=c2;else{c[w][f]++;c[w][t]--}
+    }
+    // Feinschliff
+    let imp=true,g=0;
+    while(imp&&g++<30){imp=false;
+      for(const w of idxW)for(let f=0;f<=A;f++)for(let t=0;t<=A;t++){
+        if(f===t||c[w][f]<=0)continue;c[w][f]--;c[w][t]++;
+        const c2=evalState(ctx,c);if(c2<cost-1e-9){cost=c2;imp=true}else{c[w][f]++;c[w][t]--}
+      }}
+    if(cost<bestC){bestC=cost;best=c.map(r=>r.slice())}
+  }
+  return best;
+}
+
+// Manuelle Auslegung: st.man.wr[wrIndex][mpptIndex] = {g:Fläche, s:Strings, L:Module je String} oder null
+function manOk(st){return !!(st.man&&st.man.wr&&st.man.ng===st.groups.length)}
+function plan(st){
+  const ctx=buildCtx(st),G=ctx.G;
+  const man=manOk(st);
+  const best=(!man&&ctx.act.length&&ctx.Mtot>0)?search(ctx):null;
+  const mp=ctx.vw.map(v=>new Array(v.M).fill(null));
+  const fit=G.map(()=>0),trimmed=G.map(()=>0);
+  if(best){
+    const nx=ctx.vw.map(()=>0);
+    ctx.act.forEach((o,k)=>{
+      const r=distribute(ctx,o,best.map(row=>row[k]));fit[o]=r.placed;
+      for(const e of r.m) mp[e.w][nx[e.w]++]={o,s:e.s,L:e.L};
+    });
+  }
+  if(man){ // von Hand ausgelegte Strings
+    for(const w of ctx.wr){
+      if(!w.ok)continue;const cnt={};
+      for(let mi=0;mi<w.ks.length;mi++){
+        const K=w.ks[mi],v=w.vs.find(v=>ctx.vw[v].K===K),pos=cnt[v]||0;cnt[v]=pos+1;
+        const e=(st.man.wr[w.i]||[])[mi];
+        if(!e||!(e.g>=0)||!G[e.g]||!G[e.g].valid)continue;
+        const ss=Math.max(0,Math.min(K,e.s|0)),LL=Math.max(0,e.L|0);
+        if(ss&&LL)mp[v][pos]={o:e.g,s:ss,L:LL,man:true};
+      }
+    }
+    for(const a of mp)for(const e of a)if(e)fit[e.o]+=e.s*e.L;
+  }
+  // DC/AC-Grenze (in kW): überzählige Module entfernen, ertragsschwächste Fläche zuerst
+  const capHits=[];
+  for(const w of ctx.wr){
+    if(!w.ok||!isFinite(w.capKW))continue;
+    const slots=[];w.vs.forEach(v=>{for(let k=0;k<mp[v].length;k++)slots.push([v,k])});
+    const get=sl=>mp[sl[0]][sl[1]];
+    const kwOf=()=>slots.reduce((s,sl)=>{const e=get(sl);return s+(e?e.s*e.L*G[e.o].pmax/1000:0)},0);
+    const modsOf=()=>slots.reduce((s,sl)=>{const e=get(sl);return s+(e?e.s*e.L:0)},0);
+    let kw=kwOf();const before=modsOf(),rm=G.map(()=>0);
+    while(kw>w.capKW+1e-9){
+      const ex=kw-w.capKW,cands=[];
+      slots.forEach((sl,i)=>{const e=get(sl);if(!e)return;const p=G[e.o].pmax/1000,y=G[e.o].y;
+        if(e.L>w.lo)cands.push({i,rem:e.s,kind:'L',p,y});
+        else if(e.s>1)cands.push({i,rem:e.L,kind:'s',p,y});
+        else cands.push({i,rem:e.L,kind:'x',p,y});});
+      if(!cands.length)break;
+      cands.sort((a,b)=>(Math.max(0,a.rem*a.p-ex)-Math.max(0,b.rem*b.p-ex))||(a.y-b.y));
+      const c=cands[0],sl=slots[c.i],e=get(sl);
+      if(c.kind==='L')e.L--;else if(c.kind==='s')e.s--;else mp[sl[0]][sl[1]]=null;
+      kw-=c.rem*c.p;trimmed[e.o]+=c.rem;rm[e.o]+=c.rem;
+    }
+    const after=modsOf();
+    if(before>after)capHits.push({wr:w,removed:before-after,by:rm});
+  }
+  const rows=[];
+  const wrs=ctx.wr.filter(w=>w.active).map(w=>{
+    const mps=[],nxt={};
+    for(let mi=0;mi<w.ks.length;mi++){
+      const K=w.ks[mi];let e=null;
+      if(w.ok){const v=w.vs.find(v=>ctx.vw[v].K===K);const sl=nxt[v]||0;nxt[v]=sl+1;e=sl<mp[v].length?mp[v][sl]:null}
+      const r=[];
+      for(let ii=0;ii<K;ii++){
+        const n=e&&ii<e.s?e.L:0;
+        const row={wr:w.i,mi,ii,usable:w.ok,ori:n>0?e.o:-1,n};r.push(row);rows.push(row);
+      }
+      mps.push({mi,K,rows:r,man:!!(e&&e.man),ori:e?e.o:-1,s:e?e.s:0,L:e?e.L:0,mods:e?e.s*e.L:0,kwp:e?e.s*e.L*G[e.o].pmax/1000:0});
+    }
+    const mods=mps.reduce((s,x)=>s+x.mods,0),kwp=mps.reduce((s,x)=>s+x.kwp,0);
+    return {...w,mp:mps,mods,kwp,ratio:kwp/w.w.ac};
+  });
+  const strings=rows.filter(r=>r.n>0);
+  const oriStats=G.map((g,k)=>{
+    const N=g.N,placed=fit[k]-trimmed[k];
+    const dist={};strings.filter(r=>r.ori===k).forEach(r=>dist[r.n]=(dist[r.n]||0)+1);
+    const mcount=wrs.reduce((s,w)=>s+w.mp.filter(x=>x.ori===k).length,0);
+    const capG=ctx.capG[k];
+    return {k,o:g.o,name:g.name,N,fit:fit[k],trimmed:trimmed[k],placed,unplaced:Math.max(0,N-placed),unplacedSlots:Math.max(0,N-fit[k]),
+      strings:strings.filter(r=>r.ori===k).length,dist,mppt:mcount,minMppt:capG>0?Math.ceil(N/capG):0,pmax:g.pmax,valid:g.valid};
+  });
+  const Ntot=ctx.N.reduce((a,b)=>a+b,0),placedTot=oriStats.reduce((s,o)=>s+o.placed,0);
+  const mpptUsed=wrs.reduce((s,w)=>s+w.mp.filter(x=>x.s>0).length,0);
+  const totalMppt=wrs.reduce((s,w)=>s+w.ks.length,0);
+  const res={ctx,wrs,rows,strings,oriStats,capHits,
+    totals:{N:Ntot,placed:placedTot,unplaced:oriStats.reduce((s,o)=>s+o.unplaced,0),kwp:oriStats.reduce((s,o)=>s+o.placed*o.pmax/1000,0),kwpAll:oriStats.reduce((s,o)=>s+o.N*o.pmax/1000,0),ac:wrs.reduce((s,w)=>s+w.w.ac,0),
+      strings:strings.length,inputs:rows.filter(r=>r.usable).length,mpptUsed,mpptTotal:totalMppt}};
+  diagnose(res);
+  if(man){
+    res.problems=res.problems.filter(p=>!/passen nicht|Zu wenig MPPT|Teilbelegte|bleibt frei|bleiben frei|unterschiedliche Stringlängen|Alle Grenzwerte|Alle \d+ Module/.test(p.title+' '+p.text.slice(0,20)));
+    for(const w of wrs)for(const p of w.mp)if(p.man){
+      const g=G[p.ori],uoc=p.L*g.uk;
+      if(w.w.umax>0&&uoc>w.w.umax)res.problems.unshift({lvl:'err',title:w.name+' · MPPT '+(p.mi+1)+': Spannung zu hoch',text:'Mit '+p.L+' Modulen je String liegt die Leerlaufspannung bei Kälte bei '+Math.round(uoc)+' V, erlaubt sind '+Math.round(w.w.umax)+' V. Kürzere Strings wählen.'});
+      else if(p.L<ctx.m.minStr)res.problems.push({lvl:'warn',title:w.name+' · MPPT '+(p.mi+1)+': kurzer String',text:'String mit '+p.L+' Modulen, unter dem Minimum von '+ctx.m.minStr+'.'});
+    }
+    for(const o of oriStats){
+      o.reason='Noch nicht verstringt (manuelle Auslegung).';
+      if(o.unplaced>0)res.problems.push({lvl:'err',title:o.name+': '+o.unplaced+' Module noch nicht verstringt',text:'Lege weitere Strings an oder gib weniger Module ein.'});
+      else if(o.placed>o.N)res.problems.push({lvl:'warn',title:o.name+': '+(o.placed-o.N)+' Module mehr als eingetragen',text:'In den Strings sind mehr Module als bei der Fläche eingegeben.'});
+    }
+    res.headline=res.totals.unplaced>0?'Manuelle Auslegung: noch '+res.totals.unplaced+' Module nicht verstringt.':'Manuelle Auslegung, alle Module sind verstringt.';
+  }
+  const errs=res.problems.filter(p=>p.lvl==='err').length,warns=res.problems.filter(p=>p.lvl==='warn').length;
+  res.status=Ntot===0?'empty':(res.totals.unplaced>0||errs?(placedTot===0?'fail':'partial'):(warns?'notes':'ok'));
+  return res;
+}
+
+function diagnose(r){
+  const P=[],ctx=r.ctx,G=ctx.G;r.problems=P;
+  const push=(lvl,title,text)=>P.push({lvl,title,text});
+  const fmt=(x,d=0)=>Number(x).toLocaleString('de-CH',{maximumFractionDigits:d});
+  const pl=(n,a,b)=>n+' '+(n===1?a:b);
+  const uniq=(v,i,a)=>a.indexOf(v)===i;
+  r.headline='';
+  if(r.totals.N===0){push('info','Keine Module eingetragen','Trage unter „Module je Ausrichtung“ die Stückzahlen ein.');return}
+  if(!ctx.wr.some(w=>w.active)){push('err','Kein Wechselrichter aktiv','Es braucht mindestens einen Wechselrichter mit AC-Leistung, MPPT und Eingängen.');r.headline='Kein Wechselrichter aktiv.';return}
+  const used=G.filter(g=>g.N>0);
+  const badMod=used.filter(g=>!g.valid);
+  if(badMod.length)push('err','Moduldaten unvollständig',badMod.map(g=>g.tname).filter(uniq).join(', ')+': Pmax und Uoc müssen größer als 0 sein.');
+  if(used.length&&!used.some(g=>g.valid)){r.headline='Moduldaten unvollständig (Pmax und Uoc eintragen).';return}
+  for(const w of ctx.wr){
+    if(!w.active)continue;
+    const okG=used.filter(g=>g.valid&&w.hi[g.k]>=w.lo),noG=used.filter(g=>g.valid&&w.hi[g.k]<w.lo);
+    if(!w.ok||(noG.length&&!okG.length)){
+      push('err',w.name+': keine gültige Stringlänge','Die max. Leerlaufspannung erlaubt höchstens '+used.filter(g=>g.valid).map(g=>g.tname+': '+w.hi[g.k]).filter(uniq).join(', ')+' Module je String, verlangt sind mindestens '+w.lo+' (Min. Module je String). Prüfe die Spannungswerte.');
+    }else if(noG.length){
+      push('warn',w.name+': passt nicht zu allen Flächen',noG.map(g=>g.name+' (höchstens '+w.hi[g.k]+' Module je String)').join(', ')+': Die Mindestlänge von '+w.lo+' Modulen wird nicht erreicht. Diese Flächen kommen nicht auf diesen Wechselrichter.');
+    }
+  }
+  if(ctx.Mtot===0){r.headline='Kein Wechselrichter mit gültigen Stringlängen.';return}
+  const need=r.oriStats.filter(o=>o.N>0);
+  const needTotal=need.reduce((s,o)=>s+o.minMppt,0);
+  const needTxt=need.map(o=>o.name+' '+o.minMppt).join(', ');
+  const umaxTxt=ctx.wr.filter(w=>w.ok).map(w=>fmt(w.w.umax)+' V').filter(uniq).join(' / ');
+  if(needTotal>ctx.Mtot){
+    const maxHi=Math.max(...need.flatMap(o=>ctx.wr.filter(w=>w.ok).map(w=>w.hi[o.k])));
+    const capNeed=Math.max(...need.map(o=>ctx.capG[o.k]));
+    r.headline='Zu wenig MPPT: '+needTotal+' nötig ('+needTxt+'), vorhanden '+ctx.Mtot+'. Jede Fläche braucht eigene MPPT.';
+    push('err','Zu wenig MPPT',
+      'Auf einem MPPT dürfen nur gleich lange Strings derselben Fläche (Ausrichtung, Neigung, Modultyp) liegen. Ein MPPT nimmt höchstens '+fmt(capNeed)+' Module auf (Eingänge × max. Stringlänge '+maxHi+', begrenzt durch '+umaxTxt+' Leerlaufspannung bei Kälte). Bedarf: '+needTxt+' = '+needTotal+' MPPT, vorhanden: '+ctx.Mtot+'. Es fehlen '+pl(needTotal-ctx.Mtot,'MPPT','MPPT')+'.');
+  }
+  const loMin=Math.min(...ctx.wr.filter(w=>w.ok).map(w=>w.lo));
+  for(const o of r.oriStats){
+    if(o.N===0||o.unplaced<=0)continue;
+    const parts=[];
+    if(!o.valid){parts.push('Moduldaten unvollständig (Pmax und Uoc eintragen).')}
+    else if(o.fit===0&&o.trimmed===0&&o.mppt===0){
+      parts.push(ctx.act.length&&ctx.wr.every(w=>!w.ok||o.N<w.lo||w.hi[o.k]<w.lo)?'Mit '+o.N+' Modulen wird die Mindestlänge nicht erreicht oder die Spannung passt bei keinem Wechselrichter (mind. '+loMin+' Module je String).':'Diese Fläche bekommt keinen MPPT, weil alle MPPT für Flächen mit besserer Auslastung gebraucht werden.');
+    }else if(o.unplacedSlots>0){
+      parts.push(o.name+' belegt '+o.mppt+' MPPT, '+(o.mppt===1?'der ist':'die sind')+' voll ('+fmt(o.fit)+' Module). Ein weiterer MPPT würde die restlichen '+o.unplacedSlots+' Module aufnehmen.');
+    }
+    if(o.trimmed>0)parts.push(o.trimmed+' Module: DC/AC-Grenze eines Wechselrichters überschritten.');
+    o.reason=parts.join(' ');
+    push('err',o.name+': '+o.unplaced+' von '+o.N+' Modulen passen nicht',o.reason);
+  }
+  for(const c of r.capHits){
+    const parts=c.by.map((n,k)=>n?n+'× '+G[k].name:'').filter(Boolean).join(', ');
+    push('err',c.wr.name+': DC/AC-Grenze überschritten','Erlaubt sind '+fmt(c.wr.w.dcmax)+' % von '+fmt(c.wr.w.ac)+' kW, also höchstens '+fmt(c.wr.capKW,1)+' kWp. Entfernt wurden '+c.removed+' Module ('+parts+'). Mehr geht nur mit höherer AC-Leistung oder höherem DC/AC-Limit.');
+  }
+  const part=[],free=[];
+  for(const w of r.wrs)for(const p of w.mp){
+    if(p.s>0&&p.s<p.K) part.push(w.name+' · MPPT '+(p.mi+1));
+    if(p.s===0&&p.rows.some(x=>x.usable)) free.push(w.name+' · MPPT '+(p.mi+1));
+  }
+  if(part.length)push('info','Teilbelegte MPPT',part.join(', ')+': nicht alle Eingänge belegt, damit die Modulzahl aufgeht und alle Strings am MPPT gleich lang bleiben.');
+  if(free.length&&r.totals.placed>0)push(r.totals.unplaced>0?'warn':'info',pl(free.length,'MPPT bleibt','MPPT bleiben')+' frei',free.join(', ')+'. '+(r.totals.unplaced>0?'Keine passenden Module mehr übrig.':'Alle Module sind verteilt. Mit den vorhandenen Modulen und der Mindest-Stringlänge lässt sich dieser MPPT nicht sinnvoll belegen.'));
+  for(const o of need){
+    const L=r.wrs.flatMap(w=>w.mp.filter(p=>p.ori===o.k).map(p=>p.L));
+    if(L.length>1&&Math.max(...L)-Math.min(...L)>1)push('info',o.name+': unterschiedliche Stringlängen',
+      'Die MPPT dieser Fläche haben Strings von '+Math.min(...L)+' bis '+Math.max(...L)+' Modulen. Am selben MPPT sind sie immer gleich lang.');
+  }
+  for(const w of r.wrs)if(w.w.dcmax>0&&w.ratio*100>w.w.dcmax+1e-6)push('warn',w.name+': Überbelegung '+fmt(w.ratio*100)+' %','Über dem Limit von '+fmt(w.w.dcmax)+' %.');
+  if(!r.headline){
+    r.headline=r.totals.unplaced>0?r.totals.unplaced+' von '+r.totals.N+' Modulen passen nicht. Details unten.':'Jede Fläche hat eigene MPPT mit gleich langen Strings, alle Grenzwerte sind eingehalten.';
+  }
+  if(!P.some(p=>p.lvl==='err'||p.lvl==='warn'))push('ok','Alle Grenzwerte eingehalten','Alle '+r.totals.N+' Module sind verteilt. Die Leerlaufspannung bleibt bei jedem String unter dem Limit des Wechselrichters.');
+}
+// ==SOLVER-END==
+
+
+// ==LIB-START==
+// Wechselrichter-Bibliothek: Werte aus den Herstellerdatenblättern (inp = Eingänge je MPPT, "2/1/1" = je MPPT einzeln; dc = max. empfohlene PV-Leistung in % der AC-Nennleistung)
+const LIB=[];
+(function(){
+  const add=(b,m,ac,mppt,inp,umax,dc,note)=>LIB.push({id:b+'|'+m,b,m,ac,mppt,inp,umax,dc,note:note||''});
+  // Sungrow
+  add('Sungrow','SG33CX-P2',33,3,2,1100,140);
+  add('Sungrow','SG50CX-P2',50,4,2,1100,140);
+  add('Sungrow','SG125CX-P2',125,12,2,1100,140);
+  add('Sungrow','SG150CX',150,7,3,1100,140);
+  add('Sungrow','SH15T (Hybrid)',15,3,'2/2/1',1000,200);
+  add('Sungrow','SH20T (Hybrid)',20,3,'2/2/1',1000,200);
+  add('Sungrow','SH25T (Hybrid)',25,3,'2/2/1',1000,200);
+  // Huawei
+  add('Huawei','SUN2000-5K-MAP0',5,2,1,1100,180);
+  add('Huawei','SUN2000-6K-MAP0',6,2,1,1100,183.3);
+  add('Huawei','SUN2000-8K-MAP0',8,2,1,1100,182.5);
+  add('Huawei','SUN2000-10K-MAP0',10,2,1,1100,180);
+  add('Huawei','SUN2000-12K-MAP0',12,2,1,1100,183.3);
+  add('Huawei','SUN2000-12K-MB0',12,2,2,1100,150);
+  add('Huawei','SUN2000-15K-MB0',15,2,2,1100,150);
+  add('Huawei','SUN2000-17K-MB0',17,2,2,1100,150);
+  add('Huawei','SUN2000-20K-MB0',20,2,2,1100,150);
+  add('Huawei','SUN2000-25K-MB0',25,2,2,1100,150);
+  add('Huawei','SUN2000-30K-MC0',30,4,2,1100,150,'Überbelegung nicht im Datenblatt, 150 % angenommen');
+  add('Huawei','SUN2000-40K-MC0',40,4,2,1100,150,'Überbelegung nicht im Datenblatt, 150 % angenommen');
+  // SMA
+  add('SMA','Sunny Tripower X 50',50,5,2,1100,150);
+  add('SMA','Sunny Tripower X 60',60,5,2,1100,150);
+  add('SMA','Sunny Tripower CORE2 STP 125-70',125,12,2,1100,150);
+  // Fronius
+  [3,4,5,6,8,10,12].forEach(p=>add('Fronius','Symo GEN24 '+p+'.0 SC',p,2,'2/1',1000,150));
+  [15,17.5,20,25].forEach(p=>add('Fronius','Verto '+p.toFixed(1),p,3,'2/1/1',1000,150));
+  add('Fronius','Verto 27.0',27,4,2,1000,150);
+  add('Fronius','Verto 30.0',29.99,4,2,1000,150);
+  add('Fronius','Verto 33.3',33.3,4,2,1000,150);
+  [15,17.5,20,25].forEach(p=>add('Fronius','Verto '+p.toFixed(1)+' Plus',p,3,2,1000,150));
+  add('Fronius','Verto 30.0 Plus',29.99,3,2,1000,150);
+  add('Fronius','Verto 33.3 Plus',33.3,3,2,1000,150);
+})();
+// ==LIB-END==
+return { ORI, KF_OPTIONS, defaults, migrate, plan, wrInputs, LIB, cloneSt };
+})();
+
+// ---------- Stringplan (Reiter im Projekt) ----------
+// Pro Projekt mehrere Stringpläne (p.stringplaene), jeder mit eigenem Stand (Module, Flächen, Wechselrichter). Änderungen speichern sofort.
+const SP_OC = ['#4a76a8', '#cf9610', '#dc5c24', '#8556b6'];   // Norden, Osten, Süden, Westen
+const SP_PAL = ['#2e8b6a', '#3b82c4', '#d9822b', '#8e5bb5', '#c0467a', '#6f8f1c', '#169cae', '#a8643a', '#5d6bd1', '#b29a1e'];
+// zusätzliche Wechselrichter (Ergänzung zur Bibliothek des Stringplaners) – Werte vor dem Bestellen mit dem Datenblatt prüfen
+const SP_EXTRA = [
+  ['Huawei', 'SUN2000-3KTL-M1', 3, 2, 1, 1100, 150], ['Huawei', 'SUN2000-4KTL-M1', 4, 2, 1, 1100, 150], ['Huawei', 'SUN2000-5KTL-M1', 5, 2, 1, 1100, 150],
+  ['Huawei', 'SUN2000-6KTL-M1', 6, 2, 1, 1100, 150], ['Huawei', 'SUN2000-8KTL-M1', 8, 2, 1, 1100, 150], ['Huawei', 'SUN2000-10KTL-M1', 10, 2, 1, 1100, 150],
+  ['Huawei', 'SUN2000-100KTL-M2', 100, 10, 2, 1100, 150],
+  ['Sungrow', 'SG15RT', 15, 2, 2, 1100, 150], ['Sungrow', 'SG17RT', 17, 2, 2, 1100, 150], ['Sungrow', 'SG20RT', 20, 2, 2, 1100, 150],
+  ['SMA', 'Sunny Tripower X 12', 12, 3, 2, 1000, 150], ['SMA', 'Sunny Tripower X 15', 15, 3, 2, 1000, 150], ['SMA', 'Sunny Tripower X 20', 20, 3, 2, 1000, 150], ['SMA', 'Sunny Tripower X 25', 25, 3, 2, 1000, 150],
+  ['GoodWe', 'GW5K-ET', 5, 2, 1, 1000, 150], ['GoodWe', 'GW8K-ET', 8, 2, 1, 1000, 150], ['GoodWe', 'GW10K-ET', 10, 2, 1, 1000, 150],
+  // Fronius GEN24 Plus (Symo dreiphasig, Primo einphasig) und Primo GEN24
+  ...[3, 4, 5, 6, 8, 10, 12].map(p => ['Fronius', `Symo GEN24 ${p}.0 Plus`, p, 2, '2/1', 1000, 150]),
+  ...[3, 3.6, 4, 4.6, 5, 6].flatMap(p => [['Fronius', `Primo GEN24 ${p.toFixed(1)}`, p, 2, '2/1', 600, 150], ['Fronius', `Primo GEN24 ${p.toFixed(1)} Plus`, p, 2, '2/1', 600, 150]]),
+  // Huawei SUN2000 (einphasig L1, dreiphasig M2/M3/M0, Gewerbe/Grossanlagen)
+  ...[2, 3, 3.68, 4, 4.6, 5, 6].map(p => ['Huawei', `SUN2000-${p}KTL-L1`, p, 2, 1, 600, 150]),
+  ...[12, 15, 17, 20].map(p => ['Huawei', `SUN2000-${p}KTL-M2`, p, 2, 2, 1080, 130]),
+  ...[30, 36, 40, 50].map(p => ['Huawei', `SUN2000-${p}KTL-M3`, p, 4, 2, 1100, 150]),
+  ['Huawei', 'SUN2000-60KTL-M0', 60, 6, 2, 1100, 150], ['Huawei', 'SUN2000-100KTL-M1', 100, 10, 2, 1100, 150], ['Huawei', 'SUN2000-115KTL-M2', 115, 10, 2, 1100, 150],
+  ['Huawei', 'SUN2000-150K-MG0', 150, 14, 2, 1100, 150], ['Huawei', 'SUN2000-215KTL-H3', 200, 9, 2, 1500, 150], ['Huawei', 'SUN2000-330KTL-H1', 300, 6, 4, 1500, 150],
+  // SMA Tripower CORE
+  ['SMA', 'Sunny Tripower CORE2 STP 110-60', 110, 12, 2, 1100, 150], ['SMA', 'Sunny Tripower CORE1 STP 50-41', 50, 6, 2, 1000, 150],
+  // Sungrow
+  ['Sungrow', 'SG50CX', 50, 5, 2, 1100, 140], ['Sungrow', 'SG110CX', 110, 9, 2, 1100, 140],
+  ['Sungrow', 'SH50CX (Hybrid)', 50, 4, 2, 1100, 150], ['Sungrow', 'SH80CX (Hybrid)', 80, 6, 2, 1100, 150],
+  ['Sungrow', 'SH12T (Hybrid)', 12, 3, '2/1/1', 1000, 200], ['Sungrow', 'SH10T (Hybrid)', 10, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH8T (Hybrid)', 8, 3, '1/1/1', 1000, 200],
+  ['Sungrow', 'SH6T (Hybrid)', 6, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH5T (Hybrid)', 5, 3, '1/1/1', 1000, 200]
+].map(([b, m, ac, mppt, inp, umax, dc]) => ({ id: b + '|' + m, b, m, ac, mppt, inp, umax, dc, note: 'ergänzt – mit Datenblatt prüfen' }));
+function spBib() {
+  const eigene = (S().wrEigene || []).map(x => ({ id: 'my:' + x.id, b: 'Meine Wechselrichter', m: x.m, ac: +x.ac || 0, mppt: +x.mppt || 0, inp: x.inp, umax: +x.umax || 0, dc: +x.dc || 0, note: '' }));
+  const ids = new Set(SP.LIB.map(x => x.id));
+  return [...eigene, ...SP.LIB, ...SP_EXTRA.filter(x => !ids.has(x.id))];
+}
+const spBibFind = id => id ? spBib().find(x => x.id === id) : null;
+const spZahl = (x, d = 0) => Number(x || 0).toLocaleString('de-CH', { minimumFractionDigits: d, maximumFractionDigits: d });
+const spListe = p => (Array.isArray(p.stringplaene) ? p.stringplaene : (p.stringplaene = []));
+const spAktuell = p => { const L = spListe(p); return L.find(v => v.id === p.spAktiv) || L[0] || null; };
+function spLeer() {
+  const st = SP.defaults();
+  st.types = [{ name: 'PV-Modul', pmax: 0, uoc: 0 }];
+  st.groups = [{ o: 2, n: 0, tilt: 30, t: 0 }];
+  st.wrs = [{ name: 'WR 1', ac: 0, mppt: 0, inputs: 0, umax: 0, dcmax: 0, model: '' }];
+  return st;
+}
+// Rechnen kostet etwas Zeit: Ergebnis je Stand zwischenspeichern
+function spRechnen(st) {
+  const key = JSON.stringify(st);
+  if (ui.spCache && ui.spCache.key === key) return ui.spCache.r;
+  const r = SP.plan(SP.cloneSt(st));
+  ui.spCache = { key, r };
+  return r;
+}
+function spAendern(pid, fn) {
+  const p = findP(pid), x = spAktuell(p);
+  if (!x) return;
+  fn(x.st, x, p); x.datum = todayIso(); save(); render();
+}
+const spNum = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : 0; };
+function spNeu(pid, kopie) {
+  const p = findP(pid), L = spListe(p), alt = spAktuell(p);
+  const x = { id: uid(), name: kopie && alt ? alt.name + ' (Kopie)' : 'Stringplan ' + (L.length + 1), datum: todayIso(), st: kopie && alt ? SP.cloneSt(alt.st) : spLeer() };
+  L.push(x); p.spAktiv = x.id; save(); render(); toast(kopie ? 'Stringplan kopiert.' : 'Neuer Stringplan angelegt.');
+}
+function spLoeschen(pid) {
+  const p = findP(pid), x = spAktuell(p);
+  if (!x || !confirm(`Stringplan «${x.name}» löschen?`)) return;
+  p.stringplaene = spListe(p).filter(v => v !== x); p.spAktiv = p.stringplaene[0]?.id || ''; save(); render();
+}
+function spWrModell(pid, i, id) {
+  spAendern(pid, st => {
+    const w = st.wrs[i], m = spBibFind(id);
+    w.model = id;
+    if (m) Object.assign(w, { ac: m.ac, mppt: m.mppt, inputs: m.inp, umax: m.umax, dcmax: m.dc });
+  });
+}
+function spWrEigen(pid, i) {
+  const x = spAktuell(findP(pid)), w = x && x.st.wrs[i];
+  if (!w || !(w.ac > 0)) return toast('Zuerst AC-Leistung, MPPT und Eingänge eintragen.');
+  const m = prompt('Name für deine Wechselrichter-Liste (z.B. Hersteller und Typ):', w.name && !/^WR \d+$/.test(w.name) ? w.name : '');
+  if (!m) return;
+  const id = uid();
+  (S().wrEigene = S().wrEigene || []).push({ id, m: m.trim(), ac: w.ac, mppt: w.mppt, inp: w.inputs, umax: w.umax, dc: w.dcmax });
+  spAendern(pid, st => { st.wrs[i].model = 'my:' + id; });
+  toast(`«${m.trim()}» in «Meine Wechselrichter» gespeichert.`);
+}
+function spModellOptionen(sel) {
+  const B = spBib(), marken = [...new Set(B.map(x => x.b))];
+  return `<option value="">– Eigene Werte –</option>` + marken.map(b => `<optgroup label="${esc(b)}">${B.filter(x => x.b === b).sort((x, y) => b === 'Meine Wechselrichter' ? 0 : x.m.localeCompare(y.m, 'de', { numeric: true })).map(x =>
+    `<option value="${esc(x.id)}" ${x.id === sel ? 'selected' : ''}>${esc(x.m)} · ${spZahl(x.ac, x.ac % 1 ? 1 : 0)} kW</option>`).join('')}</optgroup>`).join('');
+}
+const spFlaecheName = (st, g) => SP.ORI[g.o].name + (st.useTilt ? ' ' + Math.round(+g.tilt || 0) + '°' : '') + (st.types.length > 1 ? ' · ' + ((st.types[g.t] || st.types[0]).name) : '');
+
+function viewStringplan(p) {
+  const L = spListe(p), x = spAktuell(p), pid = p.id;
+  if (!x) return `<div class="card sp-leer"><h3 style="margin-top:0">Stringplan</h3>
+    <p class="muted">Module auf die Wechselrichter verteilen, mit Prüfung der Leerlaufspannung bei Kälte. Du kannst pro Projekt mehrere Varianten speichern und als PDF ausgeben.</p>
+    <button onclick="spNeu('${pid}')">＋ Ersten Stringplan anlegen</button></div>`;
+  const st = x.st, r = spRechnen(st);
+  const N = st.groups.reduce((a, g) => a + (+g.n || 0), 0), kwp = st.groups.reduce((a, g) => a + (+g.n || 0) * ((st.types[g.t] || st.types[0]).pmax || 0), 0) / 1000;
+  const feld = (label, wert, on, einheit = '', extra = '') => `<label class="sp-f"><span>${label}</span><span class="sp-in"><input value="${esc(wert)}" inputmode="decimal" onchange="${on}" ${extra}>${einheit ? `<i>${einheit}</i>` : ''}</span></label>`;
+  // Kopf: Auswahl der gespeicherten Pläne
+  const kopf = `<div class="card sp-kopf">
+    <div class="sp-kopf-l"><label class="sp-f"><span>Stringplan</span><select onchange="findP('${pid}').spAktiv=this.value;save();render()">${L.map(v => `<option value="${v.id}" ${v === x ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select></label>
+      <label class="sp-f"><span>Name</span><input value="${esc(x.name)}" onchange="spAendern('${pid}',(s,v)=>v.name=this.value.trim()||'Stringplan')"></label>
+      <span class="muted klein">gespeichert ${fmt(x.datum)}</span></div>
+    <div class="row"><button class="sec sm" onclick="spNeu('${pid}')">＋ Neu</button><button class="sec sm" onclick="spNeu('${pid}',true)">Kopieren</button>
+      <button class="sec sm" onclick="spLoeschen('${pid}')">Löschen</button><button class="sm" onclick="spPdf('${pid}')">📄 PDF</button></div></div>`;
+  // Eingaben
+  const modul = `<div class="card sp-karte"><h3>1 · Modul</h3>
+    ${st.types.map((t, i) => `<div class="sp-reihe">${feld('Modultyp', t.name, `spAendern('${pid}',s=>s.types[${i}].name=this.value.trim()||'Modul')`, '', 'inputmode="text"')}
+      ${feld('Leistung', t.pmax || '', `spAendern('${pid}',s=>s.types[${i}].pmax=spNum(this.value))`, 'W', 'placeholder="z.B. 500"')}
+      ${feld('Uoc', t.uoc || '', `spAendern('${pid}',s=>s.types[${i}].uoc=spNum(this.value))`, 'V', 'placeholder="z.B. 40.4"')}
+      ${st.types.length > 1 ? `<button class="ck-btn sp-x" title="Modultyp entfernen" onclick="spAendern('${pid}',s=>{s.types.splice(${i},1);s.groups.forEach(g=>{if(g.t>=${i})g.t=Math.max(0,g.t-1)})})">✕</button>` : ''}</div>`).join('')}
+    <button class="sec sm" onclick="spAendern('${pid}',s=>s.types.push({name:'Modul '+String.fromCharCode(65+s.types.length),pmax:0,uoc:0}))">＋ Modultyp</button>
+    <div class="sp-reihe sp-klein">
+      <label class="sp-f"><span>Kältefaktor</span><select onchange="spAendern('${pid}',s=>s.mod.kf=+this.value)">${SP.KF_OPTIONS.map(k => `<option value="${k}" ${k === +st.mod.kf ? 'selected' : ''}>${k.toFixed(2)}</option>`).join('')}</select></label>
+      ${feld('Min. Module je String', st.mod.minStr, `spAendern('${pid}',s=>s.mod.minStr=Math.max(1,Math.round(spNum(this.value))||1))`, 'Stk.')}
+    </div></div>`;
+  const flaechen = `<div class="card sp-karte"><h3>2 · Dachflächen</h3>
+    ${st.groups.map((g, i) => `<div class="sp-reihe sp-flaeche" style="--oc:${SP_OC[g.o]}">
+      <label class="sp-f"><span>Ausrichtung</span><select onchange="spAendern('${pid}',s=>s.groups[${i}].o=+this.value)">${SP.ORI.map((o, k) => `<option value="${k}" ${k === g.o ? 'selected' : ''}>${o.name}</option>`).join('')}</select></label>
+      <label class="sp-f"><span>Module</span><span class="sp-in sp-zaehler"><button type="button" onclick="spAendern('${pid}',s=>s.groups[${i}].n=Math.max(0,(+s.groups[${i}].n||0)-1))">−</button>
+        <input value="${g.n || 0}" inputmode="numeric" onchange="spAendern('${pid}',s=>s.groups[${i}].n=Math.max(0,Math.round(spNum(this.value))))">
+        <button type="button" onclick="spAendern('${pid}',s=>s.groups[${i}].n=(+s.groups[${i}].n||0)+1)">+</button></span></label>
+      ${st.useTilt ? feld('Neigung', g.tilt, `spAendern('${pid}',s=>s.groups[${i}].tilt=spNum(this.value))`, '°') : ''}
+      ${st.types.length > 1 ? `<label class="sp-f"><span>Modultyp</span><select onchange="spAendern('${pid}',s=>s.groups[${i}].t=+this.value)">${st.types.map((t, k) => `<option value="${k}" ${k === g.t ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>` : ''}
+      ${st.groups.length > 1 ? `<button class="ck-btn sp-x" title="Fläche entfernen" onclick="spAendern('${pid}',s=>s.groups.splice(${i},1))">✕</button>` : ''}</div>`).join('')}
+    <div class="row" style="justify-content:space-between;margin-top:4px">
+      <button class="sec sm" onclick="spAendern('${pid}',s=>s.groups.push({o:[2,1,3,0].find(o=>!s.groups.some(g=>g.o===o))??2,n:0,tilt:30,t:0}))">＋ Fläche</button>
+      <label class="check klein"><input type="checkbox" ${st.useTilt ? 'checked' : ''} onchange="spAendern('${pid}',s=>s.useTilt=this.checked)"> Neigung berücksichtigen</label></div>
+    <div class="sp-summe"><b>${spZahl(N)}</b> Module · <b>${spZahl(kwp, 1)}</b> kWp</div></div>`;
+  const wrs = `<div class="card sp-karte sp-wr-karte"><h3>3 · Wechselrichter</h3>
+    ${st.wrs.map((w, i) => { const m = spBibFind(w.model); return `<div class="sp-wr">
+      <div class="sp-reihe">${feld('Name', w.name, `spAendern('${pid}',s=>s.wrs[${i}].name=this.value.trim()||'WR ${i + 1}')`, '', 'inputmode="text"')}
+        <label class="sp-f sp-breit"><span>Modell</span><select onchange="spWrModell('${pid}',${i},this.value)">${spModellOptionen(w.model)}</select></label>
+        ${st.wrs.length > 1 ? `<button class="ck-btn sp-x" title="Wechselrichter entfernen" onclick="spAendern('${pid}',s=>s.wrs.splice(${i},1))">✕</button>` : ''}</div>
+      <div class="sp-reihe sp-klein">
+        ${feld('AC-Leistung', w.ac || '', `spAendern('${pid}',s=>{s.wrs[${i}].ac=spNum(this.value);s.wrs[${i}].model=''})`, 'kW')}
+        ${feld('MPPT', w.mppt || '', `spAendern('${pid}',s=>{s.wrs[${i}].mppt=Math.round(spNum(this.value));s.wrs[${i}].model=''})`)}
+        ${feld('Eingänge je MPPT', w.inputs || '', `spAendern('${pid}',s=>{const v=this.value.trim();s.wrs[${i}].inputs=/[\\/,;\\s]/.test(v)?v:Math.round(spNum(v));s.wrs[${i}].model=''})`, '', 'inputmode="text" title="Zahl oder je MPPT, z.B. 2/1/1"')}
+        ${feld('max. DC-Spannung', w.umax || '', `spAendern('${pid}',s=>{s.wrs[${i}].umax=spNum(this.value);s.wrs[${i}].model=''})`, 'V')}
+        ${feld('DC/AC max.', w.dcmax || '', `spAendern('${pid}',s=>{s.wrs[${i}].dcmax=spNum(this.value);s.wrs[${i}].model=''})`, '%')}
+      </div>
+      ${m && m.note ? `<div class="muted klein">ℹ ${esc(m.note)}</div>` : ''}
+      ${!w.model && w.ac > 0 ? `<button class="sec sm" style="margin-top:6px" onclick="spWrEigen('${pid}',${i})">In «Meine Wechselrichter» speichern</button>` : ''}</div>`; }).join('')}
+    <button class="sec sm" onclick="spAendern('${pid}',s=>{const v=s.wrs[s.wrs.length-1]||{};s.wrs.push({...v,name:'WR '+(s.wrs.length+1)})})">＋ Wechselrichter</button></div>`;
+  return kopf + `<div class="sp-eingaben">${modul}${flaechen}${wrs}</div>` + spErgebnisHtml(r, st);
+}
+// Ergebnis: Status, Kennzahlen, je Wechselrichter die MPPT-Kacheln, Dachskizze, Hinweise, Strings im Detail
+const spFehlen = r => r.oriStats.filter(o => o.N > 0 && o.unplaced > 0);
+// Kopfzeile ohne Lösungsfindung: was passt bzw. wie viele Module nicht passen
+function spKurz(r) {
+  const F = spFehlen(r);
+  if (r.status === 'empty') return 'Modul, Anzahl Module je Fläche und Wechselrichter eintragen.';
+  if (F.length && r.totals.placed > 0) return F.map(o => `${o.name}: ${o.unplaced} von ${o.N} passen nicht`).join(' · ');
+  if (r.status === 'fail' || !r.totals.placed) return r.headline || 'Mit diesen Werten lassen sich keine Strings bilden.';
+  return 'Alle Grenzwerte eingehalten.';
+}
+function spFarben(r) { const c = {}; let i = 0; r.wrs.forEach(w => w.mp.forEach(p => { if (p.s > 0) c[w.i + '.' + p.mi] = SP_PAL[i++ % SP_PAL.length]; })); return c; }
+function spErgebnisHtml(r, st) {
+  const T = r.totals, G = r.ctx.G, oc = k => SP_OC[G[k].o];
+  const bm = { ok: ['ok', 'Alle Module sind ausgelegt'], notes: ['ok', 'Alle Module sind ausgelegt'], partial: ['err', `${T.unplaced} von ${T.N} Modulen passen nicht`],
+    fail: ['err', 'Auslegung nicht möglich'], empty: ['info', 'Noch keine Module eingetragen'] }[r.status] || ['info', ''];
+  let h = `<div class="sp-banner sp-${bm[0]}"><b>${esc(bm[1])}</b><span>${esc(spKurz(r))}</span></div>`;
+  if (r.status === 'empty') return h;
+  h += `<div class="sp-kpis">
+    <div><span>Module platziert</span><b>${spZahl(T.placed)}</b><small>von ${spZahl(T.N)}</small></div>
+    <div><span>DC-Leistung</span><b>${spZahl(T.kwp, 1)}</b><small>kWp</small></div>
+    <div><span>DC/AC</span><b>${T.ac ? spZahl(T.kwp / T.ac * 100) : 0} %</b><small>von ${spZahl(T.ac, 1)} kW</small></div>
+    <div><span>MPPT genutzt</span><b>${T.mpptUsed}</b><small>von ${T.mpptTotal}</small></div>
+    <div><span>Strings</span><b>${T.strings}</b><small>auf ${T.inputs} Eingängen</small></div></div>`;
+  for (const w of r.wrs) {
+    const lim = w.w.dcmax > 0 ? w.w.dcmax / 100 : 1.5, over = w.w.dcmax > 0 && w.ratio > w.w.dcmax / 100 + 1e-9, m = spBibFind(w.w.model);
+    h += `<div class="sp-wr-erg"><div class="sp-wr-kopf"><div><h3>${esc(w.name)}</h3>
+        <div class="muted">AC <b>${spZahl(w.w.ac, w.w.ac % 1 ? 1 : 0)} kW</b> · max. <b>${spZahl(w.w.umax)} V</b> · mind. ${w.lo} Module je String${m ? ' · ' + esc(m.m) : ''}</div></div>
+      <div class="sp-last"><span>${spZahl(w.mods)} Module · ${spZahl(w.kwp, 1)} kWp</span><i class="${over ? 'ueber' : ''}"><b style="width:${Math.min(100, w.ratio / Math.max(lim, w.ratio) * 100)}%"></b></i><b>${spZahl(w.ratio * 100)} %</b></div></div>
+      <div class="sp-tiles">${w.mp.map(p => {
+        if (p.s === 0) return `<div class="sp-tile frei">MPPT ${p.mi + 1}<br>frei</div>`;
+        const g = G[p.ori], uoc = p.L * g.uk;
+        return `<div class="sp-tile" style="--c:${oc(p.ori)}"><div class="sp-th"><span>MPPT ${p.mi + 1}</span><b>${esc(g.name)}</b></div>
+          <div class="sp-gross">${p.s} × ${p.L} <small>Module</small></div><div class="muted">${p.mods} Module · ${spZahl(p.kwp, 1)} kWp</div>
+          <div class="sp-ids">${Array.from({ length: p.s }, (_, k) => `${w.i + 1}.${p.mi + 1}.${k + 1}`).join(' · ')}</div>
+          <div class="muted klein">Uoc kalt ${spZahl(uoc)} V · Reserve ${spZahl(w.w.umax - uoc)} V</div>
+          ${p.s < p.K ? `<div class="sp-teil">${p.s} von ${p.K} Eingängen belegt</div>` : ''}</div>`;
+      }).join('')}</div></div>`;
+  }
+  // Dachskizze
+  const fc = spFarben(r);
+  h += `<div class="card"><h3 style="margin-top:0">Dachskizze</h3><div class="muted klein" style="margin-bottom:8px">Jede Zeile ist ein String, jedes Kästchen ein Modul. Gleiche Farbe = gleicher MPPT.</div>
+    <div class="sp-legende">${r.wrs.flatMap(w => w.mp.filter(p => p.s > 0).map(p => `<span><i style="background:${fc[w.i + '.' + p.mi]}"></i>${esc(w.name)} · MPPT ${p.mi + 1}</span>`)).join('')}</div>
+    <div class="sp-daecher">${r.oriStats.filter(o => o.N > 0).map(o => `<div class="sp-dach" style="--oc:${oc(o.k)}"><div class="sp-dach-kopf"><b><i></i>${esc(o.name)}</b><span class="muted">${o.placed} von ${o.N} Modulen</span></div>
+      ${r.rows.filter(x => x.n > 0 && x.ori === o.k).map(x => `<div class="sp-srow"><span style="--k:${fc[x.wr + '.' + x.mi]}">${x.wr + 1}.${x.mi + 1}.${x.ii + 1}</span><div class="sp-mods" style="--k:${fc[x.wr + '.' + x.mi]}">${'<i></i>'.repeat(x.n)}</div></div>`).join('')}
+      ${o.unplaced > 0 ? `<div class="sp-srow sp-fehlt"><span>fehlt</span><div class="sp-mods">${'<i></i>'.repeat(o.unplaced)}</div></div>` : ''}</div>`).join('')}</div></div>`;
+  // keine Lösungsvorschläge: nur zeigen, wie viele Module je Fläche nicht passen
+  const F = spFehlen(r);
+  if (F.length) h += `<div class="card"><h3 style="margin-top:0">Module, die nicht passen</h3>${F.map(o => `<div class="sp-prob sp-err" style="--oc:${oc(o.k)}"><b>${esc(o.name)}: ${o.unplaced} von ${o.N} Modulen passen nicht</b></div>`).join('')}</div>`;
+  h += `<div class="card"><details><summary><b>Alle Strings im Detail</b> <span class="muted klein">· Nummer = WR . MPPT . String</span></summary><div class="table-wrap"><table>
+    <tr><th>String</th><th>WR</th><th>Fläche</th><th style="text-align:right">Module</th><th style="text-align:right">Uoc kalt</th><th style="text-align:right">Limit</th><th>Prüfung</th></tr>
+    ${r.rows.filter(x => x.n > 0).map(x => { const w = r.ctx.wr[x.wr], g = G[x.ori], uoc = x.n * g.uk, bad = w.w.umax > 0 && uoc > w.w.umax;
+      return `<tr><td><b>${x.wr + 1}.${x.mi + 1}.${x.ii + 1}</b></td><td>${esc(w.name)}</td><td><span class="swatch" style="background:${oc(x.ori)};border-radius:50%"></span>${esc(g.name)}</td>
+        <td style="text-align:right">${x.n}</td><td style="text-align:right" class="${bad ? 'rot-txt' : ''}">${spZahl(uoc, 1)} V</td><td style="text-align:right">${spZahl(w.w.umax)} V</td><td class="${bad ? 'rot-txt' : ''}">${bad ? 'Uoc zu hoch' : 'in Ordnung'}</td></tr>`; }).join('')}
+    </table></div></details></div>`;
+  return h;
+}
+// PDF (A4 hoch): Kopf mit Logo, Kennzahlen, je Wechselrichter eine Tabelle der MPPT, Dachskizze, Hinweise. 1 WR passt auf eine Seite, mehrere brauchen 2–3 Seiten.
+function spPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), x = spAktuell(p);
+  if (!x) return;
+  const st = x.st, r = spRechnen(st), T = r.totals, G = r.ctx.G;
+  if (r.status === 'empty') return toast('Noch keine Module eingetragen.');
+  const { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' }), W = 210, H = 297, M = 14, B = W - 2 * M, UNTEN = 16;
+  const platz = (h) => { if (y + h > H - UNTEN) { doc.addPage(); y = 16; } };
+  let y = pdfAaKopf(doc, p.nummer, [['Projektleiter', plVon(p).name], ['Stand', fmt(x.datum || todayIso())]], `Stringplan: ${p.name}`);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(90);
+  const info = [p.ort, x.name, st.types.map(t => `${t.name} ${spZahl(t.pmax)} W / Uoc ${spZahl(t.uoc, 1)} V`).join(', '), `Kältefaktor ${(+st.mod.kf).toFixed(2)}`, `min. ${st.mod.minStr} Module je String`].filter(Boolean).join('  ·  ');
+  const il = doc.splitTextToSize(info, B); doc.text(il, M, y - 3); y += il.length * 4 + 1;
+  // Kennzahlen als Kästchen
+  const K = [['Module platziert', `${spZahl(T.placed)} / ${spZahl(T.N)}`], ['DC-Leistung', `${spZahl(T.kwp, 1)} kWp`], ['DC/AC', `${T.ac ? spZahl(T.kwp / T.ac * 100) : 0} %`], ['MPPT genutzt', `${T.mpptUsed} / ${T.mpptTotal}`], ['Strings', `${T.strings}`]];
+  const kw = (B - 4 * 3) / 5;
+  K.forEach(([l, v], i) => { const kx = M + i * (kw + 3); doc.setFillColor(244, 243, 239); doc.roundedRect(kx, y, kw, 14, 2, 2, 'F');
+    doc.setFontSize(7.5); doc.setTextColor(110); doc.text(l, kx + 3, y + 4.8); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(...AA_TXT); doc.text(v, kx + 3, y + 11); doc.setFont('helvetica', 'normal'); });
+  y += 19;
+  const stFarbe = { ok: [31, 157, 85], notes: [200, 120, 0], partial: [200, 40, 40], fail: [200, 40, 40] }[r.status] || [90, 90, 90];
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...stFarbe);
+  const hl = doc.splitTextToSize(spKurz(r), B); doc.text(hl, M, y); y += hl.length * 4.4 + 3;
+  // je Wechselrichter
+  for (const w of r.wrs) {
+    const m = spBibFind(w.w.model);
+    platz(30);
+    doc.autoTable({ startY: y, margin: { left: M, right: M, bottom: UNTEN, top: 16 }, theme: 'grid', rowPageBreak: 'avoid',
+      styles: { fontSize: 8.5, cellPadding: 1.6, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30, valign: 'middle' },
+      headStyles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold' },
+      head: [[{ content: `${w.name}${m ? '  –  ' + m.m : ''}     AC ${spZahl(w.w.ac, w.w.ac % 1 ? 1 : 0)} kW · max. ${spZahl(w.w.umax)} V · ${spZahl(w.mods)} Module · ${spZahl(w.kwp, 1)} kWp · DC/AC ${spZahl(w.ratio * 100)} %`, colSpan: 7, styles: { halign: 'left' } }],
+        ['MPPT', 'Fläche', 'Belegung', 'Module', 'kWp', 'Uoc kalt / Reserve', 'Strings']],
+      body: w.mp.map(q => { if (q.s === 0) return [`MPPT ${q.mi + 1}`, { content: 'frei', colSpan: 6, styles: { textColor: 140 } }];
+        const g = G[q.ori], uoc = q.L * g.uk;
+        return [`MPPT ${q.mi + 1}`, g.name, `${q.s} × ${q.L}${q.s < q.K ? `  (${q.s}/${q.K} Eing.)` : ''}`, String(q.mods), spZahl(q.kwp, 1), `${spZahl(uoc)} V / ${spZahl(w.w.umax - uoc)} V`, Array.from({ length: q.s }, (_, k) => `${w.i + 1}.${q.mi + 1}.${k + 1}`).join(', ')]; }),
+      columnStyles: { 0: { cellWidth: 16, fontStyle: 'bold' }, 2: { cellWidth: 30 }, 3: { cellWidth: 15, halign: 'right' }, 4: { cellWidth: 14, halign: 'right' }, 5: { cellWidth: 34 } },
+      didDrawCell: d => { if (d.section === 'body' && d.column.index === 1 && d.cell.raw && d.row.raw) { const q = w.mp[d.row.index]; if (q && q.s) { doc.setFillColor(...hexRgb(SP_OC[G[q.ori].o])); doc.rect(d.cell.x, d.cell.y, 1.2, d.cell.height, 'F'); } } } });
+    y = doc.lastAutoTable.finalY + 6;
+  }
+  // Dachskizze: je Fläche die Strings als Reihen von Kästchen in der Farbe des MPPT
+  const fc = spFarben(r), mw = 3.1, mh = 4.4, gap = 0.6, proZeile = Math.floor((B - 18) / (mw + gap));
+  y += 3; platz(20);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('Dachskizze', M, y); y += 2;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(110); doc.text('Jede Zeile ist ein String, jedes Kästchen ein Modul. Gleiche Farbe = gleicher MPPT.', M + 24, y - 2); y += 3;
+  for (const o of r.oriStats.filter(o => o.N > 0)) {
+    const reihen = r.rows.filter(z => z.n > 0 && z.ori === o.k), hoch = reihen.reduce((a, z) => a + Math.ceil(z.n / proZeile) * (mh + 1.4), 0) + (o.unplaced ? Math.ceil(o.unplaced / proZeile) * (mh + 1.4) : 0) + 8;
+    platz(Math.min(hoch, 60));
+    doc.setFillColor(...hexRgb(SP_OC[G[o.k].o])); doc.circle(M + 1.6, y + 1.8, 1.4, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...AA_TXT); doc.text(o.name, M + 4.5, y + 3);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(110); doc.text(`${o.placed} von ${o.N} Modulen`, W - M, y + 3, { align: 'right' });
+    y += 6.5;
+    const zeichne = (label, n, farbe, fehlt) => {
+      let rest = n, erste = true;
+      while (rest > 0) { platz(mh + 1.4);
+        if (erste) { doc.setFontSize(8); doc.setTextColor(fehlt ? 200 : 40, fehlt ? 40 : 40, fehlt ? 40 : 40); doc.text(label, M, y + 3.3); }
+        const k = Math.min(rest, proZeile);
+        for (let j = 0; j < k; j++) { const mx = M + 18 + j * (mw + gap);
+          if (fehlt) { doc.setDrawColor(200, 40, 40); doc.setLineWidth(0.25); doc.rect(mx, y, mw, mh); } else { doc.setFillColor(...hexRgb(farbe)); doc.roundedRect(mx, y, mw, mh, 0.4, 0.4, 'F'); } }
+        rest -= k; erste = false; y += mh + 1.4; }
+    };
+    reihen.forEach(z => zeichne(`${z.wr + 1}.${z.mi + 1}.${z.ii + 1}`, z.n, fc[z.wr + '.' + z.mi]));
+    if (o.unplaced > 0) zeichne('fehlt', o.unplaced, null, true);
+    y += 3;
+  }
+  // nur die Anzahl Module, die nicht passen (keine Lösungsvorschläge)
+  const F = spFehlen(r);
+  if (F.length && r.totals.placed > 0) {
+    platz(8 + F.length * 5); y += 2;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('Module, die nicht passen', M, y); y += 5.5;
+    doc.setFontSize(9.5); doc.setTextColor(200, 40, 40);
+    F.forEach(o => { doc.text(`${o.name}: ${o.unplaced} von ${o.N} Modulen passen nicht`, M, y); y += 5; });
+  }
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
+    doc.text(`${S().firma || ''} · Stringplan ${p.nummer} · ${x.name}`, M, H - 8); doc.text(`Seite ${i} / ${n}`, W - M, H - 8, { align: 'right' }); }
+  doc.save(dateiName('Stringplan', p, 'pdf'));
+  toast('Stringplan als PDF gespeichert.');
+}
+// Einstellungen › Wechselrichter: eigene Modelle für den Stringplan
+function viewWrEigene() {
+  const L = S().wrEigene || [];
+  const z = (x, i, k, ph, ein = '') => `<td><input value="${esc(x[k] ?? '')}" placeholder="${ph}" onchange="wrEigenSet(${i},'${k}',this.value)">${ein}</td>`;
+  return `<div class="card"><h3 style="margin-top:0">Meine Wechselrichter</h3>
+    <p class="muted" style="margin-top:0">Erscheinen im Stringplan zuoberst in der Modell-Auswahl. Dazu kommen ${spBib().length - L.length} Modelle aus der Bibliothek (Sungrow, Huawei, SMA, Fronius, GoodWe).
+      Eingänge je MPPT: eine Zahl (alle gleich) oder je MPPT, z.B. <code>2/1/1</code>.</p>
+    ${L.length ? `<div class="table-wrap"><table><tr><th>Bezeichnung</th><th>AC kW</th><th>MPPT</th><th>Eingänge je MPPT</th><th>max. DC V</th><th>DC/AC %</th><th></th></tr>
+      ${L.map((x, i) => `<tr>${z(x, i, 'm', 'z.B. Kostal Plenticore 10')}${z(x, i, 'ac', '10')}${z(x, i, 'mppt', '2')}${z(x, i, 'inp', '1 oder 2/1')}${z(x, i, 'umax', '1000')}${z(x, i, 'dc', '150')}
+        <td><button class="ck-btn" title="Löschen" onclick="if(confirm('Wechselrichter löschen?')){S().wrEigene.splice(${i},1);save();render()}">✕</button></td></tr>`).join('')}</table></div>`
+      : '<div class="empty" style="padding:14px">Noch keine eigenen Wechselrichter. Im Stringplan bei «Eigene Werte» auf «In «Meine Wechselrichter» speichern» klicken oder hier anlegen.</div>'}
+    <button class="sec sm" style="margin-top:10px" onclick="(S().wrEigene=S().wrEigene||[]).push({id:uid(),m:'Neuer Wechselrichter',ac:10,mppt:2,inp:1,umax:1000,dc:150});save();render()">＋ Wechselrichter</button></div>`;
+}
+function wrEigenSet(i, k, v) { const x = S().wrEigene[i]; x[k] = k === 'm' ? v.trim() : (k === 'inp' && /[\/,;\s]/.test(v.trim()) ? v.trim() : spNum(v)); save(); toast('Gespeichert.'); }
 // ---------- Materialliste (Dokument) ----------
 // Start mit einer Vorlage je Montagesystem (Einstellungen › Dokumente › Materiallisten). Pro Artikel: Menge, Wo (Lager / Lieferant),
 // Status, Datum bestellt/reserviert und Lieferung. Angehakte Artikel («→ Protokolle») erscheinen beim gewählten Bauteil in den Produkten
@@ -4938,13 +5836,16 @@ function viewKontakte() {
   ${KONTAKT_ARTEN.map(([art, titel]) => {
     const l = liste.filter(c => c.art === art).sort(nachName);
     if (!l.length) return '';
-    return `<div class="card"><h3>${titel} <span class="muted" style="font-weight:400">· ${l.length}</span></h3><div class="table-wrap"><table>
-      <tr><th>Name</th><th>Firma</th><th>${art === 'kunde' ? 'Info' : 'Gewerk / Rolle'}</th><th>Telefon</th><th>E-Mail</th><th>Ort / Adresse</th></tr>
+    // Klick öffnet die Ansicht (mit Bemerkungen); auf dem Handy nur Name und Telefon (Klasse k-m), der Rest in der Ansicht
+    return `<div class="card"><h3>${titel} <span class="muted" style="font-weight:400">· ${l.length}</span></h3><div class="table-wrap"><table class="k-tab">
+      <tr><th class="k-m">Name</th><th>Firma</th><th>${art === 'kunde' ? 'Info' : 'Gewerk / Rolle'}</th><th class="k-m">Telefon</th><th>E-Mail</th><th>Ort / Adresse</th></tr>
       ${l.map(c => {
-        return `<tr class="click" onclick="kontaktDialog('${c.id}')">
-          <td><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="avatar klein" style="background:${avatarFarbe(c)}">${initialen(kontaktName(c))}</span><b>${markiere(kontaktName(c), woerter)}</b></div></td>
-          <td>${markiere(kontaktFirma(c), woerter)}</td><td class="muted">${markiere(c.gewerk || c.notiz || '', woerter)}</td>
-          <td style="white-space:nowrap">${telLink(c.telefon)}</td><td>${mailLink(c.email)}</td><td class="muted">${markiere(c.adresse, woerter)}</td></tr>`;
+        return `<tr class="click" onclick="kontaktAnsicht('${c.id}')">
+          <td class="k-m"><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="avatar klein" style="background:${avatarFarbe(c)}">${initialen(kontaktName(c))}</span>
+            <div style="min-width:0"><b>${markiere(kontaktName(c), woerter)}</b>${c.notiz ? ' <span class="k-hat-notiz" title="hat Bemerkungen">📝</span>' : ''}
+              ${c.name && kontaktFirma(c) ? `<div class="muted klein k-nur-handy">${markiere(kontaktFirma(c), woerter)}</div>` : ''}</div></div></td>
+          <td>${markiere(kontaktFirma(c), woerter)}</td><td class="muted">${markiere(c.gewerk || '', woerter)}</td>
+          <td class="k-m" style="white-space:nowrap">${telLink(c.telefon)}</td><td>${mailLink(c.email)}</td><td class="muted">${markiere(c.adresse, woerter)}</td></tr>`;
       }).join('')}
     </table></div></div>`;
   }).join('')}`;
@@ -4952,6 +5853,45 @@ function viewKontakte() {
 const initialen = s => String(s || '?').split(/[\s\-]+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
 const avatarFarbe = c => ({ kunde: '#8e44ad', intern: '#00558c', sub: '#e67e22', extern: '#16a085' })[c.art] || '#7f8c8d';
 
+// Kontakt ansehen: alle Angaben, Bemerkungen (direkt hier schreiben, speichert automatisch), zugehörige Projekte; «Bearbeiten» öffnet das Formular
+function kontaktAnsicht(cid) {
+  const c = kontaktById(cid), d = $('dlg');
+  if (!c) return;
+  const firma = kontaktFirma(c), pr = kontaktProjekte(cid), tel = c.telefon ? c.telefon.replace(/\s/g, '') : '';
+  const zeile = (ic, inhalt) => inhalt ? `<div class="k-zeile"><span class="k-ic">${ic}</span><div>${inhalt}</div></div>` : '';
+  d.style.width = 'min(560px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="k-ansicht-kopf">
+      <span class="avatar" style="background:${avatarFarbe(c)};width:52px;height:52px;font-size:18px">${initialen(kontaktName(c))}</span>
+      <div style="flex:1;min-width:0"><h2 style="margin:0">${esc(kontaktName(c))}</h2>
+        <div class="muted">${esc([c.name ? firma : '', c.gewerk, (KONTAKT_ARTEN.find(a => a[0] === c.art) || [])[1]?.replace('Kunden', 'Kunde')].filter(Boolean).join(' · '))}</div></div>
+      <button class="ck-btn" title="Schliessen" onclick="$('dlg').close()">✕</button></div>
+    ${tel || c.email ? `<div class="k-aktionen">${tel ? `<a class="k-akt" href="tel:${esc(tel)}">☎ Anrufen</a>` : ''}${c.email ? `<a class="k-akt" href="mailto:${esc(c.email)}">✉ E-Mail</a>` : ''}
+      ${c.adresse ? `<a class="k-akt" href="https://maps.google.com/?q=${encodeURIComponent(c.adresse)}" target="_blank" rel="noopener">📍 Karte</a>` : ''}</div>` : ''}
+    <div class="k-zeilen">
+      ${zeile('☎', c.telefon ? `<a href="tel:${esc(tel)}">${esc(c.telefon)}</a>` : '')}
+      ${zeile('✉', c.email ? `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : '')}
+      ${zeile('📍', esc(c.adresse || ''))}
+    </div>
+    <div style="margin-top:14px"><label>Bemerkungen <span class="muted klein" id="k-notiz-stand"></span></label>
+      <textarea id="k-ans-notiz" rows="4" placeholder="z.B. am besten morgens erreichbar, will Offerte per Post, Schlüssel bei …" oninput="kontaktNotiz('${cid}',this.value)">${esc(c.notiz || '')}</textarea></div>
+    ${pr.length ? `<div style="margin-top:14px"><label>Projekte (${pr.length})</label><div class="k-projekte">${pr.map(p => `<button class="sec sm" onclick="$('dlg').close();openProjekt('${p.id}')">${esc(p.nummer)} · ${esc(p.name)}</button>`).join('')}</div></div>` : ''}
+    <div class="row" style="margin-top:18px;justify-content:space-between">
+      <button class="sec" onclick="$('dlg').close()">Schliessen</button>
+      <button onclick="kontaktDialog('${cid}',{danach:'kontaktAnsicht'})">✎ Bearbeiten</button>
+    </div>`;
+  d.onkeydown = null;
+  if (!d.open) d.showModal();
+  d.addEventListener('close', () => { d.style.width = ''; }, { once: true });
+}
+// Bemerkungen speichern, während getippt wird (kurz verzögert)
+let kNotizTimer = null;
+function kontaktNotiz(cid, v) {
+  const c = kontaktById(cid); if (!c) return;
+  c.notiz = v.trim();
+  const st = $('k-notiz-stand'); if (st) st.textContent = '· speichert …';
+  clearTimeout(kNotizTimer);
+  kNotizTimer = setTimeout(() => { save(); const s = $('k-notiz-stand'); if (s) s.textContent = '· gespeichert'; if (route().page === 'kontakte') render(); }, 600);
+}
 function kontaktDialog(cid, opt = {}) {
   const c = cid ? kontaktById(cid) : null, d = $('dlg');
   const art = c ? c.art : (opt.art || 'extern');
@@ -4968,10 +5908,10 @@ function kontaktDialog(cid, opt = {}) {
       <div><label>E-Mail</label><input id="k-mail" type="email" value="${esc(c?.email || '')}" placeholder="name@firma.ch"></div>
       <div><label>Ort / Adresse</label><input id="k-adr" value="${esc(c?.adresse || '')}" placeholder="Strasse, PLZ Ort"></div>
     </div>
-    <div style="margin-top:12px"><label>Notiz</label><textarea id="k-notiz" rows="2">${esc(c?.notiz || '')}</textarea></div>
+    <div style="margin-top:12px"><label>Bemerkungen</label><textarea id="k-notiz" rows="3">${esc(c?.notiz || '')}</textarea></div>
     <div class="row" style="margin-top:16px;justify-content:space-between">
       <div>${c ? `<button class="danger sm" onclick="kontaktLoeschen('${c.id}')">Löschen</button>` : ''}</div>
-      <div class="row"><button class="sec" onclick="$('dlg').close()">Abbrechen</button><button onclick="kontaktSpeichern()">${c ? 'Speichern' : 'Anlegen'}</button></div>
+      <div class="row"><button class="sec" onclick="${c && opt.danach === 'kontaktAnsicht' ? `kontaktAnsicht('${c.id}')` : `$('dlg').close()`}">Abbrechen</button><button onclick="kontaktSpeichern()">${c ? 'Speichern' : 'Anlegen'}</button></div>
     </div>`;
   d.onkeydown = e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); kontaktSpeichern(); } };
   if (!d.open) d.showModal();
@@ -4992,7 +5932,8 @@ function kontaktSpeichern() {
   let c = cid && kontaktById(cid);
   if (c) Object.assign(c, daten); else { c = { id: uid(), ...daten }; S().kontakte.push(c); }
   save(); $('dlg').close();
-  if (danach && window[danach]) window[danach](c.id); else render();
+  if (danach === 'kontaktAnsicht') { render(); kontaktAnsicht(c.id); }
+  else if (danach && window[danach]) window[danach](c.id); else render();
   toast(cid ? 'Kontakt gespeichert.' : `Kontakt «${kontaktName(c)}» angelegt.`);
 }
 // beim Löschen bleiben die Daten in den Gewerken erhalten, nur die Verknüpfung fällt weg
@@ -5146,7 +6087,7 @@ function viewKalender() {
 // Einstellungen als getrennte Kacheln in drei Gruppen statt einer umbrechenden Reiterleiste
 const EINST_GRUPPEN = [
   ['Allgemein', [['firma', 'Projektleiter & Firma', 'Name, Adresse, Logo', 'kontakte'], ['backup', 'Backup', 'Sichern & wiederherstellen', 'backup'], ['app', 'App', 'Installieren, offline', 'app']]],
-  ['Vorlagen', [['gewerke', 'Standard-Gewerke', 'Firmen für neue Projekte', 'gewerke'], ['checkliste', 'Checkliste', 'Punkte je Projektart', 'checkliste'], ['rapport', 'Dokumente', 'Rapporte, Abnahme, Material', 'dokumente'], ['mails', 'Mailvorlagen', 'Texte für Anfragen', 'mail']]],
+  ['Vorlagen', [['gewerke', 'Standard-Gewerke', 'Firmen für neue Projekte', 'gewerke'], ['checkliste', 'Checkliste', 'Punkte je Projektart', 'checkliste'], ['rapport', 'Dokumente', 'Rapporte, Abnahme, Material', 'dokumente'], ['mails', 'Mailvorlagen', 'Texte für Anfragen', 'mail'], ['wr', 'Wechselrichter', 'Eigene Modelle für Stringplan', 'wr']]],
   ['Auswertung', [['controlling', 'Controlling', 'Stundensätze & Ampel', 'controlling']]]];
 const EINST_ICONS = {
   kontakte: ICONS.kontakte, controlling: ICONS.controlling,
@@ -5155,7 +6096,8 @@ const EINST_ICONS = {
   gewerke: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
   checkliste: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>',
   dokumente: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
-  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  wr: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12l2-2 2 2 2-2 2 2M9 17h6"/>'
 };
 function viewEinstellungen() {
   const akt = EINST_GRUPPEN.some(([, L]) => L.some(([k]) => k === ui.setTab)) ? ui.setTab : 'backup';
@@ -5166,7 +6108,7 @@ function viewEinstellungen() {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${EINST_ICONS[ic]}</svg>
       <span><b>${l}</b><small>${info}</small></span></button>`).join('')}</div></div>`).join('')}
   </div>
-  <div class="tab-inhalt" data-form="${ui.setTab}">${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, controlling: viewKtEinst, app: viewApp }[ui.setTab] || viewBackup)()}</div>`;
+  <div class="tab-inhalt" data-form="${ui.setTab}">${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, controlling: viewKtEinst, app: viewApp, wr: viewWrEigene }[ui.setTab] || viewBackup)()}</div>`;
 }
 
 // Vorlagen für Arbeitsauftrag und Abnahmeprotokoll: jedes neue Dokument startet damit
@@ -5317,23 +6259,38 @@ function delMail(i) {
 }
 
 // ---------- App installieren (PWA) ----------
+// Sobald der Browser die Seite als App installieren kann, erscheint unten ein Knopf «App installieren» (auch auf der Anmeldeseite).
+// So entsteht eine echte App (eigenes Fenster) statt nur einer Verknüpfung, die im Browser öffnet.
 let installPrompt = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; render(); });
-window.addEventListener('appinstalled', () => { installPrompt = null; toast('App installiert.'); render(); });
+const istApp = () => matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: minimal-ui)').matches || navigator.standalone === true;
+function installKnopf() {
+  let b = document.getElementById('installKnopf');
+  const zeigen = installPrompt && !istApp() && !sessionStorage.getItem('installWeg');
+  if (!zeigen) { if (b) b.remove(); return; }
+  if (b) return;
+  b = document.createElement('div'); b.id = 'installKnopf';
+  b.innerHTML = `<button onclick="installieren()">📲 App installieren</button><button class="sec" title="Ausblenden" onclick="try{sessionStorage.setItem('installWeg','1')}catch(e){};installKnopf()">✕</button>`;
+  document.body.appendChild(b);
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; installKnopf(); try { render(); } catch (x) {} });
+window.addEventListener('appinstalled', () => { installPrompt = null; installKnopf(); toast('App installiert – ab jetzt über das Symbol auf dem Startbildschirm öffnen.'); try { render(); } catch (x) {} });
 async function installieren() {
-  if (!installPrompt) return;
-  installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; render();
+  if (!installPrompt) return toast('Im Browser-Menü «App installieren» wählen (siehe Einstellungen › App).');
+  installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; installKnopf(); try { render(); } catch (x) {}
 }
 function viewApp() {
-  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const standalone = istApp();
   return `<div class="card">
     <h3>Als App installieren</h3>
     ${standalone ? '<div class="note" style="background:#eef6e6;border-color:#cfe3b8;color:#3d5a12">Du verwendest die Seite bereits als installierte App.</div>' : ''}
-    ${installPrompt ? '<p><button onclick="installieren()">App jetzt installieren</button></p>' : ''}
-    <p class="muted" style="margin-top:0">Die Seite lässt sich wie eine App auf Handy und PC installieren: eigenes Symbol, ohne Browserleiste und auch offline nutzbar.
-      Die Daten bleiben auf dem jeweiligen Gerät (für ein anderes Gerät: Backup exportieren und dort importieren).</p>
+    ${installPrompt ? '<p><button onclick="installieren()">📲 App jetzt installieren</button></p>' : ''}
+    <p class="muted" style="margin-top:0">Die Seite lässt sich wie eine App auf Handy und PC installieren: eigenes Symbol, ohne Browserleiste und auch offline nutzbar.</p>
+    <div class="note" style="margin-bottom:12px"><b>Öffnet sich vom Symbol aus immer der Browser?</b> Dann ist es nur eine Verknüpfung, keine App.
+      Symbol auf dem Startbildschirm lange drücken → <b>Entfernen</b>, danach die Seite im Browser neu laden und neu installieren: über den Knopf <b>«📲 App installieren»</b> unten
+      oder im Menü <b>«App installieren»</b> (nicht «Verknüpfung» / «Lesezeichen»).</div>
     <div class="grid" style="margin-top:8px">
-      <div><b>Android (Chrome)</b><div class="muted">Menü ⋮ → «App installieren» bzw. «Zum Startbildschirm hinzufügen».</div></div>
+      <div><b>Samsung Internet</b><div class="muted">Installieren-Symbol in der Adressleiste, oder Menü ≡ → «Seite hinzufügen zu» → «Startbildschirm» → <b>Installieren</b>.</div></div>
+      <div><b>Android (Chrome)</b><div class="muted">Menü ⋮ → «Zum Startbildschirm hinzufügen» → <b>Installieren</b> (nicht «Verknüpfung erstellen»).</div></div>
       <div><b>iPhone / iPad (Safari)</b><div class="muted">Teilen-Symbol □↑ → «Zum Home-Bildschirm».</div></div>
       <div><b>PC (Chrome / Edge)</b><div class="muted">Installieren-Symbol rechts in der Adressleiste oder Menü → «App installieren».</div></div>
     </div>
