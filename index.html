@@ -927,6 +927,21 @@
   .jahr-name { text-align: center; font-size: 12px; color: var(--muted); padding: 6px 0 4px; }
   tr.jahr-akt td { background: #f6f5f1; } tr.jahr-total td { border-top: 2px solid var(--line); }
   @media (max-width: 700px) { .jahr-chart { gap: 2px; height: 200px; } .jahr-wert { display: none; } .jahr-name { font-size: 10.5px; } }
+  /* Konto und Synchronisierung in den Einstellungen */
+  .einst-konto { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 12px 16px; margin-bottom: 16px; }
+  .einst-konto .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .einst-konto b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Handy: Menüleiste unten am Bildschirm (mit dem Daumen erreichbar), Anmeldung und Sync nur in den Einstellungen */
+  @media (max-width: 800px) {
+    aside { position: fixed !important; top: auto !important; bottom: 0; left: 0; right: 0; height: auto; z-index: 40; order: 0;
+      border-radius: 20px 20px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
+    .side-user { display: none !important; }
+    nav#nav { padding: 6px 8px; }
+    #nav > .gleiter::before { top: 3px; bottom: auto; }
+    main { padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+    #installKnopf { bottom: calc(84px + env(safe-area-inset-bottom)); }
+    .toast { bottom: calc(86px + env(safe-area-inset-bottom)); }
+  }
   /* Knopf «App installieren» unten in der Mitte */
   #installKnopf { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70; display: flex; gap: 6px; background: #fff; padding: 6px; border-radius: 999px; box-shadow: 0 6px 24px rgba(0,0,0,.18); }
   #installKnopf button { border-radius: 999px; white-space: nowrap; }
@@ -6263,6 +6278,7 @@ function viewEinstellungen() {
   ui.setTab = akt;
   return `
   <div class="page-head"><h1>${gName ? 'Einstellungen · ' + gName : 'Einstellungen'}</h1></div>
+  <div id="einstKonto">${kontoHtml()}</div>
   <div class="einst-gruppen">${GR.map(([titel, L]) => `<div class="einst-gruppe"><div class="einst-titel">${titel}</div>
     <div class="einst-kacheln">${L.map(([k, l, info, ic]) => `<button class="einst-kachel${akt === k ? ' active' : ''}" onclick="ui.setTab='${k}';render()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${EINST_ICONS[ic]}</svg>
@@ -7978,6 +7994,15 @@ function cloudStatus(s, fehler = '') {
   cloud.status = s; cloud.fehler = fehler;
   if (s === 'ok') cloud.zuletzt = new Date();
   if ($('sideUser')) renderCloud();
+  if ($('einstKonto')) $('einstKonto').innerHTML = kontoHtml();
+}
+// Einstellungen: Anmeldung und Synchronisierung (auf dem Handy nur hier, die Leiste unten zeigt nur das Menü)
+function kontoHtml() {
+  if (!cloud.user) return '';
+  const farbe = { ok: '#58d68d', speichert: '#5dade2', laedt: '#5dade2', offline: '#f5b041', fehler: '#e74c3c', aus: '#9aa5b1' }[cloud.status];
+  return `<div class="einst-konto"><span class="dot" style="background:${farbe}"></span>
+    <div style="flex:1;min-width:0"><b>${esc(cloud.user.email)}</b><div class="muted klein">☁ ${cloudText()}</div></div>
+    <button class="sec sm" onclick="abmelden()">Abmelden</button></div>`;
 }
 window.addEventListener('online', () => { if (cloud.user) cloudSchreiben(true).catch(() => {}); });
 window.addEventListener('offline', () => { if (cloud.user) cloudStatus('offline'); });
