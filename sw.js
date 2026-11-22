@@ -1,5 +1,5 @@
 // Netz zuerst (damit Änderungen auf GitHub sofort ankommen), bei fehlender Verbindung aus dem Cache
-const CACHE = 'ckw-projekte-v28'; // v28: Installierbarkeit (Manifest mit id, Knopf «App installieren»)
+const CACHE = 'ckw-projekte-v29'; // v29: Untermenüs, DB-Übersicht, Jahresübersicht, Suche mit ✕
 // die LASOLTEC-Vorlage steckt seit v4 in der index.html; fehlt eine Datei auf dem Server, darf die Installation nicht scheitern
 const APP = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // fremde Quellen, die offline gebraucht werden (Bibliotheken, Schrift). Firebase-Anmeldung und Datenbank laufen nie über den Cache.

@@ -885,6 +885,48 @@
     .card:has(.k-tab) { padding-left: 14px; padding-right: 14px; }
     .k-nur-handy { display: block; }
   }
+  /* Untermenüs in der Leiste: nur bei der offenen Hauptseite ausgeklappt */
+  nav .nav-pfeil { margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 400; }
+  .nav-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 8px 22px; padding-left: 12px; border-left: 2px solid #e3e2dc; animation: navSub .2s ease; }
+  .nav-sub a { font-size: 13px; padding: 6px 10px; border-radius: 9px; color: var(--muted); }
+  .nav-sub a:hover { color: var(--text); background: #efeee9; }
+  .nav-sub a.on { color: var(--text); font-weight: 600; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  @keyframes navSub { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .collapsed .nav-sub, .collapsed nav .nav-pfeil { display: none; }
+  /* schmal oder Leiste eingeklappt: Untermenü als Knopfreihe oben auf der Seite */
+  .sub-mobil { display: none; gap: 6px; overflow-x: auto; margin: 0 0 14px; padding-bottom: 2px; scrollbar-width: none; }
+  .sub-mobil a { white-space: nowrap; padding: 7px 14px; border-radius: 99px; background: #fff; border: 1px solid #e3e2dc; color: var(--text); font-size: 13px; text-decoration: none; }
+  .sub-mobil a.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .collapsed .sub-mobil { display: flex; }
+  @media (max-width: 800px) { .nav-sub, nav .nav-pfeil { display: none !important; } .sub-mobil { display: flex; } }
+  /* Suchfeld: ✕ zum Leeren */
+  .search input { padding-right: 36px; }
+  .such-x { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; padding: 0; border-radius: 50%; border: 0; background: #ecebe6; color: var(--muted); font-size: 12px; line-height: 26px; display: flex; align-items: center; justify-content: center; }
+  .such-x:hover { background: #e0dfd9; color: var(--text); }
+  .search input:placeholder-shown + .such-x { display: none; }
+  /* DB-Übersicht */
+  .db-li { gap: 12px; }
+  .db-name { flex: 1 1 220px; min-width: 0; }
+  .db-balken { position: relative; flex: 0 1 220px; height: 10px; border-radius: 6px; background: var(--brand-2); }
+  .db-balken i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: #1f9d55; }
+  .db-balken i.kw { background: #f08a00; } .db-balken i.kb, .db-balken i.kx { background: #e02424; } .db-balken i.kn { background: #c4c3bc; }
+  .db-balken b { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 2px; }
+  @media (max-width: 700px) { .db-balken { display: none; } }
+  /* Jahresübersicht */
+  .jahr-leg { display: flex; gap: 14px; font-size: 12.5px; color: var(--muted); }
+  .jahr-leg i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .jahr-leg i.u, .jahr-s.u { background: #3d6fb6; } .jahr-leg i.g, .jahr-s.g { background: var(--bar); }
+  .jahr-leg i.p { background: repeating-linear-gradient(45deg, #c9c8c1 0 3px, #ecebe6 3px 6px); }
+  .jahr-chart { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; height: 240px; margin-top: 14px; }
+  .jahr-m { display: flex; flex-direction: column; align-items: stretch; min-width: 0; border-radius: 10px; padding: 4px 2px 0; }
+  .jahr-m.heute { background: #f6f5f1; }
+  .jahr-wert { font-size: 10.5px; color: var(--muted); text-align: center; height: 16px; white-space: nowrap; overflow: hidden; }
+  .jahr-saeulen { flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: 3px; }
+  .jahr-s { position: relative; width: 38%; max-width: 22px; border-radius: 5px 5px 2px 2px; min-height: 0; overflow: hidden; }
+  .jahr-s i.p { position: absolute; left: 0; right: 0; top: 0; background: repeating-linear-gradient(45deg, rgba(255,255,255,.75) 0 3px, rgba(255,255,255,.35) 3px 6px); }
+  .jahr-name { text-align: center; font-size: 12px; color: var(--muted); padding: 6px 0 4px; }
+  tr.jahr-akt td { background: #f6f5f1; } tr.jahr-total td { border-top: 2px solid var(--line); }
+  @media (max-width: 700px) { .jahr-chart { gap: 2px; height: 200px; } .jahr-wert { display: none; } .jahr-name { font-size: 10.5px; } }
   /* Knopf «App installieren» unten in der Mitte */
   #installKnopf { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70; display: flex; gap: 6px; background: #fff; padding: 6px; border-radius: 999px; box-shadow: 0 6px 24px rgba(0,0,0,.18); }
   #installKnopf button { border-radius: 999px; white-space: nowrap; }
@@ -1881,16 +1923,29 @@ ICONS.kontakte = '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.
 ICONS.controlling = '<path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/><circle cx="19" cy="6" r="1.5"/>';
 // Wochenplan und Monatskalender sind ein Menüpunkt «Termine» (oben umschaltbar Woche / Monat)
 const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Termine'], ['einstellungen', 'Einstellungen']];
-const terminSicht = aktiv => `<div class="seg seg-sicht"><button class="${aktiv === 'woche' ? 'on' : ''}" onclick="nav('woche')">Woche</button><button class="${aktiv === 'termine' ? 'on' : ''}" onclick="nav('termine')">Monat</button></div>`;
+// Untermenüs: klappen in der Leiste auf, wenn die Hauptseite offen ist (Adresse #/seite/unterseite)
+const NAV_SUB = {
+  dashboard: [['projekte', 'Projekte'], ['checklisten', 'Checklisten'], ['db', 'DB-Übersicht'], ['kalender', 'Kalender'], ['jahr', 'Jahresübersicht']],
+  projekte: [['offen', 'Laufend / Offen'], ['abgeschlossen', 'Abgeschlossen']],
+  controlling: [['kontrollieren', 'Kontrollieren'], ['db', 'DB-Übersicht']],
+  kontakte: [['kunde', 'Kunden'], ['intern', 'Intern CKW'], ['sub', 'Subunternehmer'], ['extern', 'Extern']],
+  einstellungen: [['allgemein', 'Allgemein'], ['vorlagen', 'Vorlagen'], ['auswertung', 'Auswertung']]
+};
+const unterSeite = () => { const r = route(); return r.page === 'projekt' ? '' : (r.id || ''); };
+// Leeren-Knopf in Suchfeldern (erscheint nur, wenn etwas eingetippt ist)
+const SUCH_X = `<button type="button" class="such-x" title="Suche leeren" aria-label="Suche leeren" onmousedown="event.preventDefault()" onclick="suchLeeren(this)">✕</button>`;
+function suchLeeren(b) { const i = b.previousElementSibling; if (!i) return; i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); i.focus(); }
+const seitenKopf = (titel, unter = '', rechts = '') => `<div class="page-head"><div><h1>${titel}</h1>${unter ? `<div class="muted" style="margin-top:4px">${unter}</div>` : ''}</div>${rechts ? `<div class="row">${rechts}</div>` : ''}</div>`;
+const terminSicht = aktiv =>`<div class="seg seg-sicht"><button class="${aktiv === 'woche' ? 'on' : ''}" onclick="nav('woche')">Woche</button><button class="${aktiv === 'termine' ? 'on' : ''}" onclick="nav('termine')">Monat</button></div>`;
 
 function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
-function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (h === 'projekte') { ui.pZu = false; ui.pSort = 'nr'; } if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
+function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (h === 'projekte') ui.pSort = 'nr'; if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
 function openProjekt(id) { ui.tab = 'uebersicht'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
 window.addEventListener('hashchange', () => {
   // beim Hingehen immer zuerst die laufenden / offenen Projekte zeigen
   const pg = route().page;
   if (pg === 'controlling') ui.ktF = 'run';
-  if (pg === 'projekte') { ui.pZu = false; ui.pSort = 'nr'; }
+  if (pg === 'projekte') ui.pSort = 'nr';
   render({ nachOben: true });
 });
 
@@ -1955,8 +2010,12 @@ function render(opt = {}) {
   chkKeys = [];
   const active = r.page === 'projekt' ? 'projekte' : r.page === 'termine' ? 'woche' : r.page;
   if (r.page === 'woche' || r.page === 'termine') ui.terminLetzte = r.page;
+  const sub = unterSeite();
+  if (r.page === 'kontakte') ui.kart = KONTAKT_ARTEN.some(a => a[0] === sub) ? sub : '';
+  const subLinks = k => (NAV_SUB[k] || []).map(([s, l]) => `<a href="#/${k}/${s}" class="${active === k && sub === s ? 'on' : ''}">${l}</a>`).join('');
   morphHtml($('nav'), '<i class="gleiter" aria-hidden="true"></i>' + NAV.map(([k, l]) => `<a href="#/${k === 'woche' ? ui.terminLetzte || 'woche' : k}" class="${active === k ? 'active' : ''}" title="${l}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg><span>${l}</span></a>`).join('') + navProjekte(r));
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg><span>${l}</span>${NAV_SUB[k] ? `<b class="nav-pfeil">${active === k ? '▾' : '▸'}</b>` : ''}</a>`
+    + (active === k && NAV_SUB[k] ? `<div class="nav-sub">${subLinks(k)}</div>` : '')).join(''));
   morphHtml($('sideLogo'), S().logo ? `<img src="${S().logo}" alt="Logo">` : 'CKW<i></i>');
   $('layout').classList.toggle('collapsed', sideCollapsed);
   $('sideToggle').textContent = sideCollapsed ? '»' : '«';
@@ -1971,6 +2030,8 @@ function render(opt = {}) {
     r.page === 'woche' ? viewWoche() :
     r.page === 'kontakte' ? viewKontakte() :
     r.page === 'einstellungen' ? viewEinstellungen() : viewDashboard();
+  // schmale Ansicht: Untermenü als Knopfreihe oben auf der Seite (die Leiste zeigt dort nur Symbole)
+  const subMobil = !p && NAV_SUB[active] ? `<div class="sub-mobil"><a href="#/${active}" class="${sub ? '' : 'on'}">Übersicht</a>${subLinks(active)}</div>` : '';
   ui.pop = null;
   // andere Seite: neu aufbauen und kurz einblenden · anderer Tab, Monat usw.: nur Geändertes abgleichen,
   // Kopf und Tabs bleiben stehen, nur der Tab-Inhalt blendet ein · sonst: nur abgleichen, ohne Bewegung.
@@ -1982,16 +2043,19 @@ function render(opt = {}) {
   // alte Seite blendet kurz aus (bevor nach oben gescrollt wird, damit sie an ihrem Platz bleibt)
   if (neueSeite && app.childElementCount && !wenigBewegung()) seiteAusblenden(app);
   if (opt.nachOben) scrollTo(0, 0);
-  if (neueSeite) { app.innerHTML = html; einblenden(app, 'gestaffelt'); zaehlerStarten(app); }
+  if (neueSeite) { app.innerHTML = subMobil + html; einblenden(app, 'gestaffelt'); zaehlerStarten(app); }
   else {
     const vorher = wechsel ? aktiverReiter(app) : -1;
-    morphHtml(app, html);
+    morphHtml(app, subMobil + html);
     const inhalt = wechsel && app.querySelector('.tab-inhalt');
     // Reiter nach rechts: Inhalt kommt von rechts, nach links: von links
     const nachher = aktiverReiter(app);
     if (inhalt) einblenden(inhalt, vorher < 0 || nachher < 0 || vorher === nachher ? '' : nachher > vorher ? 'r' : 'l');
   }
   schieber();
+  // Knopfreihe der Unterseiten (schmal): aktiven Knopf in den sichtbaren Bereich schieben
+  const sm = app.querySelector('.sub-mobil'), smOn = sm && sm.querySelector('a.on');
+  if (smOn) sm.scrollLeft = Math.max(0, smOn.offsetLeft - sm.offsetLeft - 16);
   if (r.page === 'projekte' && ui.q) filterProjekte(ui.q);
   // Vorschaubilder der Mängel nachladen (liegen ausserhalb der Projekte)
   if (app.querySelector('img[data-bild]:not([src])')) bilderEinsetzen(app);
@@ -2043,16 +2107,6 @@ function schieber() {
 addEventListener('resize', () => schieber());
 if (window.ResizeObserver) new ResizeObserver(() => schieber()).observe(document.getElementById('nav') || document.body);
 
-// laufende und kommende Projekte als Schnellzugriff in der Leiste
-function navProjekte(r) {
-  const heute = todayIso();
-  const list = offenP().map(p => ({ p, s: span(p) })).filter(x => x.s && x.s.ende >= heute)
-    .sort((a, b) => a.s.start.localeCompare(b.s.start)).slice(0, 6);
-  if (!list.length) return '';
-  return '<div class="nav-sec">Aktuelle Projekte</div>' + list.map(({ p }) =>
-    `<a href="#/projekt/${p.id}" class="nav-proj ${r.page === 'projekt' && r.id === p.id ? 'active' : ''}" title="${esc(p.nummer + ' ' + p.name)}"
-      onclick="event.preventDefault();openProjekt('${p.id}')"><span class="pdot" style="background:${p.farbe}"></span><span>${esc(p.nummer)} · ${esc(p.name)}</span></a>`).join('');
-}
 // Halbkreis-Anzeige aus Strichen
 // o.mini: kleine Anzeige (grössere Schrift im Verhältnis), o.farbe: Strichfarbe, o.wert: eigener Text statt «pct%»
 function gauge(pct, label, o = {}) {
@@ -2215,15 +2269,16 @@ function mangelErledigt(pid, mid, el) {
   setTimeout(render, wenigBewegung() ? 0 : 380);
 }
 function zwischenUebernehmen(pid) { maengelSpiegeln(findP(pid)); save(); render(); }
-function viewOffen(today) {
+function viewOffen(today, alle) {
   const list = offenP().filter(p => projektArt(p) !== 'service' && modulAn(p, 'checkliste')).map(p => ({ p, ...freigabe(p) }))
     .filter(x => !x.s || x.s.ende >= today)
     .sort((a, b) => (a.s ? a.s.start : '9999').localeCompare(b.s ? b.s.start : '9999'))
-    .filter(x => x.offen.length || (x.s && x.s.start >= today && diffDays(today, x.s.start) <= 30));
+    .filter(x => x.offen.length || (x.s && x.s.start >= today && (alle || diffDays(today, x.s.start) <= 30)));
   if (!list.length) return '';
+  const maxP = alle ? 999 : 6, maxO = alle ? 999 : 8;
   return `<div class="card">
     <div class="ck-head"><h3 style="margin:0">Baufreigabe – vor Baustart offen</h3><span class="muted">Planung, Koordination und Beschaffung müssen erledigt sein · rot ab ${FREIGABE_TAGE} Tagen vor Baustart</span></div>
-    ${list.slice(0, 6).map(({ p, s, offen, tage, kritisch }) => {
+    ${list.slice(0, maxP).map(({ p, s, offen, tage, kritisch }) => {
       const wann = !s ? 'Baustart noch offen' : tage < 0 ? `läuft seit ${fmt(s.start)}` : `Baustart ${fmtLong(s.start)} · ${relTage(s.start)}`;
       return `<div class="of-proj ${kritisch ? 'kritisch' : ''}">
         <div class="of-head" onclick="ui.tab='checkliste';nav('projekt/${p.id}')" title="Projekt öffnen">
@@ -2231,14 +2286,19 @@ function viewOffen(today) {
           <span class="${kritisch ? 'rot-txt' : 'muted'}">${wann}</span>
           ${offen.length ? `<span class="${kritisch ? 'tag-warn' : 'tag-sub'}" style="margin-left:auto">${kritisch ? 'Baustart gefährdet · ' : ''}${offen.length} offen</span>` : '<span class="tag-ok" style="margin-left:auto">✓ Baufreigabe</span>'}
         </div>
-        ${offen.slice(0, 8).map(o => ofZeile(p, o, kritisch, `ui.tab='checkliste';nav('projekt/${p.id}')`)).join('')}
-        ${offen.length > 8 ? `<div class="muted" style="padding:4px 0 0 28px;cursor:pointer" onclick="ui.tab='checkliste';nav('projekt/${p.id}')">… und ${offen.length - 8} weitere</div>` : ''}
+        ${offen.slice(0, maxO).map(o => ofZeile(p, o, kritisch, `ui.tab='checkliste';nav('projekt/${p.id}')`)).join('')}
+        ${offen.length > maxO ?`<div class="muted" style="padding:4px 0 0 28px;cursor:pointer" onclick="ui.tab='checkliste';nav('projekt/${p.id}')">… und ${offen.length - 8} weitere</div>` : ''}
       </div>`;
     }).join('')}
   </div>`;
 }
 function viewDashboard() {
-  const today = todayIso();
+  const today = todayIso(), sub = unterSeite();
+  if (sub === 'projekte') return seitenKopf('Projekte', 'Alle laufenden und geplanten Projekte', '<button onclick="neuesProjektDialog()">+ Neues Projekt</button>') + dashProjekte(today);
+  if (sub === 'checklisten') return seitenKopf('Checklisten', 'Offene Punkte vor Baustart aller Projekte') + (viewOffen(today, true) || '<div class="card empty">✓ Bei keinem Projekt sind Punkte vor Baustart offen.</div>');
+  if (sub === 'db') return viewDb('dashboard');
+  if (sub === 'kalender') return seitenKopf('Kalender', 'Alle Projekte im Monat') + dashKalender();
+  if (sub === 'jahr') return viewJahr();
   // Bauprojekte (PV, Batterie) und Service-Aufträge werden getrennt gezählt
   const bau = offenP().filter(p => projektArt(p) !== 'service');
   const serviceOffen = offenP().filter(p => projektArt(p) === 'service' && serviceStatus(p).key !== 'erledigt').length;
@@ -2261,7 +2321,7 @@ function viewDashboard() {
     </div>
     <div class="row">
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input placeholder="Projekt suchen…" onkeydown="if(event.key==='Enter'){ui.q=this.value;nav('projekte')}"></div>
+        <input placeholder="Projekt suchen…" onkeydown="if(event.key==='Enter'){ui.q=this.value;nav('projekte')}">${SUCH_X}</div>
       <button onclick="neuesProjektDialog()">+ Neues Projekt</button>
     </div>
   </div>
@@ -2394,9 +2454,106 @@ function dashKalender() {
   </div>`;
 }
 
+// ---------- DB-Übersicht (Dashboard und Controlling) ----------
+// laufend: DB-Prognose der letzten Kontrolle gegenüber dem DB aus dem Verkauf · abgeschlossen: effektiver DB
+function dbDaten() {
+  const act = state.projects.filter(ktAktiv).map(ktInfo).filter(x => x.c.vk > 0);
+  const zu = state.projects.filter(p => p.abschluss && p.abschluss.vk > 0).map(p => ({ p, a: p.abschluss, db: p.abschluss.vk - p.abschluss.cost }));
+  const vk = act.reduce((s, x) => s + x.c.vk, 0), prog = act.reduce((s, x) => s + x.c.dbProg, 0), plan = act.reduce((s, x) => s + x.c.dbPlan, 0);
+  const zVk = zu.reduce((s, x) => s + x.a.vk, 0), zDb = zu.reduce((s, x) => s + x.db, 0);
+  return { act, zu, vk, prog, plan, zVk, zDb, pProg: vk ? prog / vk * 100 : null, pPlan: vk ? plan / vk * 100 : null, pZu: zVk ? zDb / zVk * 100 : null };
+}
+// Balken: DB-Prozent auf einer Skala bis 40 %, Strich = DB aus dem Verkauf
+function dbBalken(pct, plan, cls) {
+  const w = v => Math.max(0, Math.min(100, (v || 0) / 40 * 100));
+  return `<div class="db-balken"><i class="${cls}" style="width:${w(pct)}%"></i>${plan == null ? '' : `<b style="left:${w(plan)}%" title="DB Verkauf ${ktPct(plan)}"></b>`}</div>`;
+}
+function viewDb(ktx) {
+  const d = dbDaten(), pk = ktClassify(d.prog, d.plan), dash = ktx === 'dashboard';
+  const zeileLauf = x => `<div class="li db-li" onclick="ktKontrollieren('${x.p.id}')"><span class="kt-dot ${x.st.cls}"></span>
+      <div class="db-name"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">${x.st.lbl} · Leistung ${x.c.prog}% · VK ${ktChf(x.c.vk)}</div></div>
+      ${dbBalken(x.c.dbProgPct, x.c.dbPlanPct, 'k' + (x.st.cls || 'g'))}
+      <div class="kt-v"><div class="${KT_TXT[x.st.cls]}">${ktPct(x.c.dbProgPct)}</div><div class="muted">Verkauf ${ktPct(x.c.dbPlanPct)}</div></div></div>`;
+  const zeileZu = x => `<div class="li db-li" onclick="nav('projekt/${x.p.id}')"><span class="kt-dot ${x.db >= 0 ? 'g' : 'x'}"></span>
+      <div class="db-name"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">abgeschlossen ${fmt(x.a.date)} · Erlös ${ktChf(x.a.vk)}</div></div>
+      ${dbBalken(x.a.dbPct, null, x.db >= 0 ? 'kg' : 'kx')}
+      <div class="kt-v"><div class="${x.db >= 0 ? 'kt-pos' : 'kt-neg'}">${ktPct(x.a.dbPct)}</div><div class="muted">${ktChf(x.db)}</div></div></div>`;
+  const lauf = d.act.slice().sort(dash ? (a, b) => (b.c.dbProgPct || 0) - (a.c.dbProgPct || 0) : (a, b) => KT_RANK[a.st.cls] - KT_RANK[b.st.cls] || a.c.deltaChf - b.c.deltaChf);
+  return seitenKopf('DB-Übersicht', dash ? 'Durchschnittlicher Deckungsbeitrag laufender und abgeschlossener Projekte' : 'Wie gut laufen die Projekte? DB-Prognose gegenüber dem Verkauf')
+  + `<div class="kpis">
+    <div class="kpi"><b class="${d.pProg == null ? '' : KT_TXT[pk]}">${ktPct(d.pProg)}</b><span>Ø DB laufend (Prognose)</span><span class="kt-kpi-s">${d.act.length} Projekte · ${ktChf(d.prog)}</span></div>
+    <div class="kpi"><b>${ktPct(d.pPlan)}</b><span>Ø DB laufend (Verkauf)</span><span class="kt-kpi-s ${d.prog - d.plan < 0 ? 'kt-neg' : 'kt-pos'}">${d.act.length ? ktSgnChf(d.prog - d.plan) + ' Prognose zu Verkauf' : '–'}</span></div>
+    <div class="kpi"><b class="${d.zDb >= 0 ? 'kt-pos' : 'kt-neg'}">${ktPct(d.pZu)}</b><span>Ø DB abgeschlossen</span><span class="kt-kpi-s">${d.zu.length} Projekte · ${ktChf(d.zDb)}</span></div>
+    <div class="kpi"><b style="font-size:24px">${ktChf(d.vk)}</b><span>Volumen laufend (VK)</span><span class="kt-kpi-s">abgeschlossen ${ktChf(d.zVk)}</span></div>
+  </div>
+  <div class="card"><div class="ck-head"><h3 style="margin:0">Laufende Projekte <span class="muted" style="font-weight:400">· ${lauf.length}</span></h3>
+      <span class="muted klein">Balken = DB-Prognose (Skala bis 40 %) · Strich = DB aus dem Verkauf</span></div>
+    ${lauf.map(zeileLauf).join('') || '<div class="empty">Noch kein laufendes Controlling mit Verkaufspreis.</div>'}</div>
+  ${dash ? `<div class="card"><h3 style="margin-top:0">Abgeschlossene Projekte <span class="muted" style="font-weight:400">· ${d.zu.length}</span></h3>
+    ${d.zu.slice().sort((a, b) => b.a.date.localeCompare(a.a.date)).map(zeileZu).join('') || '<div class="empty">Noch kein Projekt abgeschlossen.</div>'}</div>` : ''}`;
+}
+
+// ---------- Jahresübersicht: Umsatz und Gewinn nach Monat des Abschlusses ----------
+// abgeschlossen = effektive Werte im Monat des Abschlusses · offen = Prognose im Monat des geplanten Bauendes (überfällige im laufenden Monat)
+function jahrEintraege() {
+  const heute = todayIso(), E = [];
+  state.projects.filter(p => p.abschluss && p.abschluss.date).forEach(p => E.push({ p, d: p.abschluss.date, vk: +p.abschluss.vk || 0, db: (+p.abschluss.vk || 0) - (+p.abschluss.cost || 0), prog: false }));
+  offenP().filter(p => p.ktr).forEach(p => {
+    const s = span(p), c = ktMitDaten(p) ? ktInfo(p).c : ktCalc(p.ktr, null);
+    if (!s || !(c.vk > 0)) return;
+    E.push({ p, d: s.ende < heute ? heute : s.ende, vk: c.vk, db: ktMitDaten(p) ? c.dbProg : c.dbPlan, prog: true });
+  });
+  return E;
+}
+function viewJahr() {
+  const E = jahrEintraege(), jetzt = +todayIso().slice(0, 4);
+  const jahre = [...new Set([jetzt, ...E.map(e => +e.d.slice(0, 4))])].sort();
+  const J = ui.jahr && jahre.includes(ui.jahr) ? ui.jahr : jetzt;
+  const imJahr = E.filter(e => +e.d.slice(0, 4) === J), eff = imJahr.filter(e => !e.prog), prg = imJahr.filter(e => e.prog);
+  const sum = (L, k) => L.reduce((s, e) => s + e[k], 0);
+  const M = MONATE.map((n, i) => { const L = imJahr.filter(e => +e.d.slice(5, 7) === i + 1); return { n, L, eVk: sum(L.filter(e => !e.prog), 'vk'), eDb: sum(L.filter(e => !e.prog), 'db'), pVk: sum(L.filter(e => e.prog), 'vk'), pDb: sum(L.filter(e => e.prog), 'db') }; });
+  const max = Math.max(1, ...M.map(m => m.eVk + m.pVk));
+  const h = v => (v / max * 100).toFixed(1) + '%';
+  const eVk = sum(eff, 'vk'), eDb = sum(eff, 'db'), pVk = sum(prg, 'vk'), pDb = sum(prg, 'db');
+  const kurz = v => Math.abs(v) >= 1000 ? (v / 1000).toLocaleString('de-CH', { maximumFractionDigits: 0 }) + 'k' : ktFmt(v);
+  const wahl = `<div class="row"><button class="sec sm" ${jahre.indexOf(J) > 0 ? '' : 'disabled'} onclick="ui.jahr=${jahre[jahre.indexOf(J) - 1] || J};render()">‹</button>
+    <b style="min-width:60px;text-align:center;font-size:17px">${J}</b>
+    <button class="sec sm" ${jahre.indexOf(J) < jahre.length - 1 ? '' : 'disabled'} onclick="ui.jahr=${jahre[jahre.indexOf(J) + 1] || J};render()">›</button>
+    ${J !== jetzt ? `<button class="sec sm" onclick="ui.jahr=${jetzt};render()">Heute</button>` : ''}</div>`;
+  const vergleich = jahre.map(j => { const L = E.filter(e => !e.prog && +e.d.slice(0, 4) === j), v = sum(L, 'vk'), d = sum(L, 'db'), P = E.filter(e => e.prog && +e.d.slice(0, 4) === j);
+    return `<tr class="${j === J ? 'jahr-akt' : ''}" onclick="ui.jahr=${j};render()" style="cursor:pointer"><td><b>${j}</b></td><td style="text-align:right">${L.length}</td><td style="text-align:right">${ktChf(v)}</td>
+      <td style="text-align:right" class="${d >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(d)}</td><td style="text-align:right">${v ? ktPct(d / v * 100) : '–'}</td>
+      <td style="text-align:right" class="muted">${P.length ? ktChf(sum(P, 'vk')) + ' · ' + P.length + ' Proj.' : '–'}</td></tr>`; }).join('');
+  return seitenKopf('Jahresübersicht', 'Umsatz und Gewinn im Monat des Abschlusses · offene Projekte als Prognose im Monat des Bauendes', wahl)
+  + `<div class="kpis">
+    <div class="kpi"><b style="font-size:24px">${ktChf(eVk)}</b><span>Umsatz ${J} (abgeschlossen)</span><span class="kt-kpi-s">${eff.length} Projekte</span></div>
+    <div class="kpi"><b style="font-size:24px" class="${eDb >= 0 ? 'kt-pos' : 'kt-neg'}">${ktChf(eDb)}</b><span>Gewinn (DB) ${J}</span><span class="kt-kpi-s">Ø ${eVk ? ktPct(eDb / eVk * 100) : '–'}</span></div>
+    <div class="kpi"><b style="font-size:24px">${ktChf(pVk)}</b><span>Prognose offene Projekte</span><span class="kt-kpi-s">${prg.length} Projekte · DB ${ktChf(pDb)}</span></div>
+    <div class="kpi"><b style="font-size:24px">${ktChf(eVk + pVk)}</b><span>Umsatz ${J} inkl. Prognose</span><span class="kt-kpi-s">DB ${ktChf(eDb + pDb)}${eVk + pVk ? ' · ' + ktPct((eDb + pDb) / (eVk + pVk) * 100) : ''}</span></div>
+  </div>
+  <div class="card"><div class="ck-head"><h3 style="margin:0">Umsatz und Gewinn pro Monat</h3>
+      <div class="jahr-leg"><span><i class="u"></i>Umsatz</span><span><i class="g"></i>Gewinn (DB)</span><span><i class="p"></i>Prognose</span></div></div>
+    <div class="jahr-chart">${M.map((m, i) => `<div class="jahr-m${i + 1 === +todayIso().slice(5, 7) && J === jetzt ? ' heute' : ''}" title="${m.n}: Umsatz ${ktChf(m.eVk)}${m.pVk ? ' + Prognose ' + ktChf(m.pVk) : ''} · DB ${ktChf(m.eDb)}${m.pDb ? ' + ' + ktChf(m.pDb) : ''}">
+        <div class="jahr-wert">${m.eVk + m.pVk ? kurz(m.eVk + m.pVk) : ''}</div>
+        <div class="jahr-saeulen"><div class="jahr-s u" style="height:${h(m.eVk + m.pVk)}"><i class="p" style="height:${m.eVk + m.pVk ? (m.pVk / (m.eVk + m.pVk) * 100).toFixed(1) : 0}%"></i></div>
+          <div class="jahr-s g" style="height:${h(Math.max(0, m.eDb + m.pDb))}"><i class="p" style="height:${m.eDb + m.pDb > 0 ? (Math.max(0, m.pDb) / (m.eDb + m.pDb) * 100).toFixed(1) : 0}%"></i></div></div>
+        <div class="jahr-name">${m.n.slice(0, 3)}</div></div>`).join('')}</div></div>
+  <div class="card"><h3 style="margin-top:0">Monate ${J}</h3><div class="table-wrap"><table>
+    <tr><th>Monat</th><th>Projekte</th><th style="text-align:right">Umsatz</th><th style="text-align:right">Gewinn (DB)</th><th style="text-align:right">DB %</th><th style="text-align:right">Prognose Umsatz</th></tr>
+    ${M.filter(m => m.L.length).map(m => `<tr><td><b>${m.n}</b></td><td>${m.L.map(e => `<a href="#/projekt/${e.p.id}" class="${e.prog ? 'muted' : ''}" title="${e.prog ? 'Prognose' : 'abgeschlossen ' + fmt(e.d)}">${esc(e.p.nummer)}${e.prog ? '*' : ''}</a>`).join(', ')}</td>
+      <td style="text-align:right">${m.eVk ? ktChf(m.eVk) : '–'}</td><td style="text-align:right" class="${m.eDb >= 0 ? 'kt-pos' : 'kt-neg'}">${m.eVk ? ktChf(m.eDb) : '–'}</td>
+      <td style="text-align:right">${m.eVk ? ktPct(m.eDb / m.eVk * 100) : '–'}</td><td style="text-align:right" class="muted">${m.pVk ? ktChf(m.pVk) : '–'}</td></tr>`).join('')
+      || '<tr><td colspan="6" class="muted">In diesem Jahr gibt es keine abgeschlossenen oder geplanten Projekte mit Verkaufspreis.</td></tr>'}
+    ${imJahr.length ? `<tr class="jahr-total"><td><b>Total</b></td><td>${eff.length} + ${prg.length}*</td><td style="text-align:right"><b>${ktChf(eVk)}</b></td><td style="text-align:right" class="${eDb >= 0 ? 'kt-pos' : 'kt-neg'}"><b>${ktChf(eDb)}</b></td>
+      <td style="text-align:right"><b>${eVk ? ktPct(eDb / eVk * 100) : '–'}</b></td><td style="text-align:right" class="muted">${pVk ? ktChf(pVk) : '–'}</td></tr>` : ''}
+  </table></div><div class="muted klein" style="margin-top:6px">* Prognose: offenes Projekt, VK und DB-Prognose aus dem Controlling (ohne Controlling: DB aus dem Verkauf)</div></div>
+  <div class="card"><h3 style="margin-top:0">Jahre im Vergleich</h3><div class="table-wrap"><table>
+    <tr><th>Jahr</th><th style="text-align:right">Projekte</th><th style="text-align:right">Umsatz</th><th style="text-align:right">Gewinn (DB)</th><th style="text-align:right">DB %</th><th style="text-align:right">Prognose</th></tr>${vergleich}</table></div></div>`;
+}
+
 // ---------- Projekte ----------
 function viewProjekte() {
-  const zuN = state.projects.filter(p => p.abschluss).length, zeigeZu = ui.pZu && zuN, nachTermin = ui.pSort === 'termin';
+  const zuN = state.projects.filter(p => p.abschluss).length, zeigeZu = unterSeite() === 'abgeschlossen', nachTermin = ui.pSort === 'termin';
   // Standard: nach Projektnummer aufsteigend; wahlweise nach Baustart (Projekte ohne Termine am Schluss)
   const nr = (a, b) => a.nummer.localeCompare(b.nummer, 'de', { numeric: true });
   const start = p => (span(p) || {}).start || '9999';
@@ -2404,12 +2561,12 @@ function viewProjekte() {
     .sort((a, b) => nachTermin ? start(a).localeCompare(start(b)) || nr(a, b) : nr(a, b));
   return `
   <div class="page-head">
-    <h1>Projekte</h1>
+    <h1>${zeigeZu ? 'Abgeschlossene Projekte' : 'Projekte'}</h1>
     <div class="row">
-      <div class="seg"><button class="${zeigeZu ? '' : 'on'}" onclick="ui.pZu=false;render()">Offen (${state.projects.length - zuN})</button><button class="${zeigeZu ? 'on' : ''}" onclick="ui.pZu=true;render()">Abgeschlossen (${zuN})</button></div>
+      <div class="seg"><button class="${zeigeZu ? '' : 'on'}" onclick="nav('projekte/offen')">Offen (${state.projects.length - zuN})</button><button class="${zeigeZu ? 'on' : ''}" onclick="nav('projekte/abgeschlossen')">Abgeschlossen (${zuN})</button></div>
       <div class="seg" title="Sortierung"><button class="${nachTermin ? '' : 'on'}" onclick="ui.pSort='nr';render()">Nach Nummer</button><button class="${nachTermin ? 'on' : ''}" onclick="ui.pSort='termin';render()">Nach Terminen</button></div>
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input placeholder="Nummer, Adresse, Name …" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)"></div>
+        <input placeholder="Nummer, Adresse, Name …" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)">${SUCH_X}</div>
       <button class="plus" title="Neues Projekt" onclick="neuesProjektDialog()">+</button>
     </div>
   </div>
@@ -2433,7 +2590,7 @@ function viewProjekte() {
         ${ktKarte(p)}`}
       </div>
     </div>`; }).join('')}</div>`
-    : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
+    : zeigeZu ? '<div class="card empty">Noch kein Projekt abgeschlossen.</div>' : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
 }
 function filterProjekte(q) {
   ui.q = q; q = q.toLowerCase();
@@ -5824,12 +5981,12 @@ function viewKontakte() {
     <div><h1>Kontakte</h1><div class="muted" style="margin-top:4px">${K.length} Kontakte · Kunden, Firmen und Personen für alle Projekte</div></div>
     <div class="row">
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="k-suche" placeholder="Name, Firma, Gewerk, Telefon …" value="${esc(ui.kq || '')}" oninput="ui.kq=this.value;render()"></div>
+        <input id="k-suche" placeholder="Name, Firma, Gewerk, Telefon …" value="${esc(ui.kq || '')}" oninput="ui.kq=this.value;render()">${SUCH_X}</div>
       <button onclick="kontaktDialog(null,{art:'${ui.kart || 'extern'}'})">＋ Kontakt</button>
     </div>
   </div>
   <div class="tabs" style="margin-bottom:16px"><i class="gleiter" aria-hidden="true"></i>
-    ${[['', 'Alle'], ...KONTAKT_ARTEN].map(([k, l]) => `<button class="${(ui.kart || '') === k ? 'active' : ''}" onclick="ui.kart='${k}';render()">${l} <span class="muted">${k ? K.filter(c => c.art === k).length : K.length}</span></button>`).join('')}
+    ${[['', 'Alle'], ...KONTAKT_ARTEN].map(([k, l]) => `<button class="${(ui.kart || '') === k ? 'active' : ''}" onclick="nav('kontakte${k ? '/' + k : ''}')">${l} <span class="muted">${k ? K.filter(c => c.art === k).length : K.length}</span></button>`).join('')}
   </div>
   ${!K.length ? '<div class="card empty">Noch keine Kontakte. Lege mit <b>＋ Kontakt</b> deinen ersten Kunden oder Partner an.</div>' : ''}
   ${K.length && !liste.length ? '<div class="card empty">Kein Kontakt gefunden.</div>' : ''}
@@ -5857,7 +6014,7 @@ const avatarFarbe = c => ({ kunde: '#8e44ad', intern: '#00558c', sub: '#e67e22',
 function kontaktAnsicht(cid) {
   const c = kontaktById(cid), d = $('dlg');
   if (!c) return;
-  const firma = kontaktFirma(c), pr = kontaktProjekte(cid), tel = c.telefon ? c.telefon.replace(/\s/g, '') : '';
+  const firma = kontaktFirma(c), tel =c.telefon ? c.telefon.replace(/\s/g, '') : '';
   const zeile = (ic, inhalt) => inhalt ? `<div class="k-zeile"><span class="k-ic">${ic}</span><div>${inhalt}</div></div>` : '';
   d.style.width = 'min(560px, calc(100vw - 24px))';
   d.innerHTML = `<div class="k-ansicht-kopf">
@@ -5874,7 +6031,6 @@ function kontaktAnsicht(cid) {
     </div>
     <div style="margin-top:14px"><label>Bemerkungen <span class="muted klein" id="k-notiz-stand"></span></label>
       <textarea id="k-ans-notiz" rows="4" placeholder="z.B. am besten morgens erreichbar, will Offerte per Post, Schlüssel bei …" oninput="kontaktNotiz('${cid}',this.value)">${esc(c.notiz || '')}</textarea></div>
-    ${pr.length ? `<div style="margin-top:14px"><label>Projekte (${pr.length})</label><div class="k-projekte">${pr.map(p => `<button class="sec sm" onclick="$('dlg').close();openProjekt('${p.id}')">${esc(p.nummer)} · ${esc(p.name)}</button>`).join('')}</div></div>` : ''}
     <div class="row" style="margin-top:18px;justify-content:space-between">
       <button class="sec" onclick="$('dlg').close()">Schliessen</button>
       <button onclick="kontaktDialog('${cid}',{danach:'kontaktAnsicht'})">✎ Bearbeiten</button>
@@ -6100,10 +6256,14 @@ const EINST_ICONS = {
   wr: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12l2-2 2 2 2-2 2 2M9 17h6"/>'
 };
 function viewEinstellungen() {
-  const akt = EINST_GRUPPEN.some(([, L]) => L.some(([k]) => k === ui.setTab)) ? ui.setTab : 'backup';
+  // Unterseite Allgemein / Vorlagen / Auswertung: nur diese Gruppe zeigen
+  const gName = { allgemein: 'Allgemein', vorlagen: 'Vorlagen', auswertung: 'Auswertung' }[unterSeite()];
+  const GR = gName ? EINST_GRUPPEN.filter(([t]) => t === gName) : EINST_GRUPPEN;
+  let akt = GR.some(([, L]) => L.some(([k]) => k === ui.setTab)) ? ui.setTab : gName ? GR[0][1][0][0] : 'backup';
+  ui.setTab = akt;
   return `
-  <div class="page-head"><h1>Einstellungen</h1></div>
-  <div class="einst-gruppen">${EINST_GRUPPEN.map(([titel, L]) => `<div class="einst-gruppe"><div class="einst-titel">${titel}</div>
+  <div class="page-head"><h1>${gName ? 'Einstellungen · ' + gName : 'Einstellungen'}</h1></div>
+  <div class="einst-gruppen">${GR.map(([titel, L]) => `<div class="einst-gruppe"><div class="einst-titel">${titel}</div>
     <div class="einst-kacheln">${L.map(([k, l, info, ic]) => `<button class="einst-kachel${akt === k ? ' active' : ''}" onclick="ui.setTab='${k}';render()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${EINST_ICONS[ic]}</svg>
       <span><b>${l}</b><small>${info}</small></span></button>`).join('')}</div></div>`).join('')}
@@ -7354,7 +7514,8 @@ function ktKpi() {
 
 // ---------- Controlling: Übersicht aller Projekte ----------
 function viewControlling() {
-  const today = todayIso(), F = ui.ktF || 'run';
+  const today = todayIso(), F = ui.ktF || 'run', sub = unterSeite();
+  if (sub === 'db') return viewDb('controlling');
   const act = state.projects.filter(ktAktiv).map(ktInfo), due = act.filter(x => x.due), n = ktCount(act);
   // abgeschlossen = alle abgeschlossenen Projekte, auch solche ohne Controlling-Erfassungen
   const zu = state.projects.filter(p => p.abschluss).map(p => ({ p, a: p.abschluss, db: p.abschluss.vk - p.abschluss.cost, plan: ktMitDaten(p) ? ktCalc(p.ktr, null).dbPlan : null }));
@@ -7375,6 +7536,20 @@ function viewControlling() {
       <div class="kt-v"><div class="${KT_TXT[x.st.cls]}">${ktPct(x.c.dbProgPct)}</div><div class="muted">${ktSgnChf(x.c.deltaChf)}</div></div></div>`;
   };
   const sortRisk = (a, b) => KT_RANK[a.st.cls] - KT_RANK[b.st.cls] || a.c.deltaChf - b.c.deltaChf;
+  // Karte «Zu kontrollieren»: im Controlling links, als Unterseite «Kontrollieren» allein
+  const kontrollKarte = `<div class="card">
+      <div class="ck-head"><h3 style="margin:0">Zu kontrollieren · KW ${kw(toDate(today))}</h3>${due.length > 1 ? '<button class="sm" onclick="ktTourStart()">Nacheinander durchgehen →</button>' : ''}</div>
+      ${due.length ? due.sort((a, b) => a.w.date.localeCompare(b.w.date)).map(x => `<div class="li"><span class="kt-dot ${x.st.cls}"></span>
+        <div style="flex:1;min-width:0" onclick="ktKontrollieren('${x.p.id}')"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">letzte Kontrolle ${fmt(x.w.date)} · ${ktLetzte(x.w)}</div></div>
+        <button class="sm" onclick="ktKontrollieren('${x.p.id}')">Kontrollieren →</button></div>`).join('')
+        : '<div class="empty">✓ Alle laufenden Projekte sind diese Woche kontrolliert.</div>'}
+      <div class="muted" style="margin-top:10px">Wöchentlich: neuen Ist-Betrag und die kommenden Rechnungen erfassen.</div>
+      ${bereit.length ? `<h3 style="margin-top:20px">Bereit zum Abschliessen</h3>
+        ${bereit.map(x => `<div class="li"><span class="kt-dot ${x.st.cls}"></span>
+          <div style="flex:1;min-width:0" onclick="ktKontrollieren('${x.p.id}')"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">Checkliste erledigt · letzter Termin ${fmt(span(x.p).ende)}</div></div>
+          <button class="sm" onclick="ktAbschlussDialog('${x.p.id}')">Abschliessen</button></div>`).join('')}` : ''}
+    </div>`;
+  if (sub === 'kontrollieren') return seitenKopf('Kontrollieren', `${due.length ? due.length + ' Projekt' + (due.length > 1 ? 'e' : '') + ' diese Woche fällig' : 'Alles kontrolliert'} · KW ${kw(toDate(today))}`) + kontrollKarte;
   const liste = F === 'done' ? zu.sort((a, b) => b.a.date.localeCompare(a.a.date)).map(zeileZu).join('') || '<div class="empty">Noch kein Projekt abgeschlossen.</div>'
     : F === 'ohne' ? ohne.map(p => `<div class="li" onclick="ktKontrollieren('${p.id}')"><span class="pdot" style="background:${p.farbe}"></span>
         <div style="flex:1;min-width:0"><b>${esc(p.nummer)}</b> ${esc(p.name)}<div class="muted">${PROJEKT_ARTEN[projektArt(p)]} · ${badge(p)}</div></div>
@@ -7397,18 +7572,7 @@ function viewControlling() {
     <div class="kpi" onclick="ui.ktF='run';render()"><b class="${due.length ? 'kt-wrn' : 'kt-pos'}" data-zahl="${due.length}">${due.length}</b><span>zu kontrollieren</span><span class="kt-kpi-s">${due.length ? 'Ist & kommende Rechnungen erfassen' : 'alles kontrolliert'}</span></div>
   </div>`}
   <div class="cols">
-    <div class="card">
-      <div class="ck-head"><h3 style="margin:0">Zu kontrollieren · KW ${kw(toDate(today))}</h3>${due.length > 1 ? '<button class="sm" onclick="ktTourStart()">Nacheinander durchgehen →</button>' : ''}</div>
-      ${due.length ? due.sort((a, b) => a.w.date.localeCompare(b.w.date)).map(x => `<div class="li"><span class="kt-dot ${x.st.cls}"></span>
-        <div style="flex:1;min-width:0" onclick="ktKontrollieren('${x.p.id}')"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">letzte Kontrolle ${fmt(x.w.date)} · ${ktLetzte(x.w)}</div></div>
-        <button class="sm" onclick="ktKontrollieren('${x.p.id}')">Kontrollieren →</button></div>`).join('')
-        : '<div class="empty">✓ Alle laufenden Projekte sind diese Woche kontrolliert.</div>'}
-      <div class="muted" style="margin-top:10px">Wöchentlich: neuen Ist-Betrag und die kommenden Rechnungen erfassen.</div>
-      ${bereit.length ? `<h3 style="margin-top:20px">Bereit zum Abschliessen</h3>
-        ${bereit.map(x => `<div class="li"><span class="kt-dot ${x.st.cls}"></span>
-          <div style="flex:1;min-width:0" onclick="ktKontrollieren('${x.p.id}')"><b>${esc(x.p.nummer)}</b> ${esc(x.p.name)}<div class="muted">Checkliste erledigt · letzter Termin ${fmt(span(x.p).ende)}</div></div>
-          <button class="sm" onclick="ktAbschlussDialog('${x.p.id}')">Abschliessen</button></div>`).join('')}` : ''}
-    </div>
+    ${kontrollKarte}
     <div class="card">
       <h3>Projekte</h3>
       <div style="margin-bottom:10px">
