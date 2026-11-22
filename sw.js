@@ -1,5 +1,5 @@
 // Netz zuerst (damit Änderungen auf GitHub sofort ankommen), bei fehlender Verbindung aus dem Cache
-const CACHE = 'ckw-projekte-v29'; // v29: Untermenüs, DB-Übersicht, Jahresübersicht, Suche mit ✕
+const CACHE = 'ckw-projekte-v31'; // v31: eigene App-ID, löscht nur noch eigene Caches (andere Apps unter jundt100.github.io bleiben unberührt)
 // die LASOLTEC-Vorlage steckt seit v4 in der index.html; fehlt eine Datei auf dem Server, darf die Installation nicht scheitern
 const APP = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 // fremde Quellen, die offline gebraucht werden (Bibliotheken, Schrift). Firebase-Anmeldung und Datenbank laufen nie über den Cache.
@@ -11,7 +11,8 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+  // nur alte Versionen dieser App löschen – andere Apps auf derselben Adresse (Ferien, Rechnung …) haben eigene Caches
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('ckw-projekte-') && k !== CACHE).map(k => caches.delete(k)))));
   self.clients.claim();
 });
 
