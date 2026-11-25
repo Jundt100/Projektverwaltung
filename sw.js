@@ -1,5 +1,6 @@
 // Netz zuerst (damit Änderungen auf GitHub sofort ankommen), bei fehlender Verbindung aus dem Cache
-const CACHE = 'ckw-projekte-v34'; // v34: Ertragsberechnung mit PVGIS (über eigenen Proxy) und Ertragsprotokoll
+const CACHE = 'ckw-projekte-v35'; // v35: Projektliste mit Filtern (Art, Kunde, Termin, Status), Dashboard ohne Unterseite Projekte
+// v34: Ertragsberechnung mit PVGIS (über eigenen Proxy) und Ertragsprotokoll
 // v33: Sunwoda All-in-One, Produkte mit kVA/kWh/Anzahl, WR-Auswahl → Stringplan
 // v32: Stringplan manuell verstringen, breitere Eingabe-Karten
 // v31: eigene App-ID, löscht nur noch eigene Caches (andere Apps unter jundt100.github.io bleiben unberührt)
