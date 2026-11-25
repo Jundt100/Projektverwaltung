@@ -452,6 +452,33 @@
   .ab-pkt input[type=checkbox] { width: 15px; height: 15px; flex: none; margin: 0; }
   .ab-text { flex: 1; min-width: 0; font-weight: 600; }
   .ab-detail { flex: 1.1; min-width: 0; }
+  .pv-karte { margin-top: 14px; }
+  .pv-ort { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(90px, 1fr)) minmax(170px, 1.4fr); gap: 10px; align-items: end; margin-bottom: 8px; }
+  .pv-ort input { min-width: 0; width: 100%; }
+  .pv-tab td, .pv-tab th { vertical-align: middle; }
+  .pv-tab .r { text-align: right; white-space: nowrap; }
+  .pv-tab .sp-in { min-width: 72px; max-width: 96px; }
+  .pv-tab .sp-in input { min-width: 40px; }
+  .pv-tab td:first-child { white-space: nowrap; }
+  .pv-mon { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; height: 150px; align-items: end; }
+  .pv-mon > div { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+  .pv-mon i { display: block; width: 70%; background: #e8a020; border-radius: 4px 4px 0 0; }
+  .pv-mon span { font-size: 10.5px; color: var(--muted, #777); margin-bottom: 2px; white-space: nowrap; }
+  .pv-mon b { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .pv-anl { padding-left: 20px; line-height: 1.6; }
+  .pv-code { background: #1f2328; color: #e6edf3; padding: 12px; border-radius: 8px; font-size: 11.5px; overflow: auto; max-height: 340px; white-space: pre; }
+  @media (max-width: 900px) { .pv-ort { grid-template-columns: 1fr 1fr; } .pv-ort .pv-adr { grid-column: 1 / -1; } }
+  @media (max-width: 520px) { .pv-mon span { font-size: 8.5px; } .pv-mon b { font-size: 9.5px; } }
+  .prod-zeile { display: grid; gap: 4px; }
+  .prod-zahl { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+  .prod-zahl input { width: 64px; text-align: right; }
+  .prod-zahl i { font-style: normal; font-size: 12px; color: var(--muted, #777); min-width: 26px; }
+  .prod-wr { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 28px 4px 0; padding: 6px 8px; background: #f4f6f8; border-radius: 8px; font-size: 12.5px; }
+  .prod-wr > span:first-child { font-weight: 600; }
+  .prod-wr select { flex: 1; min-width: 180px; max-width: 420px; padding: 4px 6px; font-size: 13px; }
+  .ab-zusatz { flex: none; font-size: 12px; color: var(--muted, #777); white-space: nowrap; }
+  @media (max-width: 700px) { .prod-zeile .ab-pkt { flex-wrap: wrap; } .prod-zeile .ab-text, .prod-zeile .ab-detail { flex: 1 1 100%; }
+    .prod-zeile { padding-bottom: 8px; border-bottom: 1px solid #e6e4df; } .prod-wr { margin-right: 0; } }
   .ab-maengel { margin-top: 18px; border: 1px solid #d9d9d9; border-radius: 12px; padding: 12px 14px; }
   .ab-tab td:first-child { text-align: center; color: #777; }
   .ab-zeilen { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 8px 0 10px; }
@@ -949,7 +976,23 @@
   .sp-kopf { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
   .sp-kopf-l { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
   .sp-kopf-l .sp-f { min-width: 180px; }
-  .sp-eingaben { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 18px; align-items: start; }
+  .sp-eingaben { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; align-items: start; }
+  @media (max-width: 900px) { .sp-eingaben { grid-template-columns: 1fr; } }
+  /* manuelle Auslegung */
+  .sp-man-kopf { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .sp-man-kopf h3 { margin: 0; font-size: 15px; }
+  .sp-zaehl { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .sp-zaehl > div { border: 1px solid var(--line); border-left: 4px solid var(--oc); border-radius: 10px; padding: 7px 12px; font-size: 12.5px; min-width: 150px; }
+  .sp-zaehl b { display: block; font-size: 13.5px; }
+  .sp-zaehl .ok { color: var(--ok); } .sp-zaehl .todo { color: var(--warn); } .sp-zaehl .over { color: var(--danger); }
+  .sp-man-wr { border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; margin-bottom: 10px; background: #fcfcfa; }
+  .sp-man-wr > header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; font-size: 13px; margin-bottom: 6px; }
+  .sp-man-zeile { display: grid; grid-template-columns: 62px minmax(140px, 1.4fr) minmax(90px, .8fr) minmax(90px, .8fr) minmax(170px, 1.4fr); gap: 10px; align-items: end; padding: 7px 0; border-top: 1px solid var(--line); }
+  .sp-man-zeile:first-of-type { border-top: 0; }
+  .sp-man-zeile > b { font-size: 13px; padding-bottom: 10px; }
+  .sp-man-info { font-size: 12px; color: var(--muted); padding-bottom: 4px; line-height: 1.35; }
+  .sp-man-info .rot { color: var(--danger); font-weight: 600; } .sp-man-info .orange { color: var(--warn); }
+  @media (max-width: 700px) { .sp-man-zeile { grid-template-columns: 1fr 1fr; } .sp-man-zeile > b { grid-column: 1 / -1; padding: 0; } .sp-man-info { grid-column: 1 / -1; } }
   .sp-eingaben .card { margin: 0; }
   .sp-wr-karte { grid-column: 1 / -1; }
   .sp-karte h3 { margin: 0 0 12px; font-size: 15px; }
@@ -2760,35 +2803,97 @@ function produkteSpiegeln(p) {
     a.gegenstand = produkte(p).map((x, i) => ({ ...x, ok: !!(alt.find(y => gleicherText(y, x)) || alt[i] || {}).ok }));
   });
 }
-const produkteGefuellt = p => produkte(p).filter(x => x.text.trim() && x.detail.trim());
+// Art des Bauteils aus dem Namen: Wechselrichter (kVA + Anzahl), Batterie (kWh), Module (Anzahl)
+function prodTyp(x) {
+  const t = String(x.text || '').toLowerCase();
+  if (/wechselrichter|\bwr\b|inverter/.test(t)) return 'wr';
+  if (/batter|speicher|akku/.test(t)) return 'bat';
+  if (/modul/.test(t)) return 'mod';
+  return '';
+}
+const PROD_FELDER = { wr: { wert: 'kVA', anz: true }, bat: { wert: 'kWh', anz: false }, mod: { wert: '', anz: true } };
+const prodZahl = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) && n > 0 ? n : 0; };
+// Zusatzangaben (kVA/kWh, Anzahl) für Dokumente
+function prodZusatz(x) {
+  const f = PROD_FELDER[prodTyp(x)];
+  if (!f) return [];
+  const w = prodZahl(x.wert), a = prodZahl(x.anzahl), out = [];
+  if (f.wert && w) out.push(w.toLocaleString('de-CH', { maximumFractionDigits: 2 }) + ' ' + f.wert);
+  if (f.anz && a) out.push(a.toLocaleString('de-CH', { maximumFractionDigits: 0 }) + ' Stk.');
+  return out;
+}
+const prodDetail = x => [String(x.detail || '').trim(), ...prodZusatz(x)].filter(Boolean).join(' · ');
+const produkteGefuellt = p => produkte(p).filter(x => x.text.trim() && prodDetail(x));
+// Wechselrichter aus den Produkten in den Stringplan übernehmen (legt bei Bedarf einen Stringplan an)
+function prodWrSync(p) {
+  const L = produkte(p).filter(x => prodTyp(x) === 'wr' && spBibFind(x.wrId));
+  if (!L.length) return false;
+  const soll = L.flatMap(x => Array.from({ length: Math.max(1, Math.min(30, Math.round(prodZahl(x.anzahl)) || 1)) }, () => spBibFind(x.wrId)));
+  let sp = spAktuell(p);
+  if (!sp) { sp = { id: uid(), name: 'Stringplan 1', datum: todayIso(), st: spLeer() }; spListe(p).push(sp); p.spAktiv = sp.id; }
+  const st = sp.st;
+  while (st.wrs.length > soll.length) spWrWeg(st, st.wrs.length - 1);
+  soll.forEach((m, i) => {
+    const w = st.wrs[i] || (st.wrs[i] = { name: 'WR ' + (i + 1), ac: 0, mppt: 0, inputs: 0, umax: 0, dcmax: 0, model: '' });
+    if (w.model !== m.id) Object.assign(w, { model: m.id, ac: m.ac, mppt: m.mppt, inputs: m.inp, umax: m.umax, dcmax: m.dc });
+  });
+  // Anzahl Module: nur eintragen, wenn im Stringplan eine einzige, noch leere Fläche besteht
+  const mod = produkte(p).find(x => prodTyp(x) === 'mod' && prodZahl(x.anzahl));
+  if (mod && st.groups.length === 1 && !(+st.groups[0].n)) st.groups[0].n = Math.round(prodZahl(mod.anzahl));
+  sp.datum = todayIso(); ui.spCache = null;
+  return true;
+}
+function prodWr(pid, i, id) {
+  const p = findP(pid), x = produkte(p)[i], m = spBibFind(id);
+  x.wrId = id || '';
+  if (m) { x.detail = (m.b === 'Meine Wechselrichter' ? '' : m.b + ' ') + m.m; x.wert = m.ac; if (!prodZahl(x.anzahl)) x.anzahl = 1; }
+  produkteSpiegeln(p);
+  const ok = m && prodWrSync(p);
+  save();
+  $('prod-liste').innerHTML = produktZeilen(p);
+  if (ok) toast(`${x.detail} im Stringplan eingetragen (${Math.round(prodZahl(x.anzahl))} Stk.).`);
+}
 function viewProdukte(p) {
   return `<div class="card">
     <div class="ck-head"><h3 style="margin:0">Produkte der Anlage</h3>
       <span class="muted klein">erscheinen im ${rapportName(p)}, in der Zwischenabnahme und im Abnahmeprotokoll</span></div>
-    <div class="muted klein" style="margin-bottom:8px">Links das Bauteil, rechts Hersteller, Typ, Anzahl usw. Leere Details bleiben im Protokoll eine Linie zum Ausfüllen.</div>
+    <div class="muted klein" style="margin-bottom:8px">Links das Bauteil, rechts Hersteller und Typ. Bei Wechselrichtern kVA und Anzahl, bei Batterien kWh, bei Modulen die Anzahl. Ein Wechselrichter aus der Liste wird direkt in den Stringplan übernommen. Leere Details bleiben im Protokoll eine Linie zum Ausfüllen.</div>
     <div class="ab-liste" id="prod-liste">${produktZeilen(p)}</div>
   </div>`;
 }
 function produktZeilen(p) {
-  return produkte(p).map((x, i) => `<div class="ab-pkt">
+  return produkte(p).map((x, i) => { const typ = prodTyp(x), f = PROD_FELDER[typ];
+    const zahl = (feld, einheit, ph) => `<span class="prod-zahl"><input value="${esc(x[feld] ?? '')}" inputmode="decimal" placeholder="–" title="${ph}" onchange="prodSet('${p.id}',${i},'${feld}',this.value)"><i>${einheit}</i></span>`;
+    const felder = !f ? '' : (f.wert ? zahl('wert', f.wert, f.wert === 'kVA' ? 'Leistung' : 'Kapazität') : '') + (f.anz ? zahl('anzahl', 'Stk.', 'Anzahl') : '');
+    return `<div class="prod-zeile"><div class="ab-pkt">
       <input class="ab-text" value="${esc(x.text)}" placeholder="Bauteil" oninput="prodSet('${p.id}',${i},'text',this.value)">
       ${x.mat ? `<input class="ab-detail" value="${esc(x.detail)}" readonly title="Kommt aus der Materialliste – dort Menge ändern oder Häkchen «→ Protokolle» entfernen" onclick="materialDialog('${p.id}')" style="cursor:pointer;background:#f4f8f1">`
-        : `<input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Hersteller, Typ, Anzahl')}" oninput="prodSet('${p.id}',${i},'detail',this.value)">`}
-      <button class="ck-btn" title="Produkt entfernen" onclick="prodSet('${p.id}',${i},'del')">✕</button></div>`).join('')
+        : `<input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Hersteller, Typ')}" oninput="prodSet('${p.id}',${i},'detail',this.value)">`}
+      ${felder}
+      <button class="ck-btn" title="Produkt entfernen" onclick="prodSet('${p.id}',${i},'del')">✕</button></div>
+      ${typ === 'wr' ? `<label class="prod-wr"><span>Modell aus der Liste</span><select onchange="prodWr('${p.id}',${i},this.value)">${spModellOptionen(x.wrId || '').replace('– Eigene Werte –', '– nicht gewählt –')}</select>
+        <span class="muted klein">${spBibFind(x.wrId) ? '→ im Stringplan eingetragen' : 'wird in den Stringplan übernommen'}</span></label>` : ''}</div>`; }).join('')
     + `<button class="sec sm" onclick="prodSet('${p.id}',0,'add')">+ Produkt</button>`;
 }
 function prodSet(pid, i, op, v) {
-  const p = findP(pid), L = produkte(p);
+  const p = findP(pid), L = produkte(p), typAlt = L[i] ? prodTyp(L[i]) : '';
   // Produkt aus der Materialliste entfernt: dort das Häkchen «→ Protokolle» ebenfalls wegnehmen
   if (op === 'del' && L[i].mat) { const z = (p.material?.zeilen || []).find(x => x.id === L[i].mat); if (z) z.prot = false; }
   if (op === 'del') L.splice(i, 1);
   else if (op === 'add') L.push({ text: '', hint: '', detail: '' });
   else L[i][op] = v;
-  produkteSpiegeln(p); save();
-  if (op !== 'del' && op !== 'add') return;
+  produkteSpiegeln(p);
+  // Anzahl Wechselrichter/Module geändert: Stringplan nachführen
+  const sync = op === 'anzahl' && (L[i].wrId || prodTyp(L[i]) === 'mod') && prodWrSync(p);
+  save();
+  if (sync) toast('Stringplan nachgeführt.');
+  // neue Bauteil-Art (z.B. «Wechselrichter» getippt): Zeile mit den passenden Feldern neu zeichnen, Cursor bleibt
+  const neuTyp = op === 'text' && prodTyp(L[i]) !== typAlt;
+  if (op !== 'del' && op !== 'add' && !neuTyp) return;
   const box = $('prod-liste');
   box.innerHTML = produktZeilen(p);
   if (op === 'add') { const t = box.querySelectorAll('.ab-text'); t[t.length - 1].focus(); }
+  if (neuTyp) { const t = box.querySelectorAll('.ab-text')[i]; t.focus(); t.setSelectionRange(t.value.length, t.value.length); }
 }
 // ---------- Stringplaner: Rechenkern (unverändert aus «PV Stringplaner» übernommen, gekapselt als SP) ----------
 // Modell: jeder MPPT trägt genau eine Fläche mit gleich langen Strings; geprüft wird Uoc × Kältefaktor gegen die max. DC-Spannung.
@@ -3320,7 +3425,9 @@ const SP_EXTRA = [
   ['Sungrow', 'SG50CX', 50, 5, 2, 1100, 140], ['Sungrow', 'SG110CX', 110, 9, 2, 1100, 140],
   ['Sungrow', 'SH50CX (Hybrid)', 50, 4, 2, 1100, 150], ['Sungrow', 'SH80CX (Hybrid)', 80, 6, 2, 1100, 150],
   ['Sungrow', 'SH12T (Hybrid)', 12, 3, '2/1/1', 1000, 200], ['Sungrow', 'SH10T (Hybrid)', 10, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH8T (Hybrid)', 8, 3, '1/1/1', 1000, 200],
-  ['Sungrow', 'SH6T (Hybrid)', 6, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH5T (Hybrid)', 5, 3, '1/1/1', 1000, 200]
+  ['Sungrow', 'SH6T (Hybrid)', 6, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH5T (Hybrid)', 5, 3, '1/1/1', 1000, 200],
+  // Sunwoda SunESS Power All-in-One (Hybrid-WR dreiphasig, 2 MPPT, max. 1000 V, Batterie 5-kWh-Module)
+  ...[5, 6, 8, 10, 12, 15].map(p => ['Sunwoda', `SunESS Power SW${p}KH3UT (All-in-One)`, p, 2, p >= 12 ? '2/1' : 1, 1000, 150])
 ].map(([b, m, ac, mppt, inp, umax, dc]) => ({ id: b + '|' + m, b, m, ac, mppt, inp, umax, dc, note: 'ergänzt – mit Datenblatt prüfen' }));
 function spBib() {
   const eigene = (S().wrEigene || []).map(x => ({ id: 'my:' + x.id, b: 'Meine Wechselrichter', m: x.m, ac: +x.ac || 0, mppt: +x.mppt || 0, inp: x.inp, umax: +x.umax || 0, dc: +x.dc || 0, note: '' }));
@@ -3349,7 +3456,69 @@ function spRechnen(st) {
 function spAendern(pid, fn) {
   const p = findP(pid), x = spAktuell(p);
   if (!x) return;
-  fn(x.st, x, p); x.datum = todayIso(); save(); render();
+  fn(x.st, x, p);
+  // neue Fläche bei manueller Auslegung: Plan bleibt gültig (Fläche ist einfach noch nicht verstringt)
+  if (x.st.man && x.st.man.ng < x.st.groups.length) x.st.man.ng = x.st.groups.length;
+  x.datum = todayIso(); save(); render();
+}
+// Fläche bzw. Wechselrichter entfernen, ohne die manuelle Auslegung durcheinanderzubringen
+function spFlaecheWeg(st, i) {
+  st.groups.splice(i, 1);
+  if (st.man) { st.man.wr = st.man.wr.map(a => (a || []).map(e => !e || e.g === i ? null : e.g > i ? { ...e, g: e.g - 1 } : e)); st.man.ng = st.groups.length; }
+}
+function spWrWeg(st, i) { st.wrs.splice(i, 1); if (st.man) st.man.wr.splice(i, 1); }
+// Manuell: Startpunkt ist die automatische Auslegung, danach ändert der Planer nichts mehr
+function spManModus(pid, an) {
+  spAendern(pid, st => {
+    if (!an) { st.man = null; return; }
+    const r = SP.plan(SP.cloneSt({ ...st, man: null }));
+    st.man = { ng: st.groups.length, wr: st.wrs.map((w, i) => { const lw = r.wrs.find(x => x.i === i); return lw ? lw.mp.map(q => q.s > 0 ? { g: q.ori, s: q.s, L: q.L } : null) : []; }) };
+  });
+}
+function spManSet(pid, wi, mi, feld, wert) {
+  spAendern(pid, st => {
+    if (!st.man) return;
+    const a = st.man.wr[wi] || (st.man.wr[wi] = []);
+    while (a.length <= mi) a.push(null);
+    const v = parseInt(wert, 10);
+    if (feld === 'g') {
+      if (!(v >= 0)) { a[mi] = null; return; }
+      // Vorschlag beim Wählen einer Fläche: 1 String mit den restlichen Modulen (höchstens so viele, wie die Spannung erlaubt)
+      const ctx = spRechnen(st).ctx, w = ctx.wr.find(x => x.i === wi), g = ctx.G[v];
+      const belegt = st.man.wr.reduce((s, arr, i) => s + (arr || []).reduce((t, e, k) => t + (e && e.g === v && !(i === wi && k === mi) ? e.s * e.L : 0), 0), 0);
+      const rest = Math.max(0, (g ? g.N : 0) - belegt), hi = w && w.hi ? w.hi[v] : 99;
+      a[mi] = a[mi] ? { ...a[mi], g: v } : { g: v, s: 1, L: Math.max(+st.mod.minStr || 1, Math.min(rest || +st.mod.minStr || 1, hi || 99)) };
+    } else if (a[mi] && v > 0) a[mi][feld] = v;
+  });
+}
+function spManHtml(p, st, r) {
+  const pid = p.id, man = !!(st.man && st.man.ng === st.groups.length), G = r.ctx.G;
+  const seg = `<div class="seg"><button class="${man ? '' : 'on'}" onclick="spManModus('${pid}',false)">Automatisch</button><button class="${man ? 'on' : ''}" onclick="spManModus('${pid}',true)">Manuell</button></div>`;
+  if (!man) return `<div class="card sp-karte"><div class="sp-man-kopf"><h3>4 · Auslegung</h3>${seg}</div>
+    <div class="muted klein">Die Strings werden automatisch verteilt. Mit «Manuell» bestimmst du pro MPPT selbst Fläche, Anzahl Strings und Module je String.</div></div>`;
+  const strung = G.map(() => 0);
+  st.man.wr.forEach(a => (a || []).forEach(e => { if (e && G[e.g]) strung[e.g] += e.s * e.L; }));
+  const zaehl = G.map((g, k) => { if (!g.N && !strung[k]) return ''; const rest = g.N - strung[k];
+    return `<div style="--oc:${SP_OC[g.o]}"><b>${esc(g.name)}</b><span class="${rest === 0 ? 'ok' : rest > 0 ? 'todo' : 'over'}">${rest === 0 ? '✓ alles verstringt' : rest > 0 ? `noch ${rest} zu verstringen` : `${-rest} zu viel`}</span>
+      <span class="muted"> · ${strung[k]} von ${g.N}</span></div>`; }).join('');
+  const wrs = r.ctx.wr.filter(w => w.active).map(w => {
+    const lw = r.wrs.find(x => x.i === w.i);
+    if (!w.ok) return `<div class="sp-man-wr"><header><b>${esc(w.name)}</b></header><div class="muted klein">Mit diesen Moduldaten ist bei diesem Wechselrichter kein gültiger String möglich (Spannung oder Mindestlänge).</div></div>`;
+    return `<div class="sp-man-wr"><header><b>${esc(w.name)}</b>${lw ? `<span class="muted">${lw.mods} Module · ${spZahl(lw.kwp, 1)} kWp · DC/AC <b class="${w.w.dcmax > 0 && lw.ratio * 100 > w.w.dcmax + 1e-6 ? 'rot-txt' : ''}">${spZahl(lw.ratio * 100)} %</b></span>` : ''}</header>
+      ${w.ks.map((K, mi) => { const e = (st.man.wr[w.i] || [])[mi], on = !!(e && G[e.g]);
+        let info = '<span class="muted">frei</span>';
+        if (on) { const g = G[e.g], s = Math.min(K, e.s), uoc = e.L * g.uk;
+          info = `${s * e.L} Module · ${spZahl(s * e.L * g.pmax / 1000, 1)} kWp<br>` + (w.w.umax > 0 && uoc > w.w.umax ? `<span class="rot">Uoc kalt ${spZahl(uoc)} V – Limit ${spZahl(w.w.umax)} V überschritten</span>`
+            : `Uoc kalt ${spZahl(uoc)} V von ${spZahl(w.w.umax)} V${e.L < st.mod.minStr ? ` <span class="orange">· unter Minimum ${st.mod.minStr}</span>` : ''}`); }
+        return `<div class="sp-man-zeile"><b>MPPT ${mi + 1}</b>
+          <label class="sp-f"><span>Fläche</span><select onchange="spManSet('${pid}',${w.i},${mi},'g',this.value)"><option value="-1">– frei –</option>${G.map((g, k) => `<option value="${k}" ${on && e.g === k ? 'selected' : ''}>${esc(g.name)}${g.N ? '' : ' (0 Module)'}</option>`).join('')}</select></label>
+          <label class="sp-f"><span>Strings (max. ${K})</span><input type="number" min="1" max="${K}" inputmode="numeric" value="${on ? Math.min(K, e.s) : ''}" ${on ? '' : 'disabled'} onchange="spManSet('${pid}',${w.i},${mi},'s',Math.min(${K},this.value))"></label>
+          <label class="sp-f"><span>Module je String</span><input type="number" min="1" inputmode="numeric" value="${on ? e.L : ''}" ${on ? '' : 'disabled'} onchange="spManSet('${pid}',${w.i},${mi},'L',this.value)"></label>
+          <div class="sp-man-info">${info}</div></div>`; }).join('')}</div>`;
+  }).join('');
+  return `<div class="card sp-karte"><div class="sp-man-kopf"><h3>4 · Auslegung · manuell</h3>${seg}</div>
+    <div class="muted klein" style="margin-bottom:10px">Pro MPPT Fläche, Anzahl Strings und Module je String wählen. Änderungen an Modulen oder Wechselrichtern ändern deine Strings nicht mehr.</div>
+    <div class="sp-zaehl">${zaehl}</div>${wrs}</div>`;
 }
 const spNum = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : 0; };
 function spNeu(pid, kopie) {
@@ -3420,7 +3589,7 @@ function viewStringplan(p) {
         <button type="button" onclick="spAendern('${pid}',s=>s.groups[${i}].n=(+s.groups[${i}].n||0)+1)">+</button></span></label>
       ${st.useTilt ? feld('Neigung', g.tilt, `spAendern('${pid}',s=>s.groups[${i}].tilt=spNum(this.value))`, '°') : ''}
       ${st.types.length > 1 ? `<label class="sp-f"><span>Modultyp</span><select onchange="spAendern('${pid}',s=>s.groups[${i}].t=+this.value)">${st.types.map((t, k) => `<option value="${k}" ${k === g.t ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>` : ''}
-      ${st.groups.length > 1 ? `<button class="ck-btn sp-x" title="Fläche entfernen" onclick="spAendern('${pid}',s=>s.groups.splice(${i},1))">✕</button>` : ''}</div>`).join('')}
+      ${st.groups.length > 1 ? `<button class="ck-btn sp-x" title="Fläche entfernen" onclick="spAendern('${pid}',s=>spFlaecheWeg(s,${i}))">✕</button>` : ''}</div>`).join('')}
     <div class="row" style="justify-content:space-between;margin-top:4px">
       <button class="sec sm" onclick="spAendern('${pid}',s=>s.groups.push({o:[2,1,3,0].find(o=>!s.groups.some(g=>g.o===o))??2,n:0,tilt:30,t:0}))">＋ Fläche</button>
       <label class="check klein"><input type="checkbox" ${st.useTilt ? 'checked' : ''} onchange="spAendern('${pid}',s=>s.useTilt=this.checked)"> Neigung berücksichtigen</label></div>
@@ -3429,7 +3598,7 @@ function viewStringplan(p) {
     ${st.wrs.map((w, i) => { const m = spBibFind(w.model); return `<div class="sp-wr">
       <div class="sp-reihe">${feld('Name', w.name, `spAendern('${pid}',s=>s.wrs[${i}].name=this.value.trim()||'WR ${i + 1}')`, '', 'inputmode="text"')}
         <label class="sp-f sp-breit"><span>Modell</span><select onchange="spWrModell('${pid}',${i},this.value)">${spModellOptionen(w.model)}</select></label>
-        ${st.wrs.length > 1 ? `<button class="ck-btn sp-x" title="Wechselrichter entfernen" onclick="spAendern('${pid}',s=>s.wrs.splice(${i},1))">✕</button>` : ''}</div>
+        ${st.wrs.length > 1 ? `<button class="ck-btn sp-x" title="Wechselrichter entfernen" onclick="spAendern('${pid}',s=>spWrWeg(s,${i}))">✕</button>` : ''}</div>
       <div class="sp-reihe sp-klein">
         ${feld('AC-Leistung', w.ac || '', `spAendern('${pid}',s=>{s.wrs[${i}].ac=spNum(this.value);s.wrs[${i}].model=''})`, 'kW')}
         ${feld('MPPT', w.mppt || '', `spAendern('${pid}',s=>{s.wrs[${i}].mppt=Math.round(spNum(this.value));s.wrs[${i}].model=''})`)}
@@ -3440,14 +3609,21 @@ function viewStringplan(p) {
       ${m && m.note ? `<div class="muted klein">ℹ ${esc(m.note)}</div>` : ''}
       ${!w.model && w.ac > 0 ? `<button class="sec sm" style="margin-top:6px" onclick="spWrEigen('${pid}',${i})">In «Meine Wechselrichter» speichern</button>` : ''}</div>`; }).join('')}
     <button class="sec sm" onclick="spAendern('${pid}',s=>{const v=s.wrs[s.wrs.length-1]||{};s.wrs.push({...v,name:'WR '+(s.wrs.length+1)})})">＋ Wechselrichter</button></div>`;
-  return kopf + `<div class="sp-eingaben">${modul}${flaechen}${wrs}</div>` + spErgebnisHtml(r, st);
+  return kopf + `<div class="sp-eingaben">${modul}${flaechen}${wrs}</div>` + spManHtml(p, st, r) + spErgebnisHtml(r, st) + spErtragHtml(p, x);
 }
 // Ergebnis: Status, Kennzahlen, je Wechselrichter die MPPT-Kacheln, Dachskizze, Hinweise, Strings im Detail
 const spFehlen = r => r.oriStats.filter(o => o.N > 0 && o.unplaced > 0);
 // Kopfzeile ohne Lösungsfindung: was passt bzw. wie viele Module nicht passen
-function spKurz(r) {
+const spIstMan = st => !!(st && st.man && st.man.ng === st.groups.length);
+// manuell: Spannung zu hoch an einem MPPT (Uoc kalt über dem Limit)
+const spZuHoch = r => r.wrs.flatMap(w => w.mp.filter(q => q.s > 0 && w.w.umax > 0 && q.L * r.ctx.G[q.ori].uk > w.w.umax).map(q => `${w.name} · MPPT ${q.mi + 1}`));
+function spKurz(r, man) {
   const F = spFehlen(r);
   if (r.status === 'empty') return 'Modul, Anzahl Module je Fläche und Wechselrichter eintragen.';
+  if (man) {
+    const zu = spZuHoch(r), mehr = r.oriStats.filter(o => o.placed > o.N);
+    return [...F.map(o => `${o.name}: noch ${o.unplaced} von ${o.N} nicht verstringt`), ...mehr.map(o => `${o.name}: ${o.placed - o.N} zu viel`), ...zu.map(t => `${t}: Spannung zu hoch`)].join(' · ') || 'Manuelle Auslegung · alle Grenzwerte eingehalten.';
+  }
   if (F.length && r.totals.placed > 0) return F.map(o => `${o.name}: ${o.unplaced} von ${o.N} passen nicht`).join(' · ');
   if (r.status === 'fail' || !r.totals.placed) return r.headline || 'Mit diesen Werten lassen sich keine Strings bilden.';
   return 'Alle Grenzwerte eingehalten.';
@@ -3455,9 +3631,12 @@ function spKurz(r) {
 function spFarben(r) { const c = {}; let i = 0; r.wrs.forEach(w => w.mp.forEach(p => { if (p.s > 0) c[w.i + '.' + p.mi] = SP_PAL[i++ % SP_PAL.length]; })); return c; }
 function spErgebnisHtml(r, st) {
   const T = r.totals, G = r.ctx.G, oc = k => SP_OC[G[k].o];
-  const bm = { ok: ['ok', 'Alle Module sind ausgelegt'], notes: ['ok', 'Alle Module sind ausgelegt'], partial: ['err', `${T.unplaced} von ${T.N} Modulen passen nicht`],
+  const man = spIstMan(st), zuHoch = man ? spZuHoch(r).length : 0;
+  const bm = man && r.status !== 'empty'
+    ? (T.unplaced ? ['err', `${T.unplaced} von ${T.N} Modulen noch nicht verstringt`] : zuHoch ? ['err', 'Spannung zu hoch'] : r.status === 'ok' || r.status === 'notes' ? ['ok', 'Alle Module sind verstringt'] : ['warn', 'Bitte Strings prüfen'])
+    : { ok: ['ok', 'Alle Module sind ausgelegt'], notes: ['ok', 'Alle Module sind ausgelegt'], partial: ['err', `${T.unplaced} von ${T.N} Modulen passen nicht`],
     fail: ['err', 'Auslegung nicht möglich'], empty: ['info', 'Noch keine Module eingetragen'] }[r.status] || ['info', ''];
-  let h = `<div class="sp-banner sp-${bm[0]}"><b>${esc(bm[1])}</b><span>${esc(spKurz(r))}</span></div>`;
+  let h = `<div class="sp-banner sp-${bm[0]}"><b>${esc(bm[1])}</b><span>${esc(spKurz(r, man))}</span></div>`;
   if (r.status === 'empty') return h;
   h += `<div class="sp-kpis">
     <div><span>Module platziert</span><b>${spZahl(T.placed)}</b><small>von ${spZahl(T.N)}</small></div>
@@ -3489,7 +3668,7 @@ function spErgebnisHtml(r, st) {
       ${o.unplaced > 0 ? `<div class="sp-srow sp-fehlt"><span>fehlt</span><div class="sp-mods">${'<i></i>'.repeat(o.unplaced)}</div></div>` : ''}</div>`).join('')}</div></div>`;
   // keine Lösungsvorschläge: nur zeigen, wie viele Module je Fläche nicht passen
   const F = spFehlen(r);
-  if (F.length) h += `<div class="card"><h3 style="margin-top:0">Module, die nicht passen</h3>${F.map(o => `<div class="sp-prob sp-err" style="--oc:${oc(o.k)}"><b>${esc(o.name)}: ${o.unplaced} von ${o.N} Modulen passen nicht</b></div>`).join('')}</div>`;
+  if (F.length && !man) h += `<div class="card"><h3 style="margin-top:0">Module, die nicht passen</h3>${F.map(o => `<div class="sp-prob sp-err" style="--oc:${oc(o.k)}"><b>${esc(o.name)}: ${o.unplaced} von ${o.N} Modulen passen nicht</b></div>`).join('')}</div>`;
   h += `<div class="card"><details><summary><b>Alle Strings im Detail</b> <span class="muted klein">· Nummer = WR . MPPT . String</span></summary><div class="table-wrap"><table>
     <tr><th>String</th><th>WR</th><th>Fläche</th><th style="text-align:right">Module</th><th style="text-align:right">Uoc kalt</th><th style="text-align:right">Limit</th><th>Prüfung</th></tr>
     ${r.rows.filter(x => x.n > 0).map(x => { const w = r.ctx.wr[x.wr], g = G[x.ori], uoc = x.n * g.uk, bad = w.w.umax > 0 && uoc > w.w.umax;
@@ -3519,7 +3698,7 @@ function spPdf(pid) {
   y += 19;
   const stFarbe = { ok: [31, 157, 85], notes: [200, 120, 0], partial: [200, 40, 40], fail: [200, 40, 40] }[r.status] || [90, 90, 90];
   doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...stFarbe);
-  const hl = doc.splitTextToSize(spKurz(r), B); doc.text(hl, M, y); y += hl.length * 4.4 + 3;
+  const hl = doc.splitTextToSize((spIstMan(st) ? 'Manuelle Auslegung · ' : '') + spKurz(r, spIstMan(st)), B); doc.text(hl, M, y); y += hl.length * 4.4 + 3;
   // je Wechselrichter
   for (const w of r.wrs) {
     const m = spBibFind(w.w.model);
@@ -3565,9 +3744,10 @@ function spPdf(pid) {
   const F = spFehlen(r);
   if (F.length && r.totals.placed > 0) {
     platz(8 + F.length * 5); y += 2;
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text('Module, die nicht passen', M, y); y += 5.5;
+    const man = spIstMan(st);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text(man ? 'Noch nicht verstringt' : 'Module, die nicht passen', M, y); y += 5.5;
     doc.setFontSize(9.5); doc.setTextColor(200, 40, 40);
-    F.forEach(o => { doc.text(`${o.name}: ${o.unplaced} von ${o.N} Modulen passen nicht`, M, y); y += 5; });
+    F.forEach(o => { doc.text(`${o.name}: ${o.unplaced} von ${o.N} Modulen ${man ? 'noch nicht verstringt' : 'passen nicht'}`, M, y); y += 5; });
   }
   const n = doc.getNumberOfPages();
   for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
@@ -3580,7 +3760,7 @@ function viewWrEigene() {
   const L = S().wrEigene || [];
   const z = (x, i, k, ph, ein = '') => `<td><input value="${esc(x[k] ?? '')}" placeholder="${ph}" onchange="wrEigenSet(${i},'${k}',this.value)">${ein}</td>`;
   return `<div class="card"><h3 style="margin-top:0">Meine Wechselrichter</h3>
-    <p class="muted" style="margin-top:0">Erscheinen im Stringplan zuoberst in der Modell-Auswahl. Dazu kommen ${spBib().length - L.length} Modelle aus der Bibliothek (Sungrow, Huawei, SMA, Fronius, GoodWe).
+    <p class="muted" style="margin-top:0">Erscheinen im Stringplan zuoberst in der Modell-Auswahl. Dazu kommen ${spBib().length - L.length} Modelle aus der Bibliothek (Sungrow, Huawei, SMA, Fronius, GoodWe, Sunwoda).
       Eingänge je MPPT: eine Zahl (alle gleich) oder je MPPT, z.B. <code>2/1/1</code>.</p>
     ${L.length ? `<div class="table-wrap"><table><tr><th>Bezeichnung</th><th>AC kW</th><th>MPPT</th><th>Eingänge je MPPT</th><th>max. DC V</th><th>DC/AC %</th><th></th></tr>
       ${L.map((x, i) => `<tr>${z(x, i, 'm', 'z.B. Kostal Plenticore 10')}${z(x, i, 'ac', '10')}${z(x, i, 'mppt', '2')}${z(x, i, 'inp', '1 oder 2/1')}${z(x, i, 'umax', '1000')}${z(x, i, 'dc', '150')}
@@ -3589,6 +3769,223 @@ function viewWrEigene() {
     <button class="sec sm" style="margin-top:10px" onclick="(S().wrEigene=S().wrEigene||[]).push({id:uid(),m:'Neuer Wechselrichter',ac:10,mppt:2,inp:1,umax:1000,dc:150});save();render()">＋ Wechselrichter</button></div>`;
 }
 function wrEigenSet(i, k, v) { const x = S().wrEigene[i]; x[k] = k === 'm' ? v.trim() : (k === 'inp' && /[\/,;\s]/.test(v.trim()) ? v.trim() : spNum(v)); save(); toast('Gespeichert.'); }
+
+// ---------- Ertragsberechnung mit PVGIS (EU-Kommission, JRC) ----------
+// Je Dachfläche des Stringplans eine Abfrage (Standort, kWp, Neigung, Azimut). PVGIS erlaubt keine direkten Abfragen aus dem Browser,
+// darum läuft sie über einen eigenen kleinen Proxy (Cloudflare Worker, Adresse in Einstellungen › Ertrag). Ergebnis wird im Stringplan gespeichert.
+const PV_AZ = [180, -90, 0, 90];   // Norden, Osten, Süden, Westen → PVGIS-Azimut (0 = Süd, −90 = Ost, 90 = West, 180 = Nord)
+const PV_MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const PV_MONTAGE = { free: 'Aufdach / freistehend (hinterlüftet)', building: 'Indach (gebäudeintegriert)' };
+const pvErtrag = x => x.ertrag || (x.ertrag = { adresse: '', lat: '', lon: '', ort: '', hoehe: null, loss: 14, montage: 'free', f: [] });
+function pvFlaechen(st, E) {
+  return st.groups.map((g, k) => { const t = st.types[g.t] || st.types[0], f = (E.f || [])[k] || {};
+    return { k, name: spFlaecheName(st, g), o: g.o, n: +g.n || 0, kwp: (+g.n || 0) * (+t.pmax || 0) / 1000,
+      az: f.az ?? PV_AZ[g.o], tilt: f.tilt ?? (st.useTilt ? +g.tilt || 0 : 30) }; }).filter(f => f.n > 0 && f.kwp > 0);
+}
+const pvSchluessel = (E, F) => JSON.stringify([+E.lat, +E.lon, +E.loss, E.montage, F.map(f => [+f.kwp.toFixed(3), +f.az, +f.tilt])]);
+const pvSumme = res => { const m = PV_MON.map((_, i) => res.F.reduce((a, f) => a + (f.E_m[i] || 0), 0)), kwp = res.F.reduce((a, f) => a + f.kwp, 0), ey = res.F.reduce((a, f) => a + f.E_y, 0);
+  return { m, kwp, ey, spez: kwp ? ey / kwp : 0, sd: res.F.reduce((a, f) => a + (f.SD_y || 0), 0), n: res.F.reduce((a, f) => a + f.n, 0) }; };
+const pvProxy = () => String(S().pvgisProxy || '').trim().replace(/\/+$/, '');
+function pvSet(pid, feld, wert) {
+  const x = spAktuell(findP(pid)), E = pvErtrag(x);
+  if (feld === 'lat' || feld === 'lon') { E[feld] = spNum(wert) || ''; E.hoehe = null; }
+  else if (feld === 'loss') E.loss = Math.max(0, Math.min(50, spNum(wert)));
+  else E[feld] = wert;
+  save(); render();
+}
+function pvFSet(pid, k, feld, wert) {
+  const x = spAktuell(findP(pid)), E = pvErtrag(x);
+  E.f = E.f || []; E.f[k] = { ...(E.f[k] || {}) };
+  if (String(wert).trim() === '') delete E.f[k][feld]; else E.f[k][feld] = spNum(wert);
+  save(); render();
+}
+// Adresse → Koordinaten: zuerst Schweizer Gebäudeadressen (geo.admin.ch), sonst OpenStreetMap
+async function pvOrtSuchen(pid) {
+  const p = findP(pid), x = spAktuell(p), E = pvErtrag(x);
+  const q = (($('pv-adr') || {}).value || E.adresse || p.ort || '').trim();
+  if (!q) return toast('Zuerst eine Adresse eintragen.');
+  try {
+    let lat = 0, lon = 0, label = '';
+    const r = await fetch('https://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&limit=1&searchText=' + encodeURIComponent(q)).then(r => r.json()).catch(() => null);
+    const a = r && r.results && r.results[0] && r.results[0].attrs;
+    if (a) { lat = a.lat; lon = a.lon; label = String(a.label || '').replace(/<[^>]+>/g, ''); }
+    else {
+      const n = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q)).then(r => r.json());
+      if (n && n[0]) { lat = +n[0].lat; lon = +n[0].lon; label = n[0].display_name; }
+    }
+    if (!lat) return toast('Adresse nicht gefunden. Koordinaten von Hand eintragen.');
+    Object.assign(E, { adresse: q, lat: +(+lat).toFixed(5), lon: +(+lon).toFixed(5), ort: label, hoehe: null });
+    save(); render(); toast('Standort: ' + label);
+  } catch { toast('Adresssuche nicht erreichbar (Internetverbindung?).'); }
+}
+async function pvAbfrage(proxy, f, E) {
+  const q = new URLSearchParams({ lat: E.lat, lon: E.lon, peakpower: f.kwp.toFixed(3), loss: E.loss, angle: f.tilt, aspect: f.az, mountingplace: E.montage || 'free', pvtechchoice: 'crystSi', outputformat: 'json' });
+  let r;
+  try { r = await fetch(proxy + '?' + q); } catch { throw new Error('Proxy nicht erreichbar – Adresse in Einstellungen › Ertrag prüfen'); }
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j || !j.outputs) throw new Error((j && j.message) || `Antwort ${r.status}`);
+  return j;
+}
+async function pvRechnen(pid) {
+  const p = findP(pid), x = spAktuell(p), E = pvErtrag(x), F = pvFlaechen(x.st, E), proxy = pvProxy();
+  if (!proxy) { toast('Zuerst die Proxy-Adresse eintragen (Einstellungen › Ertrag).'); ui.setTab = 'pvgis'; nav('einstellungen/vorlagen'); return; }
+  if (!(+E.lat) || !(+E.lon)) return toast('Zuerst den Standort festlegen.');
+  if (!F.length) return toast('Keine Dachfläche mit Modulen und Modulleistung (Watt).');
+  ui.pvLaeuft = true; render();
+  try {
+    const out = [];
+    for (const f of F) {
+      const j = await pvAbfrage(proxy, f, E), t = j.outputs.totals.fixed;
+      out.push({ k: f.k, name: f.name, o: f.o, n: f.n, kwp: f.kwp, az: f.az, tilt: f.tilt, E_y: +t.E_y || 0, H_y: +t['H(i)_y'] || 0, l_total: +t.l_total || 0, SD_y: +t.SD_y || 0,
+        E_m: (j.outputs.monthly.fixed || []).map(m => +m.E_m || 0) });
+      if (j.inputs && j.inputs.location) E.hoehe = j.inputs.location.elevation;
+      if (j.inputs && j.inputs.meteo_data) E.db = `${j.inputs.meteo_data.radiation_db} (${j.inputs.meteo_data.year_min}–${j.inputs.meteo_data.year_max})`;
+    }
+    E.res = { datum: todayIso(), key: pvSchluessel(E, F), F: out };
+    save(); toast('Ertrag berechnet.');
+  } catch (e) { toast('Ertrag nicht berechnet: ' + e.message); }
+  ui.pvLaeuft = false; render();
+}
+function pvMonateHtml(m) {
+  const max = Math.max(1, ...m);
+  return `<div class="pv-mon">${m.map((v, i) => `<div><span>${spZahl(v)}</span><i style="height:${Math.max(2, v / max * 100)}%"></i><b>${PV_MON[i]}</b></div>`).join('')}</div>`;
+}
+function spErtragHtml(p, x) {
+  const pid = p.id, st = x.st, E = pvErtrag(x), F = pvFlaechen(st, E), res = E.res, proxy = pvProxy();
+  const aktuell = res && res.key === pvSchluessel(E, F), R = res ? pvSumme(res) : null;
+  const ein = (wert, on, einheit, extra = '') => `<span class="sp-in"><input value="${esc(wert)}" inputmode="decimal" onchange="${on}" ${extra}>${einheit ? `<i>${einheit}</i>` : ''}</span>`;
+  const resF = k => res && aktuell ? res.F.find(f => f.k === k) : null;
+  return `<div class="card sp-karte pv-karte"><div class="sp-man-kopf"><h3>5 · Ertragsberechnung <span class="muted klein">PVGIS 5.3</span></h3>
+      <div class="row"><button class="sm" ${ui.pvLaeuft ? 'disabled' : ''} onclick="pvRechnen('${pid}')">${ui.pvLaeuft ? 'Rechnet …' : res ? '↻ Neu berechnen' : '☀ Ertrag berechnen'}</button>
+        ${res ? `<button class="sec sm" onclick="pvPdf('${pid}')">📄 Ertragsprotokoll</button>` : ''}</div></div>
+    ${proxy ? '' : `<div class="sp-banner sp-info" style="margin:0 0 10px"><b>Einmal einrichten</b><span>Für die Abfrage bei PVGIS braucht es einen eigenen Proxy. <a href="#" onclick="event.preventDefault();ui.setTab='pvgis';nav('einstellungen/vorlagen')">Anleitung in Einstellungen › Ertrag</a></span></div>`}
+    <div class="pv-ort">
+      <label class="sp-f pv-adr"><span>Standort (Adresse)</span><span class="row" style="gap:6px;flex-wrap:nowrap"><input id="pv-adr" value="${esc(E.adresse || p.ort || '')}" placeholder="Strasse, PLZ Ort" onkeydown="if(event.key==='Enter')pvOrtSuchen('${pid}')"><button class="sec sm" onclick="pvOrtSuchen('${pid}')">Suchen</button></span></label>
+      <label class="sp-f"><span>Breitengrad</span>${ein(E.lat, `pvSet('${pid}','lat',this.value)`, '°', 'placeholder="47.05"')}</label>
+      <label class="sp-f"><span>Längengrad</span>${ein(E.lon, `pvSet('${pid}','lon',this.value)`, '°', 'placeholder="8.31"')}</label>
+      <label class="sp-f"><span>Systemverluste</span>${ein(E.loss ?? 14, `pvSet('${pid}','loss',this.value)`, '%')}</label>
+      <label class="sp-f"><span>Montage</span><select onchange="pvSet('${pid}','montage',this.value)">${Object.entries(PV_MONTAGE).map(([k, l]) => `<option value="${k}" ${E.montage === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    </div>
+    ${+E.lat && +E.lon ? `<div class="muted klein" style="margin:-2px 0 10px">📍 ${esc(E.ort || `${E.lat}, ${E.lon}`)}${E.hoehe != null ? ` · ${spZahl(E.hoehe)} m ü. M.` : ''} · <a href="https://www.openstreetmap.org/?mlat=${+E.lat}&mlon=${+E.lon}#map=19/${+E.lat}/${+E.lon}" target="_blank" rel="noopener">auf Karte prüfen</a></div>` : ''}
+    ${F.length ? `<div class="table-wrap"><table class="pv-tab"><tr><th>Fläche</th><th class="r">Module</th><th class="r">kWp</th><th>Azimut</th><th>Neigung</th><th class="r">Ertrag</th><th class="r">spez.</th></tr>
+      ${F.map(f => { const e = resF(f.k); return `<tr><td><span class="swatch" style="background:${SP_OC[f.o]};border-radius:50%"></span>${esc(f.name)}</td><td class="r">${f.n}</td><td class="r">${spZahl(f.kwp, 2)}</td>
+        <td>${ein(f.az, `pvFSet('${pid}',${f.k},'az',this.value)`, '°', 'title="0 = Süd, −90 = Ost, 90 = West, 180 = Nord"')}</td>
+        <td>${ein(f.tilt, `pvFSet('${pid}',${f.k},'tilt',this.value)`, '°')}</td>
+        <td class="r">${e ? `<b>${spZahl(e.E_y)}</b> kWh` : '–'}</td><td class="r">${e ? spZahl(e.E_y / e.kwp) : '–'}</td></tr>`; }).join('')}</table></div>
+      <div class="muted klein" style="margin-top:4px">Azimut: 0° = Süd, −90° = Ost, 90° = West, 180° = Nord. Vorgabe aus der Ausrichtung im Stringplan, hier genauer einstellbar. Neigung ${st.useTilt ? 'aus dem Stringplan' : 'Vorgabe 30°'}.</div>`
+      : '<div class="muted">Im Stringplan zuerst Modulleistung (W) und Anzahl Module je Fläche eintragen.</div>'}
+    ${res && !aktuell ? `<div class="sp-banner sp-warn" style="margin:10px 0 0"><b>Angaben geändert</b><span>Ertrag neu berechnen, damit Protokoll und Zahlen stimmen (letzte Berechnung ${fmt(res.datum)}).</span></div>` : ''}
+    ${R ? `<div class="sp-kpis" style="margin-top:12px">
+      <div><span>Jahresertrag</span><b>${spZahl(R.ey)}</b><small>kWh/Jahr</small></div>
+      <div><span>Spezifischer Ertrag</span><b>${spZahl(R.spez)}</b><small>kWh/kWp</small></div>
+      <div><span>Leistung</span><b>${spZahl(R.kwp, 1)}</b><small>kWp · ${R.n} Module</small></div>
+      <div><span>Schwankung</span><b>± ${spZahl(R.sd)}</b><small>kWh von Jahr zu Jahr</small></div></div>
+      <h4 style="margin:14px 0 6px">Ertrag pro Monat (kWh)</h4>${pvMonateHtml(R.m)}
+      <div class="muted klein" style="margin-top:6px">Berechnet ${fmt(res.datum)} mit PVGIS 5.3 (${esc(E.db || 'PVGIS-SARAH3')}), kristallines Silizium, Horizont aus Geländemodell.</div>` : ''}
+  </div>`;
+}
+// Ertragsprotokoll (A4): Standort, Annahmen, Flächen, Monatsertrag
+function pvPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), x = spAktuell(p), E = x && pvErtrag(x), res = E && E.res;
+  if (!res) return toast('Zuerst den Ertrag berechnen.');
+  if (res.key !== pvSchluessel(E, pvFlaechen(x.st, E)) && !confirm('Die Angaben wurden seit der Berechnung geändert. Trotzdem das alte Ergebnis drucken?')) return;
+  const R = pvSumme(res), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' }), W = 210, H = 297, M = 14, B = W - 2 * M;
+  let y = pdfAaKopf(doc, p.nummer, [['Projektleiter', plVon(p).name], ['Berechnet', fmt(res.datum)]], `Ertragsprognose: ${p.name}`);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(90);
+  const il = doc.splitTextToSize([p.ort, `Stringplan «${x.name}»`].filter(Boolean).join('  ·  '), B); doc.text(il, M, y - 3); y += il.length * 4 + 1;
+  // Kennzahlen
+  const K = [['Jahresertrag', `${spZahl(R.ey)} kWh`], ['Spezifischer Ertrag', `${spZahl(R.spez)} kWh/kWp`], ['Leistung', `${spZahl(R.kwp, 1)} kWp`], ['Module', `${R.n}`]];
+  const kw = (B - 3 * 3) / 4;
+  K.forEach(([l, v], i) => { const kx = M + i * (kw + 3); doc.setFillColor(244, 243, 239); doc.roundedRect(kx, y, kw, 15, 2, 2, 'F');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(110); doc.text(l, kx + 3, y + 5); doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...AA_TXT); doc.text(v, kx + 3, y + 11.8); });
+  y += 21;
+  const tab = (opt) => { doc.autoTable({ startY: y, margin: { left: M, right: M, bottom: 16 }, theme: 'grid', styles: { fontSize: 8.8, cellPadding: 1.7, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30 },
+    headStyles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold' }, ...opt }); y = doc.lastAutoTable.finalY + 7; };
+  const ueber = t => { doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text(t, M, y); y += 2.5; };
+  ueber('Standort & Annahmen');
+  tab({ body: [['Standort', E.ort || E.adresse || p.ort || '–'], ['Koordinaten', `${(+E.lat).toFixed(5)} N, ${(+E.lon).toFixed(5)} E${E.hoehe != null ? `  ·  ${spZahl(E.hoehe)} m ü. M.` : ''}`],
+      ['Strahlungsdaten', `${E.db || 'PVGIS-SARAH3'} · Horizont aus Geländemodell`], ['PV-Technologie', 'Kristallines Silizium'], ['Montage', PV_MONTAGE[E.montage] || PV_MONTAGE.free],
+      ['Systemverluste', `${spZahl(E.loss, 1)} % (Kabel, Wechselrichter, Verschmutzung usw.)`], ['Module', x.st.types.map(t => `${t.name} ${spZahl(t.pmax)} W`).join(', ')]],
+    columnStyles: { 0: { cellWidth: 42, fontStyle: 'bold' } } });
+  ueber('Dachflächen');
+  tab({ head: [['Fläche', 'Module', 'kWp', 'Azimut', 'Neigung', 'Einstrahlung', 'Ertrag', 'spez. Ertrag']],
+    body: [...res.F.map(f => [f.name, String(f.n), spZahl(f.kwp, 2), `${spZahl(f.az)}°`, `${spZahl(f.tilt)}°`, `${spZahl(f.H_y)} kWh/m²`, `${spZahl(f.E_y)} kWh`, `${spZahl(f.E_y / f.kwp)} kWh/kWp`]),
+      [{ content: 'Total', styles: { fontStyle: 'bold' } }, String(R.n), spZahl(R.kwp, 2), '', '', '', { content: `${spZahl(R.ey)} kWh`, styles: { fontStyle: 'bold' } }, { content: `${spZahl(R.spez)} kWh/kWp`, styles: { fontStyle: 'bold' } }]],
+    columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } },
+    didDrawCell: d => { const f = res.F[d.row.index]; if (d.section === 'body' && d.column.index === 0 && f) { doc.setFillColor(...hexRgb(SP_OC[f.o] || '#888')); doc.rect(d.cell.x, d.cell.y, 1.2, d.cell.height, 'F'); } } });
+  // Monatsertrag als Balken
+  if (y > H - 95) { doc.addPage(); y = 18; }
+  ueber('Ertrag pro Monat (kWh)'); y += 4;
+  const ch = 46, max = Math.max(1, ...R.m), bw = B / 12;
+  doc.setDrawColor(210); doc.setLineWidth(0.2); doc.line(M, y + ch, M + B, y + ch);
+  R.m.forEach((v, i) => { const h = v / max * (ch - 6), bx = M + i * bw + bw * 0.18;
+    doc.setFillColor(232, 160, 32); doc.rect(bx, y + ch - h, bw * 0.64, h, 'F');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(70); doc.text(spZahl(v), bx + bw * 0.32, y + ch - h - 1.2, { align: 'center' });
+    doc.setFontSize(8); doc.setTextColor(40); doc.text(PV_MON[i], bx + bw * 0.32, y + ch + 4.5, { align: 'center' }); });
+  y += ch + 12;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(90);
+  const hinweis = doc.splitTextToSize(`Prognose aus langjährigen Mittelwerten. Der tatsächliche Ertrag schwankt wetterbedingt von Jahr zu Jahr (hier ca. ± ${spZahl(R.sd)} kWh) und hängt von Verschattung durch Nachbargebäude, Bäume oder Dachaufbauten ab, die im Geländemodell nicht enthalten sind. Quelle: PVGIS 5.3, © Europäische Union, Gemeinsame Forschungsstelle (JRC).`, B);
+  doc.text(hinweis, M, y);
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
+    doc.text(`${S().firma || ''} · Ertragsprognose ${p.nummer} · ${x.name}`, M, H - 8); doc.text(`Seite ${i} / ${n}`, W - M, H - 8, { align: 'right' }); }
+  doc.save(dateiName('Ertragsprognose', p, 'pdf'));
+  toast('Ertragsprotokoll als PDF gespeichert.');
+}
+// Einstellungen › Ertrag: Proxy-Adresse und Anleitung für den Cloudflare Worker
+const PV_WORKER = String.raw`// Cloudflare Worker: leitet Ertragsabfragen der App an PVGIS (EU-Kommission, JRC) weiter.
+const PVGIS = 'https://re.jrc.ec.europa.eu/api/v5_3/PVcalc';
+const ERLAUBT = [/^https:\/\/jundt100\.github\.io$/, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
+
+export default {
+  async fetch(request, env, ctx) {
+    const origin = request.headers.get('Origin') || '';
+    const ok = ERLAUBT.some(r => r.test(origin));
+    const cors = { 'Access-Control-Allow-Origin': ok ? origin : 'null', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Max-Age': '86400', 'Vary': 'Origin' };
+    if (request.method === 'OPTIONS') return new Response(null, { status: ok ? 204 : 403, headers: cors });
+    if (!ok) return new Response('Nicht erlaubt', { status: 403, headers: cors });
+    if (request.method !== 'GET') return new Response('Nur GET', { status: 405, headers: cors });
+    const ziel = PVGIS + new URL(request.url).search;
+    const cache = caches.default, key = new Request(ziel);
+    let res = await cache.match(key);
+    if (!res) {
+      res = await fetch(ziel, { headers: { 'Accept': 'application/json' } });
+      if (res.ok) { res = new Response(res.body, res); res.headers.set('Cache-Control', 'public, max-age=86400'); ctx.waitUntil(cache.put(key, res.clone())); }
+    }
+    const out = new Response(res.body, res);
+    Object.entries(cors).forEach(([k, v]) => out.headers.set(k, v));
+    return out;
+  }
+};`;
+function viewPvgis() {
+  const s = S();
+  return `<div class="card"><h3 style="margin-top:0">Ertragsberechnung (PVGIS)</h3>
+    <p class="muted" style="margin-top:0">Im Stringplan rechnet «5 · Ertragsberechnung» mit PVGIS der EU-Kommission den Jahres- und Monatsertrag je Dachfläche und erstellt ein Ertragsprotokoll als PDF.
+      PVGIS lässt keine direkten Abfragen aus Webseiten zu. Darum läuft die Abfrage über einen eigenen kleinen Proxy (Cloudflare Worker, kostenlos).</p>
+    <label class="sp-f" style="max-width:560px"><span>Proxy-Adresse</span><span class="row" style="gap:6px;flex-wrap:nowrap"><input id="pv-proxy" value="${esc(s.pvgisProxy || '')}" placeholder="https://pvgis.DEIN-NAME.workers.dev" onchange="S().pvgisProxy=this.value.trim();save();toast('Gespeichert.')">
+      <button class="sec sm" onclick="pvTest()">Testen</button></span></label>
+    <div id="pv-test" class="muted klein" style="margin-top:6px"></div></div>
+  <div class="card"><h3 style="margin-top:0">Einrichten (einmalig, ca. 10 Minuten)</h3>
+    <ol class="pv-anl">
+      <li>Auf <a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener">dash.cloudflare.com</a> ein kostenloses Konto erstellen und anmelden.</li>
+      <li>Links <b>Compute (Workers)</b> › <b>Workers &amp; Pages</b> › <b>Create</b> › <b>Start with Hello World!</b> wählen, Name z.B. <code>pvgis</code>, dann <b>Deploy</b>.</li>
+      <li><b>Edit code</b> öffnen, den ganzen Beispielcode löschen und den Code unten einfügen. Oben rechts <b>Deploy</b>.</li>
+      <li>Die Adresse des Workers kopieren (endet auf <code>.workers.dev</code>), oben bei «Proxy-Adresse» einfügen und <b>Testen</b>.</li>
+    </ol>
+    <p class="muted klein">Der Worker beantwortet nur Ertragsabfragen und nur von deiner App (jundt100.github.io). Der kostenlose Tarif reicht bei weitem (100 000 Abfragen pro Tag).</p>
+    <div class="row" style="justify-content:space-between;align-items:center;margin:8px 0 6px"><b>Code für den Worker</b><button class="sec sm" onclick="navigator.clipboard.writeText(PV_WORKER).then(()=>toast('Code kopiert.'),()=>toast('Kopieren nicht möglich – Code markieren und kopieren.'))">Code kopieren</button></div>
+    <pre class="pv-code">${esc(PV_WORKER)}</pre></div>`;
+}
+async function pvTest() {
+  const out = $('pv-test'), proxy = pvProxy();
+  if (!proxy) { out.textContent = 'Zuerst eine Adresse eintragen.'; return; }
+  out.textContent = 'Teste …';
+  try {
+    const j = await pvAbfrage(proxy, { kwp: 1, tilt: 30, az: 0 }, { lat: 47.05, lon: 8.31, loss: 14, montage: 'free' });
+    out.innerHTML = `<span class="ok">✓ Verbindung funktioniert</span> · Testwert Luzern: ${spZahl(j.outputs.totals.fixed.E_y)} kWh pro kWp und Jahr`;
+  } catch (e) { out.innerHTML = `<span class="rot">✕ ${esc(e.message)}</span>`; }
+}
 // ---------- Materialliste (Dokument) ----------
 // Start mit einer Vorlage je Montagesystem (Einstellungen › Dokumente › Materiallisten). Pro Artikel: Menge, Wo (Lager / Lieferant),
 // Status, Datum bestellt/reserviert und Lieferung. Angehakte Artikel («→ Protokolle») erscheinen beim gewählten Bauteil in den Produkten
@@ -3985,7 +4382,7 @@ function infosPdf(pid) {
     doc.autoTable({ startY: y + 2.5, margin: { left: M, right: M }, theme: 'grid',
       styles: { fontSize: 9.5, cellPadding: 1.8, lineColor: [215, 215, 215], lineWidth: 0.2, textColor: 30 },
       headStyles: { fillColor: AA_DUNKEL, textColor: 255, fontStyle: 'bold' },
-      head: [['Bauteil', 'Hersteller, Typ, Anzahl']], body: prod.map(x => [x.text, x.detail]), columnStyles: { 0: { cellWidth: 62, fontStyle: 'bold' } } });
+      head: [['Bauteil', 'Hersteller, Typ, Anzahl']], body: prod.map(x => [x.text, prodDetail(x)]), columnStyles: { 0: { cellWidth: 62, fontStyle: 'bold' } } });
   }
   doc.save(dateiName('Infos', p, 'pdf'));
   toast('Bemerkungen / Infos als PDF gespeichert.');
@@ -3993,7 +4390,7 @@ function infosPdf(pid) {
 // Produkte als kurze Liste (Übersicht und IBN-Rapport)
 function produktListeHtml(p, leer) {
   const L = produkteGefuellt(p);
-  return L.length ? `<div class="prod-liste">${L.map(x => `<div><b>${esc(x.text)}</b><span>${esc(x.detail)}</span></div>`).join('')}</div>` : leer;
+  return L.length ? `<div class="prod-liste">${L.map(x => `<div><b>${esc(x.text)}</b><span>${esc(prodDetail(x))}</span></div>`).join('')}</div>` : leer;
 }
 
 // ---------- Dokumente eines Projekts an einem Ort ----------
@@ -4671,7 +5068,7 @@ function ibnPdf(pid) {
     y += 5;
   };
   const prod = produkteGefuellt(p);
-  if (prod.length) abschnitt('Anlage', prod.map(x => `${x.text}: ${x.detail}`).join('\n'));
+  if (prod.length) abschnitt('Anlage', prod.map(x => `${x.text}: ${prodDetail(x)}`).join('\n'));
   abschnitt('Auszuführende Arbeiten', r.arbeiten);
   if ((r.hinweise || '').trim()) abschnitt('Hinweise für den Monteur', r.hinweise);
   // Pendente Arbeiten: Bekanntes eingetragen, darunter Linien, auf denen der Monteur Offenes notiert
@@ -4822,7 +5219,7 @@ function abListeHtml(ctx, key) {
       ${ctx === 'r' ? `<input type="checkbox" ${x.ok ? 'checked' : ''} onchange="abL('r','${key}','ok',${i},this.checked)">` : '<span class="aa-leer"></span>'}
       <input class="ab-text" value="${esc(x.text)}" placeholder="${mitDetail ? 'Bauteil' : 'Prüfpunkt'}" oninput="abL('${ctx}','${key}','text',${i},this.value)">
       ${!mitDetail ? '' : ctx === 'r'
-        ? `<input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Details')}" oninput="abL('r','${key}','detail',${i},this.value)">`
+        ? `<input class="ab-detail" value="${esc(x.detail)}" placeholder="${esc(x.hint || 'Details')}" oninput="abL('r','${key}','detail',${i},this.value)">${prodZusatz(x).length ? `<span class="ab-zusatz" title="Aus den Produkten des Projekts">${esc(prodZusatz(x).join(' · '))}</span>` : ''}`
         : `<input class="ab-detail" value="${esc(x.hint)}" placeholder="Hinweis in Klammern, z.B. Hersteller, Typ" oninput="abL('s','${key}','hint',${i},this.value)">`}
       <button class="ck-btn" title="Punkt entfernen" onclick="abL('${ctx}','${key}','del',${i})">✕</button></div>`).join('')
     + `<button class="sec sm" onclick="abL('${ctx}','${key}','add')">+ Punkt</button>`;
@@ -4835,7 +5232,7 @@ function abL(ctx, key, op, i, v) {
   if (ctx === 'r') {
     const p = findP(abPid);
     // Punkt 1 im Protokoll geändert: zurück in die Produkte des Projekts (und von dort ins andere Protokoll)
-    if (key === 'gegenstand') p.produkte = p[abArt].gegenstand.map(({ text, hint, detail, mat }) => ({ text: text || '', hint: hint || '', detail: detail || '', ...(mat ? { mat } : {}) }));
+    if (key === 'gegenstand') p.produkte = p[abArt].gegenstand.map(({ text, hint, detail, mat, wert, anzahl, wrId }) => ({ text: text || '', hint: hint || '', detail: detail || '', ...(mat ? { mat } : {}), ...(wert ? { wert } : {}), ...(anzahl ? { anzahl } : {}), ...(wrId ? { wrId } : {}) }));
     protokolleAbgleichen(p, abArt);
   }
   save();
@@ -4919,7 +5316,7 @@ function abnahmePdf(pid, art = 'abnahme') {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...AA_TXT); doc.text(titel, x, yy);
     yy += 6.5;
     L.filter(i => i.text.trim()).forEach(i => {
-      const det = (i.detail || '').trim();
+      const det = mitDetail ? prodDetail(i) : (i.detail || '').trim();
       const t = i.text.trim() + (mitDetail ? (det ? `: ${det}` : i.hint ? ` (${i.hint})` : '') : '');
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(40);
       const lines = doc.splitTextToSize(t, cw - 6);
@@ -6258,7 +6655,7 @@ function viewKalender() {
 // Einstellungen als getrennte Kacheln in drei Gruppen statt einer umbrechenden Reiterleiste
 const EINST_GRUPPEN = [
   ['Allgemein', [['firma', 'Projektleiter & Firma', 'Name, Adresse, Logo', 'kontakte'], ['backup', 'Backup', 'Sichern & wiederherstellen', 'backup'], ['app', 'App', 'Installieren, offline', 'app']]],
-  ['Vorlagen', [['gewerke', 'Standard-Gewerke', 'Firmen für neue Projekte', 'gewerke'], ['checkliste', 'Checkliste', 'Punkte je Projektart', 'checkliste'], ['rapport', 'Dokumente', 'Rapporte, Abnahme, Material', 'dokumente'], ['mails', 'Mailvorlagen', 'Texte für Anfragen', 'mail'], ['wr', 'Wechselrichter', 'Eigene Modelle für Stringplan', 'wr']]],
+  ['Vorlagen', [['gewerke', 'Standard-Gewerke', 'Firmen für neue Projekte', 'gewerke'], ['checkliste', 'Checkliste', 'Punkte je Projektart', 'checkliste'], ['rapport', 'Dokumente', 'Rapporte, Abnahme, Material', 'dokumente'], ['mails', 'Mailvorlagen', 'Texte für Anfragen', 'mail'], ['wr', 'Wechselrichter', 'Eigene Modelle für Stringplan', 'wr'], ['pvgis', 'Ertrag (PVGIS)', 'Ertragsberechnung einrichten', 'sonne']]],
   ['Auswertung', [['controlling', 'Controlling', 'Stundensätze & Ampel', 'controlling']]]];
 const EINST_ICONS = {
   kontakte: ICONS.kontakte, controlling: ICONS.controlling,
@@ -6268,7 +6665,8 @@ const EINST_ICONS = {
   checkliste: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>',
   dokumente: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
   mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
-  wr: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12l2-2 2 2 2-2 2 2M9 17h6"/>'
+  wr: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12l2-2 2 2 2-2 2 2M9 17h6"/>',
+  sonne: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
 };
 function viewEinstellungen() {
   // Unterseite Allgemein / Vorlagen / Auswertung: nur diese Gruppe zeigen
@@ -6284,7 +6682,7 @@ function viewEinstellungen() {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${EINST_ICONS[ic]}</svg>
       <span><b>${l}</b><small>${info}</small></span></button>`).join('')}</div></div>`).join('')}
   </div>
-  <div class="tab-inhalt" data-form="${ui.setTab}">${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, controlling: viewKtEinst, app: viewApp, wr: viewWrEigene }[ui.setTab] || viewBackup)()}</div>`;
+  <div class="tab-inhalt" data-form="${ui.setTab}">${({ firma: viewFirma, gewerke: viewStandard, checkliste: viewChkVorlage, rapport: viewRapportVorlage, mails: viewMails, controlling: viewKtEinst, app: viewApp, wr: viewWrEigene, pvgis: viewPvgis }[ui.setTab] || viewBackup)()}</div>`;
 }
 
 // Vorlagen für Arbeitsauftrag und Abnahmeprotokoll: jedes neue Dokument startet damit
