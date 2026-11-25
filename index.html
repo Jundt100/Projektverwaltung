@@ -452,6 +452,12 @@
   .ab-pkt input[type=checkbox] { width: 15px; height: 15px; flex: none; margin: 0; }
   .ab-text { flex: 1; min-width: 0; font-weight: 600; }
   .ab-detail { flex: 1.1; min-width: 0; }
+  .p-filter { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: flex-end; margin: -4px 0 16px; padding: 12px 14px; background: var(--card, #fff); border-radius: 14px; }
+  .p-filter label { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; color: var(--muted, #777); font-weight: 600; margin: 0; }
+  .p-filter select { padding: 6px 28px 6px 10px; font-size: 13px; min-width: 130px; max-width: 220px; }
+  .p-filter select.aktiv { border-color: var(--ink, #18181b); box-shadow: 0 0 0 1px var(--ink, #18181b); }
+  .p-filter-info { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 13px; }
+  @media (max-width: 700px) { .p-filter { display: grid; grid-template-columns: 1fr 1fr; } .p-filter select { min-width: 0; max-width: none; width: 100%; } .p-filter-info { grid-column: 1 / -1; margin-left: 0; justify-content: space-between; } }
   .pv-karte { margin-top: 14px; }
   .pv-ort { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(90px, 1fr)) minmax(170px, 1.4fr); gap: 10px; align-items: end; margin-bottom: 8px; }
   .pv-ort input { min-width: 0; width: 100%; }
@@ -1983,7 +1989,7 @@ ICONS.controlling = '<path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/><circle cx
 const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Termine'], ['einstellungen', 'Einstellungen']];
 // Untermenüs: klappen in der Leiste auf, wenn die Hauptseite offen ist (Adresse #/seite/unterseite)
 const NAV_SUB = {
-  dashboard: [['projekte', 'Projekte'], ['checklisten', 'Checklisten'], ['db', 'DB-Übersicht'], ['kalender', 'Kalender'], ['jahr', 'Jahresübersicht']],
+  dashboard: [['checklisten', 'Checklisten'], ['db', 'DB-Übersicht'], ['kalender', 'Kalender'], ['jahr', 'Jahresübersicht']],
   projekte: [['offen', 'Laufend / Offen'], ['abgeschlossen', 'Abgeschlossen']],
   controlling: [['kontrollieren', 'Kontrollieren'], ['db', 'DB-Übersicht']],
   kontakte: [['kunde', 'Kunden'], ['intern', 'Intern CKW'], ['sub', 'Subunternehmer'], ['extern', 'Extern']],
@@ -1997,13 +2003,12 @@ const seitenKopf = (titel, unter = '', rechts = '') => `<div class="page-head"><
 const terminSicht = aktiv =>`<div class="seg seg-sicht"><button class="${aktiv === 'woche' ? 'on' : ''}" onclick="nav('woche')">Woche</button><button class="${aktiv === 'termine' ? 'on' : ''}" onclick="nav('termine')">Monat</button></div>`;
 
 function route() { const [page, id] = (location.hash.slice(2) || 'dashboard').split('/'); return { page, id }; }
-function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (h === 'projekte') ui.pSort = 'nr'; if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
+function nav(h) { if (h === 'controlling') ui.ktF = 'run'; if (location.hash === '#/' + h) render(); else location.hash = '#/' + h; }
 function openProjekt(id) { ui.tab = 'uebersicht'; ui.editTermin = ui.editGewerk = null; ui.ganttScroll = true; nav('projekt/' + id); }
 window.addEventListener('hashchange', () => {
   // beim Hingehen immer zuerst die laufenden / offenen Projekte zeigen
   const pg = route().page;
   if (pg === 'controlling') ui.ktF = 'run';
-  if (pg === 'projekte') ui.pSort = 'nr';
   render({ nachOben: true });
 });
 
@@ -2352,7 +2357,6 @@ function viewOffen(today, alle) {
 }
 function viewDashboard() {
   const today = todayIso(), sub = unterSeite();
-  if (sub === 'projekte') return seitenKopf('Projekte', 'Alle laufenden und geplanten Projekte', '<button onclick="neuesProjektDialog()">+ Neues Projekt</button>') + dashProjekte(today);
   if (sub === 'checklisten') return seitenKopf('Checklisten', 'Offene Punkte vor Baustart aller Projekte') + (viewOffen(today, true) || '<div class="card empty">✓ Bei keinem Projekt sind Punkte vor Baustart offen.</div>');
   if (sub === 'db') return viewDb('dashboard');
   if (sub === 'kalender') return seitenKopf('Kalender', 'Alle Projekte im Monat') + dashKalender();
@@ -2610,29 +2614,62 @@ function viewJahr() {
 }
 
 // ---------- Projekte ----------
+// Filter und Sortierung der Projektliste (bleiben beim Wechsel offen/abgeschlossen erhalten)
+const P_SORT = { nr: 'Nummer aufsteigend', nrAb: 'Nummer absteigend', termin: 'Baustart (nächster zuerst)', kunde: 'Kunde A–Z', ort: 'Ort A–Z', abschluss: 'Abschluss (neuester zuerst)' };
+const P_TERMIN = { '': 'Alle Termine', jetzt: 'Läuft jetzt', bald: 'Start in 30 Tagen', geplant: 'Geplant (Zukunft)', vorbei: 'Bauzeit vorbei', ohne: 'Ohne Termine' };
+const P_STATUS = { '': 'Alle Status', freigabe: 'Freigabe fehlt', controlling: 'Controlling fällig', checkliste: 'Checkliste offen', fertig: 'Checkliste fertig' };
+const pKunde = p => { const k = kontaktById(p.kundeId); return k ? kontaktName(k) : ''; };
+const pOrt = p => { const t = (p.ort || '').split(',').map(x => x.trim()).filter(Boolean); return (t[t.length - 1] || '').replace(/^\d{4,5}\s*/, ''); };
+function pFilterSet(k, v) { ui.pF = { ...(ui.pF || {}), [k]: v }; render(); }
 function viewProjekte() {
-  const zuN = state.projects.filter(p => p.abschluss).length, zeigeZu = unterSeite() === 'abgeschlossen', nachTermin = ui.pSort === 'termin';
-  // Standard: nach Projektnummer aufsteigend; wahlweise nach Baustart (Projekte ohne Termine am Schluss)
+  const zeigeZu = unterSeite() === 'abgeschlossen', F = ui.pF || {}, today = todayIso();
+  let sort = ui.pSort && P_SORT[ui.pSort] ? ui.pSort : (zeigeZu ? 'abschluss' : 'nr');
+  if (sort === 'abschluss' && !zeigeZu) sort = 'nr';
   const nr = (a, b) => a.nummer.localeCompare(b.nummer, 'de', { numeric: true });
   const start = p => (span(p) || {}).start || '9999';
-  const list = state.projects.filter(p => !p.abschluss === !zeigeZu)
-    .sort((a, b) => nachTermin ? start(a).localeCompare(start(b)) || nr(a, b) : nr(a, b));
+  const txt = f => (a, b) => (f(a) || '￿').localeCompare(f(b) || '￿', 'de') || nr(a, b);
+  const SORT = { nr, nrAb: (a, b) => nr(b, a), termin: (a, b) => start(a).localeCompare(start(b)) || nr(a, b), kunde: txt(pKunde), ort: txt(pOrt),
+    abschluss: (a, b) => String((b.abschluss || {}).date || '').localeCompare(String((a.abschluss || {}).date || '')) || nr(a, b) };
+  const basis = state.projects.filter(p => !p.abschluss === !zeigeZu);
+  const terminOk = p => { const s = span(p);
+    if (!F.termin) return true; if (F.termin === 'ohne') return !s; if (!s) return false;
+    return { jetzt: s.start <= today && s.ende >= today, bald: s.start > today && diffDays(today, s.start) <= 30, geplant: s.start > today, vorbei: s.ende < today }[F.termin]; };
+  const statusOk = p => { if (!F.status || zeigeZu) return true; const ck = chkStats(p);
+    return { freigabe: freigabe(p).kritisch, controlling: ktAktiv(p) && !!ktDue(p), checkliste: ck.total > 0 && ck.pct < 100, fertig: ck.total > 0 && ck.pct >= 100 }[F.status]; };
+  const list = basis.filter(p => (!F.art || projektArt(p) === F.art) && (!F.kunde || pKunde(p) === F.kunde) && (!F.pl || plVon(p).name === F.pl)
+      && (!F.jahr || !zeigeZu || String((p.abschluss || {}).date || '').slice(0, 4) === F.jahr) && (zeigeZu || terminOk(p)) && statusOk(p))
+    .sort(SORT[sort]);
+  const kunden = [...new Set(basis.map(pKunde).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
+  const pls = [...new Set(basis.map(p => plVon(p).name))].sort();
+  const jahre = [...new Set(basis.map(p => String((p.abschluss || {}).date || '').slice(0, 4)).filter(Boolean))].sort().reverse();
+  const sel = (k, opts, wert) => `<select class="${wert ? 'aktiv' : ''}" onchange="pFilterSet('${k}',this.value)">${Object.entries(opts).map(([v, l]) => `<option value="${esc(v)}" ${v === (wert || '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
+  const liste = (alle, L) => Object.fromEntries([['', alle], ...L.map(x => [x, x])]);
+  const aktiv = ['art', 'kunde', 'pl', zeigeZu ? 'jahr' : 'termin', zeigeZu ? '' : 'status'].filter(k => k && F[k]).length;
+  const filterLeiste = `<div class="p-filter">
+    <label><span>Sortieren</span><select onchange="ui.pSort=this.value;render()">${Object.entries(P_SORT).filter(([k]) => zeigeZu || k !== 'abschluss').map(([k, l]) => `<option value="${k}" ${k === sort ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    <label><span>Art</span>${sel('art', { '': 'Alle Arten', ...PROJEKT_ARTEN }, F.art)}</label>
+    ${kunden.length ? `<label><span>Kunde</span>${sel('kunde', liste('Alle Kunden', kunden), F.kunde)}</label>` : ''}
+    ${zeigeZu ? (jahre.length > 1 ? `<label><span>Abschlussjahr</span>${sel('jahr', liste('Alle Jahre', jahre), F.jahr)}</label>` : '')
+      : `<label><span>Termin</span>${sel('termin', P_TERMIN, F.termin)}</label><label><span>Status</span>${sel('status', P_STATUS, F.status)}</label>`}
+    ${pls.length > 1 ? `<label><span>Projektleiter</span>${sel('pl', liste('Alle', pls), F.pl)}</label>` : ''}
+    <div class="p-filter-info"><span class="muted">${list.length} von ${basis.length}</span>${aktiv ? `<button class="sec sm" onclick="ui.pF={};render()">✕ Filter zurücksetzen</button>` : ''}</div>
+  </div>`;
   return `
   <div class="page-head">
-    <h1>${zeigeZu ? 'Abgeschlossene Projekte' : 'Projekte'}</h1>
+    <h1>${zeigeZu ? 'Abgeschlossene Projekte' : 'Laufende / offene Projekte'}</h1>
     <div class="row">
-      <div class="seg"><button class="${zeigeZu ? '' : 'on'}" onclick="nav('projekte/offen')">Offen (${state.projects.length - zuN})</button><button class="${zeigeZu ? 'on' : ''}" onclick="nav('projekte/abgeschlossen')">Abgeschlossen (${zuN})</button></div>
-      <div class="seg" title="Sortierung"><button class="${nachTermin ? '' : 'on'}" onclick="ui.pSort='nr';render()">Nach Nummer</button><button class="${nachTermin ? 'on' : ''}" onclick="ui.pSort='termin';render()">Nach Terminen</button></div>
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input placeholder="Nummer, Adresse, Name …" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)">${SUCH_X}</div>
+        <input placeholder="Nummer, Adresse, Kunde …" value="${esc(ui.q || '')}" oninput="filterProjekte(this.value)">${SUCH_X}</div>
       <button class="plus" title="Neues Projekt" onclick="neuesProjektDialog()">+</button>
     </div>
   </div>
+  ${basis.length ? filterLeiste : ''}
+  ${!list.length && basis.length ? '<div class="card empty">Kein Projekt passt zu diesen Filtern.</div>' : ''}
   ${list.length ? `<div class="projects">${list.map(p => { const s = span(p), ck = chkStats(p);
     // Adresse als Titel (Strasse gross, PLZ/Ort darunter); ohne Adresse der Projektname
     const [strasse, ...rest] = (p.ort || '').split(',').map(x => x.trim()).filter(Boolean);
     return `
-    <div class="pcard pk2${p.abschluss ? '' : ktGlow(p)}" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
+    <div class="pcard pk2${p.abschluss ? '' : ktGlow(p)}" style="--c:${p.farbe}" data-q="${esc((p.nummer + ' ' + p.name + ' ' + (p.ort || '') + ' ' + pKunde(p) + ' ' + PROJEKT_ARTEN[projektArt(p)]).toLowerCase())}" onclick="openProjekt('${p.id}')">
       <div class="pk2-kopf"><b class="pk2-nr">${esc(p.nummer)}</b>
         <div class="row" style="gap:4px">${artBadge(p)}${badge(p)}</div></div>
       <div class="pk2-adr">${strasse ? esc(strasse) : esc(p.name)}</div>
@@ -2648,7 +2685,7 @@ function viewProjekte() {
         ${ktKarte(p)}`}
       </div>
     </div>`; }).join('')}</div>`
-    : zeigeZu ? '<div class="card empty">Noch kein Projekt abgeschlossen.</div>' : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
+    : basis.length ? '' : zeigeZu ? '<div class="card empty">Noch kein Projekt abgeschlossen.</div>' : '<div class="card empty">Noch keine Projekte – klicke auf <b>+</b>, um dein erstes Projekt anzulegen.</div>'}`;
 }
 function filterProjekte(q) {
   ui.q = q; q = q.toLowerCase();
