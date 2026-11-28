@@ -1,5 +1,10 @@
 // Netz zuerst (damit Änderungen auf GitHub sofort ankommen), bei fehlender Verbindung aus dem Cache
-const CACHE = 'ckw-projekte-v45'; // v45: Terminplan auf dem Handy mit schmaler Namensspalte (Daten darunter)
+const CACHE = 'ckw-projekte-v50'; // v50: eigenes CKW-Sicherheitskonzept für PV (Ja/Nein-Gefährdungen, Instruktion mit Unterschrift, Projektleiter + Monteur)
+// v49: Sicherheitskonzept (BauAV Art. 4) als Projekt-Dokument mit Unterschrift Monteur, Spitäler je Ort in den Einstellungen
+// v48: Offerte → Projekt legt den Kunden an, fehlende Kundenangaben rot
+// v47: Batterien parallel (Anzahl Türme, Total), Lynx Home F G2
+// v46: Batterie Fronius Reserva Pro in den Offerten
+// v45: Terminplan auf dem Handy mit schmaler Namensspalte (Daten darunter)
 // v44: Bogenanzeigen (Checkliste, DB, Leistung) als dicker Bogen mit Symbol
 // v43: neue Symbole Meldewesen und Gerüst
 // v42: Offerten mit mehreren Zählern (Haus, Allgemein, Mieter, WP)

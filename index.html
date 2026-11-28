@@ -359,6 +359,13 @@
   .of-x { background: none; border: 0; color: var(--muted); padding: 2px 6px; font-size: 14px; min-height: 0; }
   .of-x:hover { color: #c0392b; background: none; }
   .of-hinweis { font-size: 12.5px; color: var(--muted); }
+  /* fehlende Kundenangaben */
+  input.fehlt { border-color: var(--danger, #c0392b) !important; background: #fdf1ef; }
+  .kunde-fehlt { color: var(--danger, #c0392b); font-size: 12.5px; margin-top: 6px; }
+  .kunde-fehlt:empty { display: none; }
+  .kunde-fehlt a { color: inherit; font-weight: 600; }
+  .k-fehlt { color: var(--danger, #c0392b); font-size: 12px; font-weight: 600; }
+  .np-kunde { margin-top: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fafaf7; }
   @media (max-width: 700px) { .of-grid { grid-template-columns: 1fr; } }
   /* Projektkarten im Dashboard: Checkliste gross, Controlling und Fortschritt klein darunter */
   .dp-karte { cursor: pointer; }
@@ -466,6 +473,55 @@
   .aa-pkt input[type=checkbox] { width: 15px; height: 15px; flex: none; margin: 0; }
   .aa-leer { display: inline-block; width: 13px; height: 13px; flex: none; border: 1.5px solid #9a9a9a; border-radius: 3px; vertical-align: -2px; }
   .aa-box > .sec.sm { align-self: flex-start; margin-top: 4px; }
+  /* Sicherheitskonzept */
+  .sk-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px 16px; background: #f4f6f8; border-radius: 12px; padding: 10px 14px; }
+  .sk-auto small { display: block; color: var(--muted); font-size: 11.5px; }
+  .sk-auto b { font-weight: 600; }
+  .sk-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  .sk-notruf { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sk-notruf span { background: #fdecec; border-radius: 9px; padding: 5px 12px; font-size: 13px; }
+  .sk-notruf b { color: #c02026; font-size: 16px; margin-right: 3px; }
+  .sk-regeln { display: grid; grid-template-columns: 1fr 230px; gap: 12px; align-items: start; }
+  .sk-regeln ul { margin: 0; padding-left: 18px; color: #a51d22; font-size: 13.5px; line-height: 1.6; }
+  .sk-stopp { border: 1.5px solid #c02026; border-radius: 10px; padding: 8px 10px; font-size: 12.5px; }
+  .sk-stopp b { display: inline-block; background: #c02026; color: #fff; border-radius: 5px; padding: 1px 7px; margin-bottom: 5px; letter-spacing: .5px; }
+  .sk-titel { margin: 16px 0 4px; }
+  .sk-titel b { display: block; font-size: 24px; }
+  .sk-titel span { color: var(--muted); font-size: 13px; }
+  .sk-h { display: flex; align-items: center; gap: 9px; margin: 22px 0 10px; font-size: 17px; }
+  .sk-h > span:first-child { width: 24px; height: 24px; border-radius: 50%; background: #37474f; color: #fff; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .sk-frage { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; background: #fff; }
+  .sk-frage.nein { background: #fdf1ef; border-color: #f0c4bd; }
+  .sk-f-kopf { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-weight: 600; font-size: 14px; }
+  .sk-jn { display: flex; flex: none; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .sk-jn button { border: none; border-radius: 0; background: #fff; color: var(--text); padding: 5px 12px; font-size: 13px; min-width: 46px; box-shadow: none; }
+  .sk-jn button + button { border-left: 1px solid var(--line); }
+  .sk-jn button.ja.on { background: #2e7d32; color: #fff; }
+  .sk-jn button.nein.on { background: #c62828; color: #fff; }
+  .sk-jn button.na.on { background: #78909c; color: #fff; }
+  .sk-subs { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0; }
+  .sk-subs label { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; margin: 0; color: inherit; font-weight: 400; cursor: pointer; }
+  .sk-subs input { width: 15px; height: 15px; flex: none; margin: 0; }
+  .sk-notiz { margin-top: 8px; font-size: 13px; padding: 6px 9px; }
+  .sk-ma { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; display: grid; grid-template-columns: 1fr 300px; gap: 12px; align-items: start; background: #fff; }
+  .sk-ma-daten { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px 10px; align-items: end; }
+  .sk-ma-ausb { grid-column: 1 / 3; display: flex; gap: 14px; font-size: 13px; }
+  .sk-ma-ausb label { display: inline-flex; gap: 5px; align-items: center; margin: 0; color: inherit; font-weight: 400; }
+  .sk-ma-ausb input { width: 15px; height: 15px; margin: 0; }
+  .sk-ma-daten .ck-btn { grid-column: 3; grid-row: 1; }
+  .sk-unter2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .sk-unter2 > div { border: 1.5px solid #37474f; border-radius: 12px; padding: 12px; }
+  .sk-wer { margin-bottom: 8px; }
+  .sk-wer b, .sk-wer input { display: block; font-size: 15px; }
+  .sk-wer span { color: var(--muted); font-size: 12px; }
+  .sk-sig { max-width: 460px; }
+  .sk-sig.klein { max-width: 340px; }
+  .sk-sig-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+  .sk-sig-dat { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .sk-sig-dat input { width: auto; padding: 2px 6px; font-size: 12.5px; }
+  .sk-sig-fuss { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .sk-pad { display: block; width: 100%; aspect-ratio: 3 / 1; border: 1.5px dashed #b8b8b0; border-radius: 10px; background: #fafaf7; touch-action: none; cursor: crosshair; }
+  @media (max-width: 700px) { .sk-2, .sk-regeln, .sk-unter2, .sk-ma { grid-template-columns: 1fr; } .sk-f-kopf { flex-direction: column; } }
   .aa-neu { border: 1.5px dashed #c8c8c0; background: none; color: var(--muted); border-radius: 12px; min-height: 80px; }
   .aa-neu:hover { border-color: #9a9a92; color: var(--text); }
   .aa-fuss { margin-top: 18px; padding-top: 10px; border-top: 1px solid #e6e6e6; }
@@ -1175,6 +1231,12 @@ const STANDARD_GEWERKE = [
   { name: 'Kran', art: 'extern', firma: 'Flück AG', farbe: '#e84393' }
 ];
 const ARTEN = { intern: 'intern', sub: 'Subunternehmer', extern: 'extern' };
+// Sicherheitskonzept (BauAV Art. 4): Vorgaben in den Einstellungen – Spitäler je Ort, Notfall-Standards, vorangekreuzte Massnahmen und Antworten
+const SK_VORLAGE = {
+  v: 2, orte: [], sammelplatz: '', ersteHilfe: 'Im Firmenfahrzeug', feuerloescher: 'Im Firmenfahrzeug', notfallkarte: false, a: {},
+  x: { 'psa.schuhe': true, 'psa.helm': true, 'psa.handschuhe': true, 'psa.uv': true, 'dc.stecker': true, 'dc.werkzeug': true, 'dc.zuletzt': true,
+    'ac.frei': true, 'ac.pruefen': true, 'wetter.wind': true, 'wetter.gewitter': true, 'allein.zweit': true }
+};
 // Controlling: Personal und Gewerke der Kostenschätzung
 const KT_PERSONAL = ['Projektleiter', 'Montage / IBN', 'Admin'];
 const KT_GEWERKE = ['Elektriker', 'ToiToi', 'Gerüst', 'Gärtner', 'Maler', 'Unabhängige Kontrolle', 'Blitzschutzabnahme', 'Transport', 'Kran', 'Bestellungen', 'Abdichtung / Brandschottung'];
@@ -1755,6 +1817,7 @@ function migrate(d) {
     if (typeof d.settings.rapportVorlagen[art][k] !== 'boolean') d.settings.rapportVorlagen[art][k] = std[k];
   }));
   if (!d.settings.abnahmeVorlage) d.settings.abnahmeVorlage = vorlageKopie(ABNAHME_VORLAGE);
+  if (!d.settings.sicherheit) d.settings.sicherheit = vorlageKopie(SK_VORLAGE);
   // uid() ist hier noch nicht definiert (migrate läuft schon beim Laden)
   if (!Array.isArray(d.settings.materialVorlagen)) d.settings.materialVorlagen = MATERIAL_VORLAGEN.map((v, i) => ({ id: 'mv' + i + Math.random().toString(36).slice(2, 7), ...v }));
   d.settings.checklisteService = d.settings.checklisteService.replace(/^IBN-Rapport erstellt/m, 'Service-Rapport erstellt');
@@ -2761,21 +2824,32 @@ const OF_ART_INFO = { pva: ['☀', 'Neue PV-Anlage, Erweiterung'], evo: ['🔋',
 const OF_STATUS = { offen: 'Offen', offeriert: 'Offeriert', auftrag: 'Auftrag erhalten', abgelehnt: 'Abgelehnt' };
 const OF_SUB = { offen: ['offen'], offeriert: ['offeriert'], erledigt: ['auftrag', 'abgelehnt'] };
 const OF_MARKEN = ['Sungrow', 'SMA', 'Huawei', 'Fronius', 'GoodWe', 'Sunwoda'];
-// Batterien mit ihren Kapazitätsstufen (Herstellerangaben, Stand 11/2026) und den WR-Marken, an denen sie laufen
+// Batterien (Herstellerangaben, Stand 11/2026) und die WR-Marken, an denen sie laufen
+// kwh = Kapazität eines Turms / Stapels, par = so viele gleiche Türme lassen sich parallel schalten (Total = kWh × Anzahl)
 const OF_BATTERIEN = [
-  { id: 'sg-sbr', b: 'Sungrow', m: 'SBR (Hochvolt)', kwh: [9.6, 12.8, 16, 19.2, 22.4, 25.6], wr: ['Sungrow'] },
-  { id: 'sg-sbh', b: 'Sungrow', m: 'SBH', kwh: [10, 15, 20, 25, 30, 35, 40], wr: ['Sungrow'] },
-  // PowerKeeper (Gewerbe, zu SH-CX): Pakete à 12,48 kWh, Systeme 49,9–249,6 kWh (Datenblatt ST050CF–ST250CF)
+  // SBR: 3–8 Module à 3,2 kWh je Stapel, max. 4 Stapel parallel (Y-Stecker / Combiner)
+  { id: 'sg-sbr', b: 'Sungrow', m: 'SBR (Hochvolt)', kwh: [9.6, 12.8, 16, 19.2, 22.4, 25.6], par: 4, wr: ['Sungrow'] },
+  // SBH: 4–8 Module à 5 kWh je Stapel (einphasige WR max. 6), max. 4 Stapel parallel (Combiner SJR050-04)
+  { id: 'sg-sbh', b: 'Sungrow', m: 'SBH', kwh: [20, 25, 30, 35, 40], par: 4, wr: ['Sungrow'] },
+  // PowerKeeper (Gewerbe, nur SH50CX / SH80CX): Systeme 49,9–249,6 kWh (Datenblatt ST050CF–ST250CF)
   // nur: Batterie gibt es nur zu diesen WR-Modellen (erscheint erst, wenn ein passendes Modell gewählt ist)
-  { id: 'sg-pk', b: 'Sungrow', m: 'PowerKeeper (Gewerbe)', kwh: [49.9, 62.4, 74.9, 99.8, 149.8, 199.7, 249.6], wr: ['Sungrow'], nur: /^SH(50|80)CX\b/ },
-  { id: 'hw-s0', b: 'Huawei', m: 'LUNA2000-S0', kwh: [5, 10, 15, 20, 25, 30], wr: ['Huawei'] },
-  { id: 'hw-s1', b: 'Huawei', m: 'LUNA2000-S1', kwh: [6.9, 13.8, 20.7], wr: ['Huawei'] },
-  { id: 'fr-reserva', b: 'Fronius', m: 'Reserva', kwh: [6.3, 9.5, 12.6, 15.8], wr: ['Fronius'] },
-  { id: 'byd-hvs', b: 'BYD', m: 'Battery-Box Premium HVS', kwh: [5.1, 7.7, 10.2, 12.8], wr: ['Fronius', 'SMA', 'GoodWe', 'Sungrow'] },
-  { id: 'byd-hvm', b: 'BYD', m: 'Battery-Box Premium HVM', kwh: [8.3, 11, 13.8, 16.6, 19.3, 22.1], wr: ['Fronius', 'SMA', 'GoodWe', 'Sungrow'] },
-  { id: 'sma-hs', b: 'SMA', m: 'Home Storage', kwh: [3.3, 6.6, 9.8, 13.1, 16.4], wr: ['SMA'] },
-  { id: 'gw-lynxf', b: 'GoodWe', m: 'Lynx Home F', kwh: [6.6, 9.8, 13.1, 16.4], wr: ['GoodWe'] },
-  { id: 'sw-sunesss', b: 'Sunwoda', m: 'SunESS Power Batteriemodule', kwh: [], wr: ['Sunwoda'] }
+  { id: 'sg-pk', b: 'Sungrow', m: 'PowerKeeper (Gewerbe)', kwh: [49.9, 62.4, 74.9, 99.8, 149.8, 199.7, 249.6], par: 1, wr: ['Sungrow'], nur: /^SH(50|80)CX\b/ },
+  // LUNA2000-S0: 1–3 Module à 5 kWh je Stapel, max. 2 Stapel je WR (30 kWh)
+  { id: 'hw-s0', b: 'Huawei', m: 'LUNA2000-S0', kwh: [5, 10, 15], par: 2, wr: ['Huawei'] },
+  // LUNA2000-S1: Gruppe bis 20,7 kWh, max. 4 Gruppen parallel (nur mit WR MB0, 82,8 kWh)
+  { id: 'hw-s1', b: 'Huawei', m: 'LUNA2000-S1', kwh: [6.9, 13.8, 20.7], par: 4, wr: ['Huawei'] },
+  // Reserva: 2–5 Module à 3,15 kWh je Turm, max. 4 Türme parallel (63 kWh)
+  { id: 'fr-reserva', b: 'Fronius', m: 'Reserva', kwh: [6.3, 9.5, 12.6, 15.8], par: 4, wr: ['Fronius'] },
+  // Reserva Pro (Datenblatt 2026): 3–8 Module à 3,98 kWh nutzbar je Turm, max. 4 Türme parallel (ca. 128 kWh)
+  { id: 'fr-reserva-pro', b: 'Fronius', m: 'Reserva Pro', kwh: [11.9, 15.9, 19.9, 23.9, 27.9, 31.9], par: 4, wr: ['Fronius'] },
+  // BYD: max. 3 gleiche Türme parallel (HVS 38,4 kWh, HVM 66,2 kWh); HVS und HVM nicht mischen; Fronius: 3 × HVM 22.1 nicht zulässig
+  { id: 'byd-hvs', b: 'BYD', m: 'Battery-Box Premium HVS', kwh: [5.1, 7.7, 10.2, 12.8], par: 3, wr: ['Fronius', 'SMA', 'GoodWe', 'Sungrow'] },
+  { id: 'byd-hvm', b: 'BYD', m: 'Battery-Box Premium HVM', kwh: [8.3, 11, 13.8, 16.6, 19.3, 22.1], par: 3, wr: ['Fronius', 'SMA', 'GoodWe', 'Sungrow'] },
+  // SMA Home Storage: 1–5 Module à 3,28 kWh, kein Parallelbetrieb mehrerer Türme dokumentiert (max. 16,4 kWh)
+  { id: 'sma-hs', b: 'SMA', m: 'Home Storage', kwh: [3.3, 6.6, 9.8, 13.1, 16.4], par: 1, wr: ['SMA'] },
+  // Lynx Home F G2: 2–9 Module à 3,2 kWh je Turm, max. 8 Türme parallel (230,4 kWh)
+  { id: 'gw-lynxf', b: 'GoodWe', m: 'Lynx Home F G2', kwh: [6.4, 9.6, 12.8, 16, 19.2, 22.4, 25.6, 28.8], par: 8, wr: ['GoodWe'] },
+  { id: 'sw-sunesss', b: 'Sunwoda', m: 'SunESS Power Batteriemodule', kwh: [], par: 1, wr: ['Sunwoda'] }
 ];
 const ofOpt = L => L.map(x => Array.isArray(x) ? x : [x, x]);
 const ofJn = (ja = [], nein = []) => [['ja', 'Ja', ja], ['nein', 'Nein', nein]];
@@ -2816,6 +2890,13 @@ const OF_BAT_MODELL = { k: 'bat_modell', t: 'wahl', l: 'Batterie', wenn: d => !o
     return OF_BATTERIEN.filter(b => (!m || b.wr.includes(m)) && (!b.nur || b.nur.test(wm))).map(b => [b.id, `${b.b} ${b.m}`]); } };
 const ofBatAkt = d => ofOpts(OF_BAT_MODELL, d).some(x => x[0] === d.bat_modell) ? OF_BATTERIEN.find(b => b.id === d.bat_modell) : null;
 const OF_BAT_KAP = { k: 'bat_kwh', t: 'kap', l: 'Kapazität', wenn: d => !!ofBatAkt(d) };
+// Parallelschaltung: Anzahl gleicher Türme, danach das Total
+const ofBatPar = d => { const b = ofBatAkt(d); return b && b.par > 1 ? b.par : 1; };
+const OF_BAT_ANZ = { k: 'bat_anz', t: 'wahl', l: 'Anzahl Türme (parallel)', wenn: d => ofBatPar(d) > 1,
+  o: d => Array.from({ length: ofBatPar(d) }, (_, i) => [String(i + 1), i ? `${i + 1} Türme` : '1 Turm']) };
+const OF_BAT_TOTAL = { k: 'bat_total', t: 'hinweis', l: 'Total', v: d => {
+  const n = Math.min(+d.bat_anz || 1, ofBatPar(d)), k = spNum(d.bat_kwh);
+  return ofBatAkt(d) && n > 1 && k ? `${n} × ${spZahl(k, k % 1 ? 1 : 0)} kWh = ${spZahl(n * k, (n * k) % 1 ? 1 : 0)} kWh` : ''; } };
 const OF_NS = { k: 'ns', t: 'wahl', l: 'Notstrom', o: ofJn([{ k: 'ns_art', t: 'wahl', l: 'Art', o: [
   ['full', 'FullBackup', [{ k: 'ns_full', t: 'wahl', l: 'Ausführung', o: ofOpt(['Fronius bis 32 A', 'Envitec bis 63 A']) }]],
   ['dose', 'Notstrom-Steckdose', [{ k: 'ns_dose', t: 'wahl', l: 'Steckdose', o: ofOpt(['Immer Strom', 'Nur Notstrom']) }]]] }]) };
@@ -2832,7 +2913,7 @@ const OF_ABSCHNITTE = {
     { k: 'mod_optik', t: 'wahl', l: 'Optik', o: [['ss', 'Schwarz / Schwarz'], ['ws', 'Weiss / Schwarz']] },
     { k: 'mod_anz', t: 'zahl', l: 'Anzahl Module (ca.)', e: 'Stk.' }] },
   wr: { i: '⚡', t: 'Wechselrichter', f: ofWr('wr') },
-  bat: { i: '🔋', t: 'Batteriespeicher', f: [{ k: 'bat', t: 'wahl', l: 'Batterie', o: ofJn([OF_BAT_TIPP, OF_BAT_MODELL, OF_BAT_KAP, OF_NS]) }] },
+  bat: { i: '🔋', t: 'Batteriespeicher', f: [{ k: 'bat', t: 'wahl', l: 'Batterie', o: ofJn([OF_BAT_TIPP, OF_BAT_MODELL, OF_BAT_KAP, OF_BAT_ANZ, OF_BAT_TOTAL, OF_NS]) }] },
   // Eigenverbrauchsoptimierung: Hybrid-WR vorhanden → DC daran; sonst AC-gekoppelt oder DC mit neuem Hybrid-WR
   batEvo: { i: '🔋', t: 'Batteriespeicher', f: [{ k: 'bat', t: 'wahl', l: 'Batterie', o: ofJn([
     { k: 'bat_an', t: 'wahl', l: 'Batterie an', wenn: d => ofHybride(d).length > 1, o: d => ofHybride(d).map(w => [String(w.i), `WR ${w.i + 1}: ${w.marke} ${w.name}`.trim()]) },
@@ -2840,7 +2921,7 @@ const OF_ABSCHNITTE = {
     { k: 'bat_kop', t: 'wahl', l: 'Kopplung', wenn: d => !ofHybride(d).length, o: [
       ['ac', 'AC-gekoppelt', [{ k: 'bat_ac_marke', t: 'wahl', l: 'Marke Batteriesystem', o: ofOpt(OF_MARKEN) }]],
       ['dc', 'DC mit neuem Hybrid-WR', [{ k: 'dc_wr_marke', t: 'wahl', l: 'Marke neuer WR', o: ofOpt(OF_MARKEN) }, { k: 'dc_wr_modell', t: 'wr', l: 'Modell (Hybrid)', marke: 'dc_wr_marke', hybrid: true }]]] },
-    OF_BAT_TIPP, OF_BAT_MODELL, OF_BAT_KAP, OF_NS]) }] },
+    OF_BAT_TIPP, OF_BAT_MODELL, OF_BAT_KAP, OF_BAT_ANZ, OF_BAT_TOTAL, OF_NS]) }] },
   lsg: { i: '🚙', t: 'Ladestation', f: [{ k: 'lsg', t: 'wahl', l: 'Ladestation', o: ofJn([OF_LSG]) }] },
   inet: { i: '🌐', t: 'Internet', f: [{ k: 'inet', t: 'wahl', l: 'Verbindung', o: ofOpt(['Modem vom Kunden', 'GSM-Router', 'Offline']) }] },
   dach: { i: '🏠', t: 'Dach', f: [
@@ -3041,7 +3122,7 @@ function viewOfferte(o) {
       <button class="sec sm" onclick="nav('offerten')">← Alle Offerten</button>
       <div class="row"><select style="width:auto" onchange="ofSet('${id}','o.status',this.value)" title="Status">${Object.entries(OF_STATUS).map(([k, l]) => `<option value="${k}" ${(o.status || 'offen') === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
         <button class="sm" onclick="ofPdf('${id}')">📄 PDF</button>
-        <button class="sec sm" onclick="ofZuProjekt('${id}')" title="Aus dieser Aufnahme ein Projekt anlegen">→ Projekt</button>
+        <button class="sec sm" onclick="ofZuProjekt('${id}')" title="${o.projektId && findP(o.projektId) ? 'Zum Projekt dieser Aufnahme' : 'Aus dieser Aufnahme ein Projekt anlegen'}">${o.projektId && findP(o.projektId) ? '→ Zum Projekt' : '→ Projekt'}</button>
         <button class="danger sm" onclick="ofLoeschen('${id}')">Löschen</button></div></div>
     <div class="page-head" style="margin-bottom:12px"><div><div class="muted">${OF_ART_INFO[o.art][0]} ${esc(OF_ARTEN[o.art])}</div><h1>${esc(o.name || 'Ohne Namen')}</h1></div></div>
     <div class="card of-kunde">
@@ -3085,10 +3166,42 @@ function ofLoeschen(id) {
 // Auftrag erhalten: Projekt-Dialog mit Kunde und Adresse vorausfüllen
 function ofZuProjekt(id) {
   const o = findO(id);
+  if (o.projektId && findP(o.projektId)) return openProjekt(o.projektId);
   neuesProjektDialog();
+  ui.npOf = id;
   npArt(o.art === 'evo' ? 'batterie' : 'pv');
   $('np-name').value = o.name || ''; $('np-ort').value = o.adresse || '';
-  if ((o.status || 'offen') !== 'auftrag') { o.status = 'auftrag'; save(); }
+  // Kunde aus der Offerte: wird beim Erstellen als Kontakt angelegt; leere Angaben rot, dürfen aber leer bleiben
+  const k = ofKundeFinden(o), wert = f => String((k && k[f]) || o[f] || '');
+  const feld = (f, l, typ, ph) => `<div><label>${l}</label><input id="np-k-${f}" type="${typ}" value="${esc(wert(f))}" placeholder="${ph}" class="${wert(f).trim() ? '' : 'fehlt'}"
+    oninput="this.classList.toggle('fehlt',!this.value.trim());npKundeHinweis()"></div>`;
+  $('np-ok').parentElement.insertAdjacentHTML('beforebegin', `<div class="np-kunde">
+    <div class="ck-head"><b>Kunde ${k ? '<span class="muted" style="font-weight:400">· bestehender Kontakt, leere Felder werden ergänzt</span>' : '<span class="muted" style="font-weight:400">· wird als Kunde angelegt</span>'}</b></div>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div><label>Name</label><input id="np-k-name" value="${esc((k && kontaktName(k)) || o.name || '')}" ${k ? 'disabled' : ''}></div>
+      ${feld('adresse', 'Adresse', 'text', 'Strasse, PLZ Ort')}${feld('telefon', 'Telefon', 'tel', '+41 …')}${feld('email', 'E-Mail', 'email', 'name@beispiel.ch')}
+    </div><div id="np-k-hinweis" class="kunde-fehlt"></div></div>`);
+  npKundeHinweis();
+}
+const KUNDE_PFLICHT = [['adresse', 'Adresse'], ['telefon', 'Telefon'], ['email', 'E-Mail']];
+const kundeFehlt = k => k ? KUNDE_PFLICHT.filter(([f]) => !String(k[f] || '').trim()).map(x => x[1]) : [];
+function npKundeHinweis() {
+  const f = KUNDE_PFLICHT.filter(([k]) => !val('np-k-' + k)).map(x => x[1]), h = $('np-k-hinweis');
+  if (h) h.innerHTML = f.length ? `⚠ Fehlt noch: ${f.join(', ')} – das Projekt kannst du trotzdem anlegen, der Kunde bleibt rot markiert.` : '';
+}
+// bestehenden Kunden zur Offerte suchen (verknüpft oder gleicher Name)
+function ofKundeFinden(o) {
+  const K = (S().kontakte || []).filter(c => c.art === 'kunde'), n = String(o.name || '').trim().toLowerCase();
+  return K.find(c => c.id === o.kundeId) || (n ? K.find(c => kontaktName(c).trim().toLowerCase() === n) : null) || null;
+}
+// Kunde anlegen oder leere Felder ergänzen (nichts überschreiben)
+function ofKundeUebernehmen(o, daten) {
+  let k = ofKundeFinden(o);
+  if (!k) { k = { id: uid(), art: 'kunde', name: daten.name || o.name || '', firma: '', gewerk: '', telefon: '', email: '', adresse: '', notiz: '' }; S().kontakte.push(k); }
+  KUNDE_PFLICHT.forEach(([f]) => { if (!String(k[f] || '').trim() && daten[f]) k[f] = daten[f]; });
+  ['adresse', 'telefon', 'email'].forEach(f => { if (!o[f] && daten[f]) o[f] = daten[f]; });
+  o.kundeId = k.id;
+  return k;
 }
 // A4: Kopf, Kundendaten, danach alle Themen in zwei Spalten (nur gewählte Antworten; leere Themen grau «nicht erfasst»)
 function ofPdf(id) {
@@ -3165,7 +3278,7 @@ function neuesProjektDialog() {
       <button class="sec" onclick="$('dlg').close()">Abbrechen</button>
       <button id="np-ok" onclick="neuesProjekt()">Projekt erstellen</button>
     </div>`;
-  ui.npArt = 'pv';
+  ui.npArt = 'pv'; ui.npOf = null;
   d.showModal(); $('np-nr').focus();
   d.onkeydown = e => { if (e.key === 'Enter') neuesProjekt(); };
 }
@@ -3185,7 +3298,17 @@ function neuesProjekt() {
     gewerke: S().standardGewerke.map(({ sid, ...g }) => ({ ...g, id: uid(), std: sid, fix: true, eigen: g.art === 'intern' })), termine: [],
     checkliste: vorlageFuer(art), chk: {}, personen: [], kundeId: ''
   };
+  // aus einer Offerte: Kunde anlegen / ergänzen und verknüpfen, Offerte auf «Auftrag erhalten»
+  const o = ui.npOf && findO(ui.npOf);
+  let kNeu = null;
+  if (o) {
+    const vorher = ofKundeFinden(o);
+    const k = ofKundeUebernehmen(o, { name: val('np-k-name'), adresse: val('np-k-adresse'), telefon: val('np-k-telefon'), email: val('np-k-email') });
+    p.kundeId = k.id; o.projektId = p.id; o.status = 'auftrag'; o.geaendert = todayIso(); kNeu = vorher ? null : k;
+    ui.npOf = null;
+  }
   state.projects.push(p); save(); $('dlg').close(); openProjekt(p.id);
+  if (o) toast(kNeu ? `Projekt erstellt, Kunde «${kontaktName(kNeu)}» angelegt.` : 'Projekt erstellt und mit dem Kunden verknüpft.');
 }
 
 // ---------- Projektansicht ----------
@@ -4918,7 +5041,8 @@ const DOK_ICONS = {
   material: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
   bau: '<path d="M2 18h20M4 18v-3a8 8 0 0 1 16 0v3"/><path d="M10 7.5V5h4v2.5"/>',
   maengel: '<path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
-  termine: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'
+  termine: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  sicher: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6z"/><path d="M8.8 12.2l2.2 2.2 4.2-4.6"/>'
 };
 // Checklisten-Punkt, an dem ein Dokument hängt ([dok: …])
 function dokPunkt(p, dok) {
@@ -4944,6 +5068,9 @@ function dokListe(p) {
       stand: (s => !s.total ? '' : s.offen ? `<span class="tag-warn">${s.offen} noch nicht bestellt</span> <span class="muted klein">${s.total - s.offen} von ${s.total} bestellt/reserviert</span>`
         : s.geliefert === s.total ? `<span class="tag-ok">✓ alle ${s.total} geliefert</span>` : `<span class="tag-sub">alles bestellt</span> <span class="muted klein">${s.geliefert} von ${s.total} geliefert</span>`)(matStand(p)) },
     { icon: 'rapport', titel: rapportName(p), info: 'Arbeitsauftrag für den Monteur', dok: 'ibn', da: !!p.ibn, auf: `ibnDialog('${id}')`, pdf: `ibnPdf('${id}')` },
+    { icon: 'sicher', titel: 'Sicherheitskonzept', info: 'BauAV Art. 4 · Notfall, Gefährdungen, Instruktion, Unterschriften', dok: 'sicherheit', da: !!p.sicherheit, auf: `skDialog('${id}')`, pdf: `skPdf('${id}')`,
+      stand: !p.sicherheit ? '' : (st => st.unterschrieben && !st.offen && !st.nein ?'<span class="tag-ok">✓ ausgefüllt und unterschrieben</span>'
+        : `<span class="tag-sub">angefangen</span> <span class="muted klein">${[st.offen && `${st.offen} Fragen offen`, st.nein && `${st.nein}× Nein ohne Massnahme`, !st.unterschrieben && 'Unterschrift fehlt'].filter(Boolean).join(' · ')}</span>`)(skStand(p)) },
     ...(service ? [] : [
       { icon: 'zwischen', titel: 'Zwischenabnahmeprotokoll', info: 'Teile der Anlage abnehmen und Mängel festhalten', dok: 'zwischen', da: !!p.zwischen, auf: `zwischenDialog('${id}')`, pdf: `zwischenPdf('${id}')`,
         stand: (z => z.total ? (z.offen ? `<span class="tag-warn">${z.offen} Mängel offen</span>` : `<span class="tag-ok">✓ alle ${z.total} Mängel erledigt</span>`) : '')(zwischenOffen(p)) },
@@ -5093,6 +5220,7 @@ function viewUebersicht(p) {
       <div class="ueb-kunde">${kunde
         ? personKarte({ name: kontaktName(kunde), rolle: 'Kunde', firma: kunde.name ? kunde.firma : '', tel: kunde.telefon, mail: kunde.email, farbe: avatarFarbe(kunde),
             aktion: `<button class="ck-btn" title="Kunde bearbeiten" onclick="kontaktDialog('${kunde.id}')">✎</button><button class="ck-btn" title="anderen Kunden wählen" onclick="findP('${p.id}').kundeId='';save();render()">✕</button>` })
+          + kundeFehltHtml(kunde)
         : `<label>Kunde</label>${kontaktPicker('kundeSetzen', { filter: 'kunde', platzhalter: 'Kunde aus Kontakten wählen oder neu anlegen …' })}`}</div>
       ${LEUTE_GRUPPEN.map(([k, titel]) => { const L = leuteZusammen(leute.filter(x => x.gruppe === k)); return L.length ? `<div class="leute-gr">
         <div class="leute-titel">${titel} <span>${L.length}</span></div>
@@ -6251,13 +6379,497 @@ async function blitzPdf(pid) {
   }
   if (knopf) { knopf.disabled = false; knopf.textContent = 'Als PDF speichern'; }
 }
+// ---------- Sicherheitskonzept Baustelle (BauAV Art. 4) – eigenes CKW-Dokument für PV und Batteriespeicher ----------
+// Gespeichert in p.sicherheit (v 2). Baustelle, Adresse, Zeitraum und Projektleiter kommen immer frisch aus dem Projekt; Vorgaben aus S().sicherheit.
+const SK_REGELN = ['9 lebenswichtige Regeln für das Arbeiten auf Dächern und an Fassaden', '8 lebenswichtige Regeln für das Arbeiten mit Anseilschutz',
+  '5 + 5 lebenswichtige Regeln im Umgang mit Elektrizität', '10 lebenswichtige Regeln für Gebäudetechniker',
+  '8 lebenswichtige Regeln für die Instandhaltung', 'Lebenswichtige Regeln Asbest'];
+const SK_STOPP = ['Wir sagen STOPP, wenn eine lebenswichtige Regel missachtet wird.', 'Wir arbeiten erst weiter, wenn die Gefahr behoben ist.'];
+const SK_TAETIGKEIT = { pv: 'Montage Photovoltaikanlage', batterie: 'Montage Batteriespeicher', service: 'Service / Unterhalt' };
+const SK_GRUNDSATZ = 'Dieses Sicherheitskonzept regelt die Arbeitssicherheit auf dieser Baustelle. Die Mitarbeitenden sind ausgebildet und vor Arbeitsbeginn instruiert. Sie halten die Regeln ein, melden Mängel sofort und sagen STOPP bei Gefahr.';
+// Gefährdungsermittlung: [key, Frage (Ja = sicher), Massnahmen zum Ankreuzen, nur für diese Projektarten (leer = alle), «NA» möglich]
+const SK_FRAGEN = [
+  ['dachrand', 'Ist die Absturzsicherung am Dachrand gewährleistet?', [['geruest', 'Fassadengerüst'], ['seiten', 'Seitenschutz'], ['netz', 'Auffangnetz'], ['psaga', 'Anseilschutz (PSAgA)']], ['pv'], true],
+  ['zugang', 'Ist ein sicherer Zugang zum Arbeitsplatz vorhanden?', [['turm', 'Treppenturm'], ['ausstieg', 'Innentreppe / Dachausstieg'], ['hab', 'Hubarbeitsbühne'], ['leiter', 'Anstellleiter, gesichert']], [], false],
+  ['durchbruch', 'Ist die Dachfläche durchbruchsicher, sind Öffnungen gesichert?', [['kuppeln', 'Lichtkuppeln abgedeckt'], ['laufsteg', 'Laufstege'], ['netz', 'Netze']], ['pv'], true],
+  ['material', 'Ist der Materialtransport geregelt?', [['kran', 'Kran'], ['aufzug', 'Schrägaufzug'], ['hab', 'Hubarbeitsbühne'], ['hilfe', 'Hilfsmittel für schwere Lasten']], [], false],
+  ['dc', 'Wird die DC-Spannung der Module berücksichtigt? (Module stehen bei Licht immer unter Spannung)', [['stecker', 'Stecker nur lastfrei trennen'], ['abdecken', 'Module bei Bedarf abdecken'], ['werkzeug', 'Isoliertes Werkzeug'], ['zuletzt', 'Strings erst am Schluss verbinden']], ['pv'], false],
+  ['ac', 'Wird an der AC-Installation spannungsfrei gearbeitet (5 + 5 Regeln)?', [['frei', 'Freigeschaltet und gesichert'], ['pruefen', 'Spannungsfreiheit geprüft'], ['psa', 'PSA gegen Lichtbogen'], ['elektriker', 'Nur durch Elektriker']], [], false],
+  ['batterie', 'Werden die Batteriemodule sicher transportiert und montiert?', [['hersteller', 'Herstellervorgaben beachtet'], ['tragen', 'Tragehilfe / zu zweit'], ['brand', 'Feuerlöscher beim Speicher']], ['batterie'], false],
+  ['psa', 'Ist die nötige PSA vorhanden und wird sie getragen?', [['schuhe', 'Schutzschuhe'], ['helm', 'Helm'], ['handschuhe', 'Handschuhe'], ['brille', 'Schutzbrille'], ['gehoer', 'Gehörschutz'], ['uv', 'Sonnen- / UV-Schutz']], [], false],
+  ['wetter', 'Ist das Wetter beurteilt? (bei Gefahr wird die Arbeit unterbrochen)', [['wind', 'Wind – Module wirken wie Segel'], ['gewitter', 'Gewitter'], ['glaette', 'Nässe, Schnee, Glätte'], ['hitze', 'Hitze']], ['pv'], false],
+  ['asbest', 'Ist Asbest ausgeschlossen? (z.B. Eternit-Dach vor 1990)', [['bericht', 'Schadstoffbericht vorhanden'], ['suva', 'Massnahmen nach Suva 88254']], [], true],
+  ['absperrung', 'Ist der Bereich unter dem Arbeitsplatz abgesperrt (öffentliche Sicherheit)?', [['band', 'Absperrung'], ['signal', 'Signalisation']], [], true],
+  ['allein', 'Ist Alleinarbeit ausgeschlossen oder überwacht?', [['zweit', 'Immer mindestens zu zweit'], ['geraet', 'Personenüberwachung']], [], false]
+];
+const SK_ANTW = { ja: 'Ja', nein: 'Nein', na: 'NA' };
+const SK_AUSB = [['psaga', 'PSAgA'], ['hab', 'HAB'], ['kran', 'Anschlagen']];
+const skFragen = p => SK_FRAGEN.filter(f => !p || !f[3].length || f[3].includes(projektArt(p)));
+// Vorgaben aus den Einstellungen; ältere Stände (v1) übernehmen nur Spitäler, Sammelplatz und Notfallkarte
+function skV() {
+  const s = S();
+  if (!s.sicherheit) s.sicherheit = vorlageKopie(SK_VORLAGE);
+  let v = s.sicherheit;
+  if (v.v !== 2) v = s.sicherheit = { ...vorlageKopie(SK_VORLAGE), orte: Array.isArray(v.orte) ? v.orte : [], sammelplatz: v.sammelplatz || '', notfallkarte: !!v.notfallkarte };
+  if (!Array.isArray(v.orte)) v.orte = [];
+  if (!v.x) v.x = {};
+  if (!v.a) v.a = {};
+  return v;
+}
+function skDefaults(p) {
+  const v = skV();
+  return { v: 2, datum: todayIso(), taetigkeit: SK_TAETIGKEIT[projektArt(p)] || '', zeitraum: '', uebergeordnet: false, mobil: true, notfallkarte: !!v.notfallkarte,
+    sammelplatz: v.sammelplatz || '', ersteHilfe: v.ersteHilfe || '', feuerloescher: v.feuerloescher || '', arzt: '', spitalId: '', notfall: '',
+    a: { ...v.a }, x: { ...v.x }, n: {}, anhang: [], ma: [], monteur: '', uMonteur: '', moDatum: '', uPl: '', plDatum: '' };
+}
+function skBereit(p) {
+  const alt = p.sicherheit;
+  if (!alt || alt.v !== 2) {
+    p.sicherheit = skDefaults(p);
+    // aus der ersten Version übernehmen, was noch passt
+    if (alt) ['sammelplatz', 'notfall', 'spitalId', 'monteur', 'datum', 'taetigkeit'].forEach(k => { if (alt[k]) p.sicherheit[k] = alt[k]; });
+    save();
+  }
+  const s = p.sicherheit;
+  ['a', 'x', 'n'].forEach(k => { if (!s[k]) s[k] = {}; });
+  ['anhang', 'ma'].forEach(k => { if (!Array.isArray(s[k])) s[k] = []; });
+  return s;
+}
+// Werte, die immer aus dem Projekt kommen
+function skAuto(p) {
+  const pl = plVon(p), sp = span(p);
+  return { baustelle: p.name || '', adresse: p.ort || '', pl: pl.name, tel: pl.telefon || '', firma: S().firma || 'CKW',
+    zeitraum: sp ? `${fmt(sp.start)} – ${fmt(sp.ende)}` : '' };
+}
+const skZeitraum = (p, s) => s.zeitraum || skAuto(p).zeitraum;
+// offene Fragen und Unterschriften (für Kachel und Formular)
+function skStand(p) {
+  const s = p.sicherheit;
+  if (!s || s.v !== 2) return { offen: skFragen(p).length, nein: 0, unterschrieben: false };
+  const F = skFragen(p);
+  // «nein»: mit Nein beantwortet, aber noch ohne Massnahme
+  return { offen: F.filter(f => !s.a[f[0]]).length, nein: F.filter(f => s.a[f[0]] === 'nein' && !String(s.n[f[0]] || '').trim()).length, unterschrieben: !!(s.uPl && s.uMonteur) };
+}
+// Spital zum Ort der Baustelle: Einträge «Luzern, Kriens, 6000-6048» – Ortsname im Text, PLZ oder PLZ-Bereich
+function skSpitalFuer(adr) {
+  const a = String(adr || '').toLowerCase(), plz = +((a.match(/\b(\d{4})\b/) || [])[1] || 0);
+  return skV().orte.find(o => String(o.orte || '').split(/[,;]/).map(x => x.trim().toLowerCase()).filter(Boolean).some(t => {
+    const r = t.match(/^(\d{4})\s*[-–]\s*(\d{4})$/);
+    if (r) return plz >= +r[1] && plz <= +r[2];
+    return /^\d{4}$/.test(t) ? plz === +t : a.includes(t);
+  }));
+}
+function skSpital(p) {
+  const s = p.sicherheit;
+  if (s.spitalId === '-') return null;
+  return (s.spitalId && skV().orte.find(o => o.id === s.spitalId)) || skSpitalFuer(p.ort);
+}
+const skSpitalText = o => o ? [o.spital, o.adresse, o.tel && 'Tel. ' + o.tel].filter(Boolean).join(', ') : '';
+let skPid = null;
+const skZiel = ctx => ctx === 'r' ? findP(skPid).sicherheit : skV();
+
+// eine Frage der Gefährdungsermittlung: Ja / Nein / NA, Massnahmen zum Ankreuzen, Feststellung
+function skFrageHtml(ctx, f) {
+  const [k, frage, mass, , na] = f, z = skZiel(ctx), w = z.a[k] || '';
+  return `<div class="sk-frage${w === 'nein' ? ' nein' : ''}" id="sk-${ctx}-f-${k}">
+    <div class="sk-f-kopf"><span>${esc(frage)}</span>
+      <div class="sk-jn">${Object.entries(SK_ANTW).filter(([a]) => a !== 'na' || na).map(([a, l]) =>
+        `<button class="${a}${w === a ? ' on' : ''}" onclick="skAntw('${ctx}','${k}','${a}')">${l}</button>`).join('')}</div></div>
+    <div class="sk-subs">${mass.map(([m, l]) => `<label><input type="checkbox" ${z.x[k + '.' + m] ? 'checked' : ''} onchange="skX('${ctx}','${k}.${m}',this.checked)"> <span>${esc(l)}</span></label>`).join('')}</div>
+    ${ctx === 'r' ? `<input class="sk-notiz" value="${esc(z.n[k])}" placeholder="${w === 'nein' ? 'Was wird unternommen? (wichtig bei «Nein»)' : 'Feststellung / weitere Massnahme (optional)'}" data-n="${k}" oninput="skNotiz(this)">` : ''}
+  </div>`;
+}
+function skAntw(ctx, k, a) {
+  const z = skZiel(ctx);
+  z.a[k] = z.a[k] === a ? '' : a;
+  save();
+  const el = $(`sk-${ctx}-f-${k}`);
+  if (el) el.outerHTML = skFrageHtml(ctx, SK_FRAGEN.find(f => f[0] === k));
+  if (ctx === 'r') skOffenHinweis();
+}
+function skX(ctx, key, an) { skZiel(ctx).x[key] = an; save(); }
+function skNotiz(el) { findP(skPid).sicherheit.n[el.dataset.n] = el.value; save(); skOffenHinweis(); }
+function skSet(el) {
+  const s = findP(skPid).sicherheit, k = el.dataset.s;
+  s[k] = el.type === 'checkbox' ? el.checked : el.value;
+  save();
+  if (k === 'spitalId') $('sk-spital').innerHTML = skSpitalHinweis(findP(skPid));
+}
+function skOffenHinweis() {
+  const el = $('sk-offen'); if (!el) return;
+  const st = skStand(findP(skPid));
+  el.innerHTML = st.offen ? `<span class="tag-warn">${st.offen} offen</span>` : st.nein ? `<span class="tag-warn">${st.nein}× Nein ohne Massnahme</span>` : '<span class="tag-ok">✓ alles beantwortet</span>';
+}
+function skSpitalHinweis(p) {
+  const o = skSpital(p), s = p.sicherheit;
+  if (o) return `<b>${esc(o.spital)}</b>${o.adresse || o.tel ? `<div class="muted klein">${esc([o.adresse, o.tel && 'Tel. ' + o.tel].filter(Boolean).join(' · '))}</div>` : ''}`;
+  if (s.spitalId === '-') return '<span class="muted klein">Kein Spital im PDF.</span>';
+  return `<span class="kunde-fehlt" style="display:block;margin:0">⚠ Für «${esc(p.ort || 'diesen Ort')}» ist kein Spital hinterlegt.
+    <a href="#" onclick="event.preventDefault();$('dlg').close();ui.setTab='rapport';ui.aaArt='sicherheit';nav('einstellungen/vorlagen')">In den Einstellungen ergänzen</a></span>`;
+}
+// objektspezifische Massnahmen
+function skAnhangHtml() {
+  const L = findP(skPid).sicherheit.anhang;
+  return `${L.length ? `<table class="aa-stunden ab-tab ab-edit"><tr><th>Massnahme</th><th style="width:34%">Wer / Kontrolle</th><th style="width:34px"></th></tr>
+    ${L.map((r, i) => `<tr>${['m', 'k'].map(k => `<td><input value="${esc(r[k])}" oninput="skAnh(${i},'${k}',this.value)"></td>`).join('')}
+      <td><button class="ck-btn" title="Zeile entfernen" onclick="skAnh(${i},'del')">✕</button></td></tr>`).join('')}</table>` : ''}
+    <button class="sec sm" style="margin-top:8px" onclick="skAnh(0,'add')">+ Massnahme</button>`;
+}
+function skAnh(i, op, v) {
+  const L = findP(skPid).sicherheit.anhang;
+  if (op === 'add') L.push({ m: '', k: '' });
+  else if (op === 'del') L.splice(i, 1);
+  else { L[i][op] = v; save(); return; }
+  save();
+  $('sk-anhang').innerHTML = skAnhangHtml();
+  if (op === 'add') { const t = $('sk-anhang').querySelectorAll('tr:last-child input'); t[0]?.focus(); }
+}
+// Mitarbeitende mit Ausbildung und Unterschrift (Instruktionsnachweis)
+function skMaHtml() {
+  const L = findP(skPid).sicherheit.ma;
+  return `${L.map((m, i) => `<div class="sk-ma">
+      <div class="sk-ma-daten">
+        <div><label>Name</label><input list="sk-namen" value="${esc(m.name)}" placeholder="Vorname Name" oninput="skMa(${i},'name',this.value)"></div>
+        <div><label>Funktion</label><input list="sk-funktionen" value="${esc(m.funktion)}" placeholder="z.B. Monteur" oninput="skMa(${i},'funktion',this.value)"></div>
+        <div class="sk-ma-ausb">${SK_AUSB.map(([k, l]) => `<label><input type="checkbox" ${m[k] ? 'checked' : ''} onchange="skMa(${i},'${k}',this.checked)"> ${l}</label>`).join('')}</div>
+        <button class="ck-btn" title="Person entfernen" onclick="skMa(${i},'del')">✕</button>
+      </div>
+      ${skSigHtml(`ma.${i}.u`, `ma.${i}.datum`, m.datum, 'Unterschrift', true)}
+    </div>`).join('')}
+    <button class="sec sm" style="margin-top:8px" onclick="skMa(0,'add')">+ Mitarbeitende/r</button>
+    ${L.length ? '' : '<div class="muted klein" style="margin-top:6px">Ohne Einträge bleibt die Tabelle im PDF leer zum Unterschreiben von Hand.</div>'}`;
+}
+function skMa(i, op, v) {
+  const L = findP(skPid).sicherheit.ma;
+  if (op === 'add') L.push({ name: '', funktion: 'Monteur', psaga: false, hab: false, kran: false, u: '', datum: '' });
+  else if (op === 'del') L.splice(i, 1);
+  else { L[i][op] = v; save(); return; }
+  save();
+  $('sk-ma').innerHTML = skMaHtml();
+  skPads();
+  if (op === 'add') { const t = $('sk-ma').querySelectorAll('.sk-ma:last-of-type input'); t[0]?.focus(); }
+}
+// Unterschriftenfeld: pfad zeigt in p.sicherheit (z.B. «uPl», «ma.0.u»), datumPfad wird beim Unterschreiben mit heute gefüllt
+function skSigHtml(pfad, datumPfad, datum, titel, klein) {
+  const u = skPfad(findP(skPid).sicherheit, pfad);
+  return `<div class="sk-sig${klein ? ' klein' : ''}">
+    <div class="sk-sig-kopf"><span>${titel}</span><label class="sk-sig-dat">Datum <input type="date" data-dp="${datumPfad}" value="${esc(datum)}" oninput="skPfadSetzen('${datumPfad}',this.value)"></label></div>
+    <canvas class="sk-pad" data-u="${pfad}" data-d="${datumPfad}"></canvas>
+    <div class="sk-sig-fuss"><span class="muted klein sk-pad-info">${u ? '✓ unterschrieben' : 'Mit dem Finger oder der Maus unterschreiben'}</span>
+      <button class="sec sm" onclick="skPadLeeren(this)">Löschen</button></div>
+  </div>`;
+}
+const skPfad = (o, pfad) => pfad.split('.').reduce((x, k) => x == null ? x : x[k], o);
+function skPfadSetzen(pfad, v) {
+  const t = pfad.split('.'), last = t.pop(), ziel = t.reduce((x, k) => x[k], findP(skPid).sicherheit);
+  ziel[last] = v; save();
+}
+const SK_PAD_W = 450, SK_PAD_H = 150;
+function skPads() { document.querySelectorAll('#dlg canvas.sk-pad').forEach(c => { if (!c._an) skPadInit(c); }); }
+function skPadInit(c) {
+  c._an = true;
+  const r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr); ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = ctx.fillStyle = '#0d2a6b';
+  const alt = skPfad(findP(skPid).sicherheit, c.dataset.u);
+  if (alt) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0, r.width, r.height); img.src = alt; }
+  let zieht = false, last = null;
+  const pos = e => { const b = c.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+  c.onpointerdown = e => { zieht = true; last = pos(e); try { c.setPointerCapture(e.pointerId); } catch (x) { } ctx.beginPath(); ctx.arc(last[0], last[1], 1.1, 0, 7); ctx.fill(); e.preventDefault(); };
+  c.onpointermove = e => { if (!zieht) return; const q = pos(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(q[0], q[1]); ctx.stroke(); last = q; };
+  c.onpointerup = c.onpointercancel = () => {
+    if (!zieht) return; zieht = false;
+    const o = document.createElement('canvas'); o.width = SK_PAD_W; o.height = SK_PAD_H;
+    o.getContext('2d').drawImage(c, 0, 0, SK_PAD_W, SK_PAD_H);
+    skPfadSetzen(c.dataset.u, o.toDataURL('image/png'));
+    const d = c.dataset.d;
+    if (d && !skPfad(findP(skPid).sicherheit, d)) { skPfadSetzen(d, todayIso()); const inp = document.querySelector(`#dlg [data-dp="${d}"]`); if (inp) inp.value = todayIso(); }
+    const info = c.parentElement.querySelector('.sk-pad-info'); if (info) info.textContent = '✓ unterschrieben';
+  };
+}
+function skPadLeeren(btn) {
+  const c = btn.closest('.sk-sig').querySelector('canvas');
+  skPfadSetzen(c.dataset.u, '');
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  c.parentElement.querySelector('.sk-pad-info').textContent = 'Mit dem Finger oder der Maus unterschreiben';
+}
+
+function skDialog(pid) {
+  const p = findP(pid), d = $('dlg');
+  skPid = pid;
+  const s = skBereit(p), a = skAuto(p), v = skV();
+  const f = k => `data-s="${k}" value="${esc(s[k])}" oninput="skSet(this)"`;
+  const chk = (k, l) => `<label class="bz-box"><input type="checkbox" data-s="${k}" ${s[k] ? 'checked' : ''} onchange="skSet(this)"> <span>${l}</span></label>`;
+  const auto = (l, w, fehlt = 'fehlt im Projekt') => `<div><small>${l}</small>${w ? `<b>${esc(w)}</b>` : `<span class="kunde-fehlt" style="display:block;margin:0">${fehlt}</span>`}</div>`;
+  const namen = [...new Set([...leuteImProjekt(p).filter(x => x.gruppe === 'ckw' || x.gruppe === 'montage').map(x => x.name),
+    ...S().kontakte.filter(c => c.art === 'intern' || c.art === 'sub').map(kontaktName)].filter(Boolean))];
+  const nr = (n, t, extra = '') => `<h3 class="sk-h"><span>${n}</span>${t}${extra}</h3>`;
+  d.style.width = 'min(900px, calc(100vw - 24px))';
+  d.innerHTML = `<div class="aa sk">
+    <div class="aa-logo">${S().logo ? `<img src="${S().logo}" alt="Logo">` : '<div class="logo" style="font-size:40px">CKW<i style="width:12px;height:12px"></i></div>'}</div>
+    <div class="aa-linie"></div>
+    <div class="aa-bar"><span>Projekt-Nr: <b>${esc(p.nummer)}</b></span><span class="aa-bar-r"><label>Datum: <input type="date" ${f('datum')}></label></span></div>
+    <div class="sk-titel"><b>Sicherheitskonzept Baustelle</b><span>nach Bauarbeitenverordnung (BauAV) Art. 4 · Photovoltaik und Batteriespeicher</span></div>
+
+    ${nr(1, 'Baustelle')}
+    <div class="sk-auto">${auto('Baustelle', a.baustelle)}${auto('Adresse', a.adresse)}${auto('Projektleiter', a.pl + (a.tel ? ' · ' + a.tel : ''))}${auto('Unternehmer', a.firma)}</div>
+    <div class="grid" style="margin-top:10px"><div><label>Tätigkeit</label><input ${f('taetigkeit')} placeholder="z.B. Montage Photovoltaikanlage"></div>
+      <div><label>Zeitraum</label><input ${f('zeitraum')} placeholder="${esc(a.zeitraum || 'z.B. 12.01. – 16.01.2027')}">
+        <div class="muted klein">${a.zeitraum ? 'Leer = aus dem Terminplan: ' + esc(a.zeitraum) : 'Kein Terminplan – bitte eintragen.'}</div></div></div>
+    ${chk('uebergeordnet', 'Für die Baustelle gibt es ein übergeordnetes Sicherheitskonzept (z.B. vom Generalunternehmer).')}
+
+    ${nr(2, 'Notfall')}
+    <div class="sk-notruf"><span><b>144</b> Sanität</span><span><b>1414</b> Rega</span><span><b>118</b> Feuerwehr</span><span><b>117</b> Polizei</span></div>
+    <div class="grid" style="margin-top:10px">
+      <div><label>Nächstes Spital</label><select data-s="spitalId" onchange="skSet(this)">
+        <option value="">Automatisch nach Ort${skSpitalFuer(p.ort) ? ': ' + esc(skSpitalFuer(p.ort).spital) : ''}</option>
+        ${v.orte.map(o => `<option value="${o.id}" ${s.spitalId === o.id ? 'selected' : ''}>${esc(o.spital)}${o.orte ? ' (' + esc(o.orte) + ')' : ''}</option>`).join('')}
+        <option value="-" ${s.spitalId === '-' ? 'selected' : ''}>Keins angeben</option></select>
+        <div id="sk-spital" style="margin-top:6px">${skSpitalHinweis(p)}</div></div>
+      <div><label>Nächster Arzt <span class="muted klein">optional</span></label><input ${f('arzt')} placeholder="Name, Ort, Telefon"></div>
+      <div><label>Sammelplatz</label><input ${f('sammelplatz')} placeholder="z.B. Vorplatz beim Hauseingang"></div>
+      <div><label>Erste-Hilfe-Material</label><input ${f('ersteHilfe')} placeholder="z.B. Im Firmenfahrzeug"></div>
+      <div><label>Feuerlöscher</label><input ${f('feuerloescher')} placeholder="z.B. Im Firmenfahrzeug"></div>
+      <div><label>Weitere Notfallnummern <span class="muted klein">optional</span></label><input ${f('notfall')} placeholder="z.B. Hauswart, Bauleitung GU"></div>
+    </div>
+    <div class="sk-2" style="margin-top:6px">${chk('mobil', 'Verbindung mit mobilen Geräten gewährleistet.')}${chk('notfallkarte', 'Eine Notfallkarte wird abgegeben.')}</div>
+
+    ${nr(3, 'Lebenswichtige Regeln', ' <span class="muted klein" style="font-weight:400">stehen immer im Dokument</span>')}
+    <div class="sk-regeln"><ul>${SK_REGELN.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+      <div class="sk-stopp"><b>STOPP</b>${SK_STOPP.map(t => `<div>☒ ${t}</div>`).join('')}</div></div>
+
+    ${nr(4, 'Gefährdungsermittlung', ' <span id="sk-offen"></span>')}
+    <div class="muted klein" style="margin:-4px 0 8px">Ja = sicher. Bei «Nein» eine Massnahme eintragen. Massnahmen ankreuzen, die auf dieser Baustelle gelten.</div>
+    <div id="sk-fragen">${skFragen(p).map(q => skFrageHtml('r', q)).join('')}</div>
+
+    ${nr(5, 'Objektspezifische Massnahmen', ' <span class="muted klein" style="font-weight:400">optional</span>')}
+    <div id="sk-anhang">${skAnhangHtml()}</div>
+
+    ${nr(6, 'Instruktion der Mitarbeitenden')}
+    <div class="muted klein" style="margin:-4px 0 8px">Jede Person bestätigt mit ihrer Unterschrift, dass sie über dieses Sicherheitskonzept instruiert wurde.</div>
+    <div id="sk-ma">${skMaHtml()}</div>
+    <datalist id="sk-namen">${namen.map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+    <datalist id="sk-funktionen"><option value="Monteur"><option value="Baustellenverantwortlicher"><option value="Elektriker"><option value="Lernende/r"><option value="Temporär"></datalist>
+
+    ${nr(7, 'Unterschriften')}
+    <div class="sk-unter2">
+      <div><div class="sk-wer"><b>${esc(a.pl)}</b><span>Projektleiter – erstellt und Umsetzung kontrolliert</span></div>${skSigHtml('uPl', 'plDatum', s.plDatum, 'Unterschrift Projektleiter')}</div>
+      <div><div class="sk-wer"><input list="sk-namen" ${f('monteur')} placeholder="Name Monteur"><span>Baustellenverantwortlicher Monteur</span></div>${skSigHtml('uMonteur', 'moDatum', s.moDatum, 'Unterschrift Monteur')}</div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="danger sm" onclick="if(confirm('Sicherheitskonzept leeren und mit den Vorgaben neu beginnen? Unterschriften werden gelöscht.')){findP(skPid).sicherheit=skDefaults(findP(skPid));save();skDialog(skPid)}">Neu beginnen</button>
+    <div class="row"><button class="sec" onclick="$('dlg').close()">Schliessen</button><button onclick="skPdf(skPid)">Als PDF speichern</button></div>
+  </div>`;
+  d.onkeydown = null;
+  if (!d.open) {
+    d.showModal();
+    d.addEventListener('close', () => { d.style.width = ''; d.innerHTML = ''; render(); }, { once: true });
+  }
+  skOffenHinweis();
+  requestAnimationFrame(skPads);
+}
+
+// Sicherheitskonzept als PDF (A4): Baustelle, Notfall, Regeln, Gefährdungsermittlung, Massnahmen, Instruktion, Unterschriften
+function skPdf(pid) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const p = findP(pid), s = skBereit(p), a = skAuto(p);
+  const { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, M = 14, B = W - 2 * M, ROT = [192, 32, 38], HELL = [240, 242, 245], LINIE = [205, 209, 214];
+  const GRUEN = [46, 125, 50], ROTA = [198, 40, 40], GRAU = [120, 134, 144];
+  let y = pdfAaKopf(doc, p.nummer, [['Datum', s.datum ? fmt(s.datum) : '']], 'Sicherheitskonzept Baustelle');
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(100);
+  doc.text('nach Bauarbeitenverordnung (BauAV) Art. 4 · Photovoltaik und Batteriespeicher', M, y - 5);
+  doc.setFontSize(9.5); doc.setTextColor(60);
+  const gl = doc.splitTextToSize(SK_GRUNDSATZ, B);
+  doc.text(gl, M, y + 1); y += gl.length * 4.2 + 5;
+  const platz = h => { if (y + h > H - 16) { doc.addPage(); y = 18; } };
+  let nrZ = 0;
+  const titel = (t, min = 30) => {
+    platz(min); nrZ++;
+    doc.setFillColor(...AA_DUNKEL); doc.circle(M + 3.2, y + 2.9, 3.2, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255); doc.text(String(nrZ), M + 3.2, y + 4.3, { align: 'center' });
+    doc.setFontSize(12.5); doc.setTextColor(...AA_TXT); doc.text(t, M + 9, y + 4.4);
+    y += 9.5;
+  };
+  const tabStil = { theme: 'grid', margin: { left: M, right: M, top: 18, bottom: 16 },
+    styles: { fontSize: 9.5, cellPadding: { top: 2, bottom: 2, left: 2.2, right: 2.2 }, lineColor: LINIE, lineWidth: 0.25, textColor: 25, valign: 'middle' },
+    headStyles: { fillColor: HELL, textColor: AA_TXT, fontStyle: 'bold', fontSize: 9 } };
+  // Tabelle; Zellen mit chk (true/false) bekommen links ein Kästchen
+  const tabelle = (body, spalten, extra = {}) => {
+    doc.autoTable({ ...tabStil, startY: y, body, columnStyles: spalten, ...extra,
+      didParseCell: d => { if (d.cell.raw && d.cell.raw.chk !== undefined) d.cell.styles.cellPadding = { top: 2, bottom: 2, left: 7.5, right: 2.2 }; extra.didParseCell && extra.didParseCell(d); },
+      didDrawCell: d => { if (d.cell.raw && d.cell.raw.chk !== undefined) pdfKaestchen(doc, d.cell.x + 2.2, d.cell.y + d.cell.height / 2 - 1.6, d.cell.raw.chk); extra.didDrawCell && extra.didDrawCell(d); } });
+    y = doc.lastAutoTable.finalY + 7;
+  };
+  const lab = t => ({ content: t, styles: { fontSize: 7.8, textColor: 110, fillColor: [250, 250, 251] } });
+
+  // 1 Baustelle
+  titel('Baustelle');
+  tabelle([
+    [lab('Baustelle'), a.baustelle, lab('Zeitraum'), skZeitraum(p, s)],
+    [lab('Adresse'), { content: a.adresse, colSpan: 3 }],
+    [lab('Tätigkeit'), s.taetigkeit || '', lab('Unternehmer'), a.firma],
+    [lab('Projektleiter'), a.pl, lab('Telefon'), a.tel],
+    [{ content: 'Für die Baustelle gibt es ein übergeordnetes Sicherheitskonzept (z.B. vom Generalunternehmer).', colSpan: 4, chk: !!s.uebergeordnet }]
+  ], { 0: { cellWidth: 28 }, 2: { cellWidth: 26 }, 3: { cellWidth: 52 } });
+
+  // 2 Notfall
+  titel('Notfall', 50);
+  const nw = (B - 3 * 3) / 4;
+  [['144', 'Sanität'], ['1414', 'Rega'], ['118', 'Feuerwehr'], ['117', 'Polizei']].forEach(([n, l], i) => {
+    const bx = M + i * (nw + 3);
+    doc.setFillColor(253, 236, 236); doc.roundedRect(bx, y, nw, 11, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...ROT); doc.text(n, bx + 5, y + 7.3);
+    const nb = doc.getTextWidth(n);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60); doc.text(l, bx + 5 + nb + 2.5, y + 7.1);
+  });
+  y += 15;
+  tabelle([
+    [lab('Nächstes Spital'), { content: skSpitalText(skSpital(p)), colSpan: 3 }],
+    [lab('Nächster Arzt'), s.arzt || '', lab('Sammelplatz'), s.sammelplatz || ''],
+    [lab('Erste-Hilfe-Material'), s.ersteHilfe || '', lab('Feuerlöscher'), s.feuerloescher || ''],
+    ...(s.notfall ? [[lab('Weitere Nummern'), { content: s.notfall, colSpan: 3 }]] : []),
+    [{ content: 'Verbindung mit mobilen Geräten gewährleistet.', colSpan: 2, chk: !!s.mobil }, { content: 'Eine Notfallkarte wird abgegeben.', colSpan: 2, chk: !!s.notfallkarte }]
+  ], { 0: { cellWidth: 34 }, 1: { cellWidth: 57 }, 2: { cellWidth: 28 } });
+
+  // 3 Lebenswichtige Regeln und STOPP
+  titel('Lebenswichtige Regeln', 52);
+  const lw = 118, y0 = y, zh = 6.3;
+  SK_REGELN.forEach((r, i) => {
+    if (i % 2 === 0) { doc.setFillColor(250, 246, 246); doc.rect(M, y, lw, zh, 'F'); }
+    pdfKaestchen(doc, M + 1.8, y + 1.55, true);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...ROT); doc.text(r, M + 7, y + 4.3);
+    y += zh;
+  });
+  doc.setDrawColor(...LINIE); doc.setLineWidth(0.25); doc.rect(M, y0, lw, y - y0);
+  const bx = M + lw + 5, bw = W - M - bx, bh = y - y0;
+  doc.setDrawColor(...ROT); doc.setLineWidth(0.5); doc.roundedRect(bx, y0, bw, bh, 2, 2);
+  const cx = bx + bw / 2, cy = y0 + 7.8, rr = 6;
+  const pts = Array.from({ length: 8 }, (_, i) => [cx + rr * Math.cos(Math.PI / 8 + i * Math.PI / 4), cy + rr * Math.sin(Math.PI / 8 + i * Math.PI / 4)]);
+  doc.setFillColor(...ROT); doc.lines(pts.slice(1).map((q, i) => [q[0] - pts[i][0], q[1] - pts[i][1]]), pts[0][0], pts[0][1], [1, 1], 'F', true);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(255); doc.text('STOPP', cx, cy + 1.2, { align: 'center' });
+  let ty = y0 + 18;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(30);
+  SK_STOPP.forEach(t => { const L = doc.splitTextToSize(t, bw - 9); pdfKaestchen(doc, bx + 2.5, ty - 2.7, true); doc.text(L, bx + 7.3, ty); ty += L.length * 3.7 + 2; });
+  y += 8;
+
+  // 4 Gefährdungsermittlung: Frage | Ja | Nein | NA | Massnahmen
+  titel('Gefährdungsermittlung', 40);
+  const F = skFragen(p);
+  const massText = q => [q[2].filter(([m]) => s.x[q[0] + '.' + m]).map(([, l]) => l).join(' · '), s.n[q[0]]].filter(Boolean).join('\n');
+  doc.autoTable({ ...tabStil, startY: y,
+    head: [['Gefährdung', { content: 'Ja', styles: { halign: 'center' } }, { content: 'Nein', styles: { halign: 'center' } }, { content: 'NA', styles: { halign: 'center' } }, 'Massnahmen / Feststellungen']],
+    body: F.map(q => [q[1], '', '', '', massText(q)]),
+    styles: { ...tabStil.styles, fontSize: 8.8, valign: 'middle' },
+    columnStyles: { 0: { cellWidth: 74 }, 1: { cellWidth: 10 }, 2: { cellWidth: 11 }, 3: { cellWidth: 10 }, 4: { textColor: 45 } },
+    didParseCell: d => { if (d.section === 'body' && s.a[F[d.row.index][0]] === 'nein') d.cell.styles.fillColor = [253, 238, 236]; },
+    didDrawCell: d => {
+      if (d.section !== 'body' || d.column.index < 1 || d.column.index > 3) return;
+      const q = F[d.row.index], art = ['ja', 'nein', 'na'][d.column.index - 1];
+      if (art === 'na' && !q[4]) return;
+      const mx = d.cell.x + d.cell.width / 2, my = d.cell.y + d.cell.height / 2;
+      if (s.a[q[0]] === art) { doc.setFillColor(...({ ja: GRUEN, nein: ROTA, na: GRAU }[art])); doc.circle(mx, my, 1.9, 'F'); }
+      else { doc.setDrawColor(170); doc.setLineWidth(0.25); doc.circle(mx, my, 1.7, 'S'); }
+    } });
+  y = doc.lastAutoTable.finalY + 7;
+
+  // 5 Objektspezifische Massnahmen (nur wenn eingetragen)
+  const anh = s.anhang.filter(r => r.m || r.k);
+  if (anh.length) {
+    titel('Objektspezifische Massnahmen', 24);
+    doc.autoTable({ ...tabStil, startY: y, head: [['Massnahme', 'Wer / Kontrolle']], body: anh.map(r => [r.m, r.k]), columnStyles: { 1: { cellWidth: 60 } } });
+    y = doc.lastAutoTable.finalY + 7;
+  }
+
+  // 6 Instruktion: eingetragene Personen, darunter leere Zeilen zum Unterschreiben von Hand (mindestens 4)
+  titel('Instruktion der Mitarbeitenden', 40);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(80);
+  doc.text('Mit der Unterschrift bestätigen die Mitarbeitenden, dass sie über dieses Sicherheitskonzept instruiert wurden.', M, y); y += 3;
+  const MA = s.ma.filter(m => m.name || m.u);
+  const zeilen = [...MA, ...Array.from({ length: Math.max(0, 4 - MA.length) }, () => null)];
+  doc.autoTable({ ...tabStil, startY: y, head: [['Name', 'Funktion', 'Ausbildung', 'Datum', 'Unterschrift']],
+    body: zeilen.map(m => m ? [m.name, m.funktion || '', SK_AUSB.filter(([k]) => m[k]).map(([, l]) => l).join(', '), m.datum ? fmt(m.datum) : '', ''] : ['', '', '', '', '']),
+    styles: { ...tabStil.styles, minCellHeight: 12 },
+    columnStyles: { 0: { cellWidth: 44 }, 1: { cellWidth: 32 }, 2: { cellWidth: 30 }, 3: { cellWidth: 22 } },
+    didDrawCell: d => {
+      const m = zeilen[d.row.index];
+      if (d.section !== 'body' || d.column.index !== 4 || !m || !m.u) return;
+      const h = d.cell.height - 2, w = Math.min(d.cell.width - 4, h * SK_PAD_W / SK_PAD_H);
+      try { doc.addImage(m.u, 'PNG', d.cell.x + 2, d.cell.y + 1, w, w * SK_PAD_H / SK_PAD_W); } catch (e) { /* ohne Bild */ }
+    } });
+  y = doc.lastAutoTable.finalY + 8;
+
+  // 7 Unterschriften Projektleiter und Monteur nebeneinander
+  titel('Unterschriften', 48);
+  const kw = (B - 6) / 2, kh = 36;
+  [[a.pl, 'Projektleiter – erstellt und Umsetzung kontrolliert', s.plDatum, s.uPl], [s.monteur, 'Baustellenverantwortlicher Monteur', s.moDatum, s.uMonteur]].forEach(([name, rolle, dat, u], i) => {
+    const kx = M + i * (kw + 6);
+    doc.setDrawColor(...LINIE); doc.setLineWidth(0.3); doc.roundedRect(kx, y, kw, kh, 2, 2);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(110); doc.text(rolle, kx + 4, y + 5.5);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(...AA_TXT); doc.text(name || '', kx + 4, y + 11);
+    const ly = y + kh - 7;
+    doc.setDrawColor(130); doc.setLineWidth(0.3); doc.line(kx + 4, ly, kx + 26, ly); doc.line(kx + 30, ly, kx + kw - 4, ly);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(120); doc.text('Datum', kx + 4, ly + 3.8); doc.text('Unterschrift', kx + 30, ly + 3.8);
+    doc.setFontSize(9.5); doc.setTextColor(25); if (dat) doc.text(fmt(dat), kx + 4, ly - 1.5);
+    if (u) { try { const uh = 15, uw = Math.min(uh * SK_PAD_W / SK_PAD_H, kw - 36); doc.addImage(u, 'PNG', kx + 30, ly - uw * SK_PAD_H / SK_PAD_W + 1, uw, uw * SK_PAD_H / SK_PAD_W); } catch (e) { /* ohne Bild */ } }
+  });
+  y += kh + 4;
+
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
+    doc.text(`${S().firma || ''} · Sicherheitskonzept ${p.nummer} · ${p.name}`, M, 289); doc.text(`Seite ${i} / ${n}`, W - M, 289, { align: 'right' }); }
+  doc.save(dateiName('Sicherheitskonzept', p, 'pdf'));
+  toast('Sicherheitskonzept als PDF gespeichert.');
+}
+
+// Vorgaben in den Einstellungen: Spitäler je Ort, Notfall-Standards, vorangekreuzte Massnahmen und Antworten
+function viewSkVorlage() {
+  const v = skV();
+  const feld = (k, l, ph) => `<div><label>${l}</label><input value="${esc(v[k])}" placeholder="${ph}" onchange="skV().${k}=this.value.trim();save();toast('Vorlage gespeichert.')"></div>`;
+  return `<div class="card aa sk">
+    <h3 style="margin-top:0">Sicherheitskonzept Baustelle</h3>
+    <p class="muted" style="margin-top:0">Jedes neue Sicherheitskonzept startet mit diesen Vorgaben. Baustelle, Adresse, Zeitraum und Projektleiter kommen automatisch aus dem Projekt.</p>
+    <h4 class="aa-h">Spitäler je Ort</h4>
+    <div class="muted klein" style="margin-bottom:6px">Bei «Orte / PLZ» mehrere mit Komma trennen, auch PLZ-Bereiche – z.B. <i>Luzern, Kriens, 6000-6048</i>. Das Spital wird nach der Adresse des Projekts gewählt.</div>
+    <div id="sk-orte">${skOrteHtml()}</div>
+    <h4 class="aa-h">Notfall</h4>
+    <div class="grid">${feld('sammelplatz', 'Sammelplatz', 'z.B. Vorplatz beim Hauseingang')}${feld('ersteHilfe', 'Erste-Hilfe-Material', 'z.B. Im Firmenfahrzeug')}${feld('feuerloescher', 'Feuerlöscher', 'z.B. Im Firmenfahrzeug')}
+      <div style="align-self:end"><label class="bz-box"><input type="checkbox" ${v.notfallkarte ? 'checked' : ''} onchange="skV().notfallkarte=this.checked;save()"> <span>Notfallkarte wird abgegeben</span></label></div></div>
+    <h4 class="aa-h">Gefährdungsermittlung <span class="muted">Antworten und Massnahmen, die schon gesetzt sind</span></h4>
+    <div class="muted klein" style="margin-bottom:6px">Fragen zu Dach, DC und Wetter erscheinen nur bei PV-Projekten, die Batterie-Frage nur bei Batterienachrüstungen.</div>
+    ${SK_FRAGEN.map(q => skFrageHtml('s', q)).join('')}
+    <div class="row" style="margin-top:14px"><button class="sec" onclick="if(confirm('Vorgaben auf den Standard zurücksetzen? Die Spitäler bleiben.')){const o=skV().orte;S().sicherheit=vorlageKopie(SK_VORLAGE);S().sicherheit.orte=o;save();render()}">Standard laden</button></div>
+  </div>`;
+}
+function skOrteHtml() {
+  const L = skV().orte;
+  return `${L.length ? `<table class="aa-stunden ab-tab ab-edit"><tr><th>Orte / PLZ</th><th>Spital</th><th>Adresse</th><th style="width:150px">Telefon</th><th style="width:34px"></th></tr>
+    ${L.map((o, i) => `<tr>${[['orte', 'Luzern, Kriens'], ['spital', 'Name des Spitals'], ['adresse', 'Strasse, PLZ Ort'], ['tel', '041 …']].map(([k, ph]) =>
+      `<td><input value="${esc(o[k])}" placeholder="${ph}" oninput="skOrt(${i},'${k}',this.value)"></td>`).join('')}
+      <td><button class="ck-btn" title="Spital entfernen" onclick="skOrt(${i},'del')">✕</button></td></tr>`).join('')}</table>`
+    : '<div class="muted klein">Noch keine Spitäler hinterlegt.</div>'}
+    <button class="sec sm" style="margin-top:8px" onclick="skOrt(0,'add')">+ Spital</button>`;
+}
+function skOrt(i, op, v) {
+  const L = skV().orte;
+  if (op === 'add') L.push({ id: uid(), orte: '', spital: '', adresse: '', tel: '' });
+  else if (op === 'del') L.splice(i, 1);
+  else { L[i][op] = v; save(); return; }
+  save();
+  $('sk-orte').innerHTML = skOrteHtml();
+  if (op === 'add') { const t = $('sk-orte').querySelectorAll('tr:last-child input'); t[0]?.focus(); }
+}
+
 // Dokumente, die an Checklisten-Punkten hängen können ([dok: …])
 const DOKS = {
   ibn: { label: 'IBN- / Service-Rapport', fn: 'ibnDialog', hat: p => !!p.ibn },
   blitz: { label: 'Checkliste Blitzschutz', fn: 'blitzDialog', hat: p => !!p.blitz },
   zwischen: { label: 'Zwischenabnahmeprotokoll', fn: 'zwischenDialog', hat: p => !!p.zwischen },
   abnahme: { label: 'Abnahmeprotokoll', fn: 'abnahmeDialog', hat: p => !!p.abnahme },
-  maengel: { label: 'Mängelliste', fn: 'maengelDialog', hat: p => !!p.maengel }
+  maengel: { label: 'Mängelliste', fn: 'maengelDialog', hat: p => !!p.maengel },
+  sicherheit: { label: 'Sicherheitskonzept', fn: 'skDialog', hat: p => !!p.sicherheit }
 };
 
 // ---------- Checklisten-Editor (für Vorlage und einzelne Projekte) ----------
@@ -6792,7 +7404,7 @@ function viewInfo(p) {
         ? `<div class="info-kunde"><span class="avatar" style="background:${avatarFarbe(kunde)}">${initialen(kontaktName(kunde))}</span>
             <div style="flex:1;min-width:0"><b>${esc(kontaktName(kunde))}</b><div class="muted klein">${esc([kunde.name ? kontaktFirma(kunde) : '', kunde.adresse].filter(Boolean).join(' · '))}</div></div>
             <button class="ck-btn" title="Kunde bearbeiten" onclick="kontaktDialog('${kunde.id}')">✎</button>
-            <button class="ck-btn" title="anderen Kunden wählen" onclick="findP('${p.id}').kundeId='';save();render()">✕</button></div>`
+            <button class="ck-btn" title="anderen Kunden wählen" onclick="findP('${p.id}').kundeId='';save();render()">✕</button></div>${kundeFehltHtml(kunde)}`
         : kontaktPicker('kundeSetzen', { filter: 'kunde', platzhalter: 'Kunde aus Kontakten wählen oder neu anlegen …' })}</div>
       <div><label>Farbe im Kalender</label><input type="color" id="i-farbe" value="${p.farbe}"></div>
       <div><label>Art</label><select id="i-art">${Object.entries(PROJEKT_ARTEN).map(([k, l]) => `<option value="${k}" ${projektArt(p) === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
@@ -6893,6 +7505,9 @@ const kontaktFirma = c => c.art === 'intern' ? S().firma : (c.firma || '');
 const nachName = (a, b) => kontaktName(a).localeCompare(kontaktName(b), 'de');
 const kontaktProjekte = cid => state.projects.filter(p => p.kundeId === cid || p.personen.includes(cid) || p.gewerke.some(g => g.crm === cid));
 const kontaktText = c => [c.name, c.firma, c.gewerk, c.telefon, c.email, c.adresse, c.notiz].join(' ').toLowerCase();
+// Kunde mit fehlenden Angaben: roter Hinweis mit Link zum Ergänzen
+const kundeFehltHtml = k => { const f = kundeFehlt(k); return f.length ? `<div class="kunde-fehlt">⚠ Beim Kunden fehlt: ${f.join(', ')} · <a href="#" onclick="event.preventDefault();kontaktDialog('${k.id}')">ergänzen</a></div>` : ''; };
+const FEHLT = '<span class="k-fehlt">fehlt</span>';
 function markiere(s, woerter) {
   let h = esc(s || '');
   woerter.forEach(w => { h = h.replace(new RegExp('(' + esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>'); });
@@ -6929,7 +7544,8 @@ function viewKontakte() {
             <div style="min-width:0"><b>${markiere(kontaktName(c), woerter)}</b>${c.notiz ? ' <span class="k-hat-notiz" title="hat Bemerkungen">📝</span>' : ''}
               ${c.name && kontaktFirma(c) ? `<div class="muted klein k-nur-handy">${markiere(kontaktFirma(c), woerter)}</div>` : ''}</div></div></td>
           <td>${markiere(kontaktFirma(c), woerter)}</td><td class="muted">${markiere(c.gewerk || '', woerter)}</td>
-          <td class="k-m" style="white-space:nowrap">${telLink(c.telefon)}</td><td>${mailLink(c.email)}</td><td class="muted">${markiere(c.adresse, woerter)}</td></tr>`;
+          <td class="k-m" style="white-space:nowrap">${c.telefon || art !== 'kunde' ? telLink(c.telefon) : FEHLT}</td><td>${c.email || art !== 'kunde' ? mailLink(c.email) : FEHLT}</td>
+          <td class="muted">${c.adresse || art !== 'kunde' ? markiere(c.adresse, woerter) : FEHLT}</td></tr>`;
       }).join('')}
     </table></div></div>`;
   }).join('')}`;
@@ -7007,6 +7623,14 @@ function kArt(art) {
   document.querySelectorAll('#k-art button').forEach(b => b.classList.toggle('on', b.dataset.art === art));
   $('k-gewerk-l').textContent = art === 'kunde' ? 'Info (z.B. Bauherr, Verwaltung)' : 'Gewerk / Rolle';
   $('k-firma').placeholder = art === 'intern' ? S().firma : 'z.B. Müller AG';
+  kFehltMarkieren();
+}
+// beim Kunden: leere Pflichtangaben (Adresse, Telefon, E-Mail) rot umranden
+function kFehltMarkieren() {
+  const kunde = ui.kDlg && ui.kDlg.art === 'kunde';
+  ['k-adr', 'k-tel', 'k-mail'].forEach(id => { const i = $(id); if (!i) return;
+    i.classList.toggle('fehlt', kunde && !i.value.trim());
+    i.oninput = kFehltMarkieren; });
 }
 function kontaktSpeichern() {
   const { cid, art, danach } = ui.kDlg;
@@ -7170,7 +7794,7 @@ function viewKalender() {
 // Einstellungen als getrennte Kacheln in drei Gruppen statt einer umbrechenden Reiterleiste
 const EINST_GRUPPEN = [
   ['Allgemein', [['firma', 'Projektleiter & Firma', 'Name, Adresse, Logo', 'kontakte'], ['backup', 'Backup', 'Sichern & wiederherstellen', 'backup'], ['app', 'App', 'Installieren, offline', 'app']]],
-  ['Vorlagen', [['gewerke', 'Standard-Gewerke', 'Firmen für neue Projekte', 'gewerke'], ['checkliste', 'Checkliste', 'Punkte je Projektart', 'checkliste'], ['rapport', 'Dokumente', 'Rapporte, Abnahme, Material', 'dokumente'], ['mails', 'Mailvorlagen', 'Texte für Anfragen', 'mail'], ['wr', 'Wechselrichter', 'Eigene Modelle für Stringplan', 'wr'], ['pvgis', 'Ertrag (PVGIS)', 'Ertragsberechnung einrichten', 'sonne']]],
+  ['Vorlagen', [['gewerke', 'Standard-Gewerke', 'Firmen für neue Projekte', 'gewerke'], ['checkliste', 'Checkliste', 'Punkte je Projektart', 'checkliste'], ['rapport', 'Dokumente', 'Rapporte, Abnahme, Material, Sicherheit', 'dokumente'], ['mails', 'Mailvorlagen', 'Texte für Anfragen', 'mail'], ['wr', 'Wechselrichter', 'Eigene Modelle für Stringplan', 'wr'], ['pvgis', 'Ertrag (PVGIS)', 'Ertragsberechnung einrichten', 'sonne']]],
   ['Auswertung', [['controlling', 'Controlling', 'Stundensätze & Ampel', 'controlling']]]];
 const EINST_ICONS = {
   kontakte: ICONS.kontakte, controlling: ICONS.controlling,
@@ -7202,10 +7826,11 @@ function viewEinstellungen() {
 
 // Vorlagen für Arbeitsauftrag und Abnahmeprotokoll: jedes neue Dokument startet damit
 function viewRapportVorlage() {
-  const wahl = ['service', 'abnahme', 'material'].includes(ui.aaArt) ? ui.aaArt : 'ibn';
-  const seg = `<div class="seg seg-breit" style="margin-bottom:14px">${[['ibn', 'IBN-Rapport'], ['service', 'Service-Rapport'], ['abnahme', '(Zwischen-)Abnahme'], ['material', 'Materiallisten']].map(([k, l]) =>
+  const wahl = ['service', 'abnahme', 'material', 'sicherheit'].includes(ui.aaArt) ? ui.aaArt : 'ibn';
+  const seg = `<div class="seg seg-breit" style="margin-bottom:14px">${[['ibn', 'IBN-Rapport'], ['service', 'Service-Rapport'], ['abnahme', '(Zwischen-)Abnahme'], ['material', 'Materiallisten'], ['sicherheit', 'Sicherheitskonzept']].map(([k, l]) =>
       `<button class="${wahl === k ? 'on' : ''}" onclick="ui.aaArt='${k}';render()">${l}</button>`).join('')}</div>`;
   if (wahl === 'abnahme') return seg + viewAbnahmeVorlage();
+  if (wahl === 'sicherheit') return seg + viewSkVorlage();
   if (wahl === 'material') return seg + viewMatVorlagen();
   const art = wahl, v = rapVorlage(art);
   return `${seg}
