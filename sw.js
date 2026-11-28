@@ -1,5 +1,7 @@
 // Netz zuerst (damit Änderungen auf GitHub sofort ankommen), bei fehlender Verbindung aus dem Cache
-const CACHE = 'ckw-projekte-v50'; // v50: eigenes CKW-Sicherheitskonzept für PV (Ja/Nein-Gefährdungen, Instruktion mit Unterschrift, Projektleiter + Monteur)
+const CACHE = 'ckw-projekte-v52'; // v52: Sicherheitskonzept – nur der baustellenverantwortliche Monteur unterschreibt, Monteur-Auswahl (Einstellungen)
+// v51: Sicherheitskonzept – nächstes Spital über OpenStreetMap suchen, «NA» heisst jetzt «Entfällt»
+// v50: eigenes CKW-Sicherheitskonzept für PV (Ja/Nein-Gefährdungen, Instruktion mit Unterschrift, Projektleiter + Monteur)
 // v49: Sicherheitskonzept (BauAV Art. 4) als Projekt-Dokument mit Unterschrift Monteur, Spitäler je Ort in den Einstellungen
 // v48: Offerte → Projekt legt den Kunden an, fehlende Kundenangaben rot
 // v47: Batterien parallel (Anzahl Türme, Total), Lynx Home F G2

@@ -509,11 +509,21 @@
   .sk-ma-ausb label { display: inline-flex; gap: 5px; align-items: center; margin: 0; color: inherit; font-weight: 400; }
   .sk-ma-ausb input { width: 15px; height: 15px; margin: 0; }
   .sk-ma-daten .ck-btn { grid-column: 3; grid-row: 1; }
+  .sk-mo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border: 1.5px solid #37474f; border-radius: 12px; padding: 14px; align-items: start; }
+  .sk-mo-text { font-size: 13px; color: #444; margin: 10px 0 0; }
+  @media (max-width: 700px) { .sk-mo { grid-template-columns: 1fr; } }
   .sk-unter2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .sk-unter2 > div { border: 1.5px solid #37474f; border-radius: 12px; padding: 12px; }
   .sk-wer { margin-bottom: 8px; }
   .sk-wer b, .sk-wer input { display: block; font-size: 15px; }
   .sk-wer span { color: var(--muted); font-size: 12px; }
+  .sk-spital-zeile { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sk-spital-zeile select { flex: 1 1 240px; width: auto; }
+  .sk-treffer { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; }
+  .sk-treffer > label, .sk-treffer > div { grid-column: 1 / -1; }
+  .sk-treffer-zeile { text-align: left; background: #fff; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; font-weight: 400; box-shadow: none; }
+  .sk-treffer-zeile:hover { border-color: #37474f; background: #f6f7f9; }
+  .sk-treffer-zeile .tag-ok, .sk-treffer-zeile .tag-sub { margin-left: 4px; }
   .sk-sig { max-width: 460px; }
   .sk-sig.klein { max-width: 340px; }
   .sk-sig-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
@@ -1234,6 +1244,8 @@ const ARTEN = { intern: 'intern', sub: 'Subunternehmer', extern: 'extern' };
 // Sicherheitskonzept (BauAV Art. 4): Vorgaben in den Einstellungen – Spitäler je Ort, Notfall-Standards, vorangekreuzte Massnahmen und Antworten
 const SK_VORLAGE = {
   v: 2, orte: [], sammelplatz: '', ersteHilfe: 'Im Firmenfahrzeug', feuerloescher: 'Im Firmenfahrzeug', notfallkarte: false, a: {},
+  // baustellenverantwortliche Monteure zur Auswahl (unterschreiben das Konzept)
+  monteure: [{ name: 'Milan Bartos', firma: 'CKW' }, { name: 'Patryk Kowalczyk', firma: 'CKW' }, { name: 'Mateusz', firma: 'Mic Solar Montage GmbH' }],
   x: { 'psa.schuhe': true, 'psa.helm': true, 'psa.handschuhe': true, 'psa.uv': true, 'dc.stecker': true, 'dc.werkzeug': true, 'dc.zuletzt': true,
     'ac.frei': true, 'ac.pruefen': true, 'wetter.wind': true, 'wetter.gewitter': true, 'allein.zweit': true }
 };
@@ -4437,21 +4449,22 @@ function pvFSet(pid, k, feld, wert) {
   if (String(wert).trim() === '') delete E.f[k][feld]; else E.f[k][feld] = spNum(wert);
   save(); render();
 }
-// Adresse → Koordinaten: zuerst Schweizer Gebäudeadressen (geo.admin.ch), sonst OpenStreetMap
+// Adresse → Koordinaten: zuerst Schweizer Gebäudeadressen (geo.admin.ch), sonst OpenStreetMap; null wenn nicht gefunden
+async function adresseKoordinaten(q) {
+  const r = await fetch('https://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&limit=1&searchText=' + encodeURIComponent(q)).then(r => r.json()).catch(() => null);
+  const a = r && r.results && r.results[0] && r.results[0].attrs;
+  if (a) return { lat: +a.lat, lon: +a.lon, label: String(a.label || '').replace(/<[^>]+>/g, '') };
+  const n = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q)).then(r => r.json());
+  return n && n[0] ? { lat: +n[0].lat, lon: +n[0].lon, label: n[0].display_name } : null;
+}
 async function pvOrtSuchen(pid) {
   const p = findP(pid), x = spAktuell(p), E = pvErtrag(x);
   const q = (($('pv-adr') || {}).value || E.adresse || p.ort || '').trim();
   if (!q) return toast('Zuerst eine Adresse eintragen.');
   try {
-    let lat = 0, lon = 0, label = '';
-    const r = await fetch('https://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&sr=4326&limit=1&searchText=' + encodeURIComponent(q)).then(r => r.json()).catch(() => null);
-    const a = r && r.results && r.results[0] && r.results[0].attrs;
-    if (a) { lat = a.lat; lon = a.lon; label = String(a.label || '').replace(/<[^>]+>/g, ''); }
-    else {
-      const n = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q)).then(r => r.json());
-      if (n && n[0]) { lat = +n[0].lat; lon = +n[0].lon; label = n[0].display_name; }
-    }
-    if (!lat) return toast('Adresse nicht gefunden. Koordinaten von Hand eintragen.');
+    const k = await adresseKoordinaten(q);
+    if (!k) return toast('Adresse nicht gefunden. Koordinaten von Hand eintragen.');
+    const { lat, lon, label } = k;
     Object.assign(E, { adresse: q, lat: +(+lat).toFixed(5), lon: +(+lon).toFixed(5), ort: label, hoehe: null });
     save(); render(); toast('Standort: ' + label);
   } catch { toast('Adresssuche nicht erreichbar (Internetverbindung?).'); }
@@ -5068,7 +5081,7 @@ function dokListe(p) {
       stand: (s => !s.total ? '' : s.offen ? `<span class="tag-warn">${s.offen} noch nicht bestellt</span> <span class="muted klein">${s.total - s.offen} von ${s.total} bestellt/reserviert</span>`
         : s.geliefert === s.total ? `<span class="tag-ok">✓ alle ${s.total} geliefert</span>` : `<span class="tag-sub">alles bestellt</span> <span class="muted klein">${s.geliefert} von ${s.total} geliefert</span>`)(matStand(p)) },
     { icon: 'rapport', titel: rapportName(p), info: 'Arbeitsauftrag für den Monteur', dok: 'ibn', da: !!p.ibn, auf: `ibnDialog('${id}')`, pdf: `ibnPdf('${id}')` },
-    { icon: 'sicher', titel: 'Sicherheitskonzept', info: 'BauAV Art. 4 · Notfall, Gefährdungen, Instruktion, Unterschriften', dok: 'sicherheit', da: !!p.sicherheit, auf: `skDialog('${id}')`, pdf: `skPdf('${id}')`,
+    { icon: 'sicher', titel: 'Sicherheitskonzept', info: 'BauAV Art. 4 · Notfall, Gefährdungen, Unterschrift Monteur', dok: 'sicherheit', da: !!p.sicherheit, auf: `skDialog('${id}')`, pdf: `skPdf('${id}')`,
       stand: !p.sicherheit ? '' : (st => st.unterschrieben && !st.offen && !st.nein ?'<span class="tag-ok">✓ ausgefüllt und unterschrieben</span>'
         : `<span class="tag-sub">angefangen</span> <span class="muted klein">${[st.offen && `${st.offen} Fragen offen`, st.nein && `${st.nein}× Nein ohne Massnahme`, !st.unterschrieben && 'Unterschrift fehlt'].filter(Boolean).join(' · ')}</span>`)(skStand(p)) },
     ...(service ? [] : [
@@ -6402,8 +6415,8 @@ const SK_FRAGEN = [
   ['absperrung', 'Ist der Bereich unter dem Arbeitsplatz abgesperrt (öffentliche Sicherheit)?', [['band', 'Absperrung'], ['signal', 'Signalisation']], [], true],
   ['allein', 'Ist Alleinarbeit ausgeschlossen oder überwacht?', [['zweit', 'Immer mindestens zu zweit'], ['geraet', 'Personenüberwachung']], [], false]
 ];
-const SK_ANTW = { ja: 'Ja', nein: 'Nein', na: 'NA' };
-const SK_AUSB = [['psaga', 'PSAgA'], ['hab', 'HAB'], ['kran', 'Anschlagen']];
+// «na» = nicht anwendbar, die Frage betrifft diese Baustelle nicht
+const SK_ANTW = { ja: 'Ja', nein: 'Nein', na: 'Entfällt' };
 const skFragen = p => SK_FRAGEN.filter(f => !p || !f[3].length || f[3].includes(projektArt(p)));
 // Vorgaben aus den Einstellungen; ältere Stände (v1) übernehmen nur Spitäler, Sammelplatz und Notfallkarte
 function skV() {
@@ -6414,13 +6427,14 @@ function skV() {
   if (!Array.isArray(v.orte)) v.orte = [];
   if (!v.x) v.x = {};
   if (!v.a) v.a = {};
+  if (!Array.isArray(v.monteure)) v.monteure = vorlageKopie(SK_VORLAGE.monteure);
   return v;
 }
 function skDefaults(p) {
   const v = skV();
   return { v: 2, datum: todayIso(), taetigkeit: SK_TAETIGKEIT[projektArt(p)] || '', zeitraum: '', uebergeordnet: false, mobil: true, notfallkarte: !!v.notfallkarte,
     sammelplatz: v.sammelplatz || '', ersteHilfe: v.ersteHilfe || '', feuerloescher: v.feuerloescher || '', arzt: '', spitalId: '', notfall: '',
-    a: { ...v.a }, x: { ...v.x }, n: {}, anhang: [], ma: [], monteur: '', uMonteur: '', moDatum: '', uPl: '', plDatum: '' };
+    a: { ...v.a }, x: { ...v.x }, n: {}, anhang: [], monteur: '', monteurFirma: '', uMonteur: '', moDatum: '' };
 }
 function skBereit(p) {
   const alt = p.sicherheit;
@@ -6432,7 +6446,7 @@ function skBereit(p) {
   }
   const s = p.sicherheit;
   ['a', 'x', 'n'].forEach(k => { if (!s[k]) s[k] = {}; });
-  ['anhang', 'ma'].forEach(k => { if (!Array.isArray(s[k])) s[k] = []; });
+  if (!Array.isArray(s.anhang)) s.anhang = [];
   return s;
 }
 // Werte, die immer aus dem Projekt kommen
@@ -6448,7 +6462,7 @@ function skStand(p) {
   if (!s || s.v !== 2) return { offen: skFragen(p).length, nein: 0, unterschrieben: false };
   const F = skFragen(p);
   // «nein»: mit Nein beantwortet, aber noch ohne Massnahme
-  return { offen: F.filter(f => !s.a[f[0]]).length, nein: F.filter(f => s.a[f[0]] === 'nein' && !String(s.n[f[0]] || '').trim()).length, unterschrieben: !!(s.uPl && s.uMonteur) };
+  return { offen: F.filter(f => !s.a[f[0]]).length, nein: F.filter(f => s.a[f[0]] === 'nein' && !String(s.n[f[0]] || '').trim()).length, unterschrieben: !!s.uMonteur };
 }
 // Spital zum Ort der Baustelle: Einträge «Luzern, Kriens, 6000-6048» – Ortsname im Text, PLZ oder PLZ-Bereich
 function skSpitalFuer(adr) {
@@ -6462,7 +6476,84 @@ function skSpitalFuer(adr) {
 function skSpital(p) {
   const s = p.sicherheit;
   if (s.spitalId === '-') return null;
+  if (s.spitalId === 'eigen' && s.spitalEigen) return s.spitalEigen;
   return (s.spitalId && skV().orte.find(o => o.id === s.spitalId)) || skSpitalFuer(p.ort);
+}
+// Auswahl des Spitals im Formular: hinterlegte Spitäler, gesuchtes Spital, Suche über OpenStreetMap
+function skSpitalBox(p) {
+  const s = p.sicherheit, v = skV(), auto = skSpitalFuer(p.ort);
+  return `<label>Nächstes Spital</label><div class="sk-spital-zeile"><select data-s="spitalId" onchange="skSet(this)">
+      <option value="">Automatisch nach Ort${auto ? ': ' + esc(auto.spital) : ''}</option>
+      ${s.spitalEigen ? `<option value="eigen" ${s.spitalId === 'eigen' ? 'selected' : ''}>${esc(s.spitalEigen.spital)} (gesucht)</option>` : ''}
+      ${v.orte.map(o => `<option value="${o.id}" ${s.spitalId === o.id ? 'selected' : ''}>${esc(o.spital)}${o.orte ? ' (' + esc(o.orte) + ')' : ''}</option>`).join('')}
+      <option value="-" ${s.spitalId === '-' ? 'selected' : ''}>Keins angeben</option></select>
+    <button class="sec" id="sk-suche-btn" onclick="skSpitalSuchen()">📍 Nächstes Spital suchen</button></div>
+    <div id="sk-spital" style="margin-top:6px">${skSpitalHinweis(p)}</div>
+    <div id="sk-treffer"></div>`;
+}
+// Spitäler mit Notfallstation in der Nähe der Baustelle (OpenStreetMap über Overpass), die drei nächsten zur Auswahl
+let skTreffer = [];
+const skKm = (a, b) => { const R = 6371, r = x => x * Math.PI / 180, dLat = r(b.lat - a.lat), dLon = r(b.lon - a.lon);
+  return 2 * R * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLon / 2) ** 2)); };
+async function skSpitalSuchen() {
+  const p = findP(skPid), q = String(p.ort || '').trim(), btn = $('sk-suche-btn'), box = $('sk-treffer');
+  if (!q) return toast('Im Projekt ist keine Adresse eingetragen.');
+  btn.disabled = true; btn.textContent = 'Suche …';
+  try {
+    const k = await adresseKoordinaten(q);
+    if (!k) throw new Error('Adresse nicht gefunden');
+    const abfrage = `[out:json][timeout:25];nwr["amenity"="hospital"](around:40000,${k.lat},${k.lon});out center tags;`;
+    // Overpass ist manchmal überlastet: der Reihe nach zwei Server versuchen
+    let daten = null;
+    for (const server of ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']) {
+      try {
+        const r = await fetch(server, { method: 'POST', body: 'data=' + encodeURIComponent(abfrage), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+        if (r.ok) { daten = await r.json(); break; }
+      } catch (e) { /* nächster Server */ }
+    }
+    if (!daten) throw new Error('Spitalsuche gerade überlastet – bitte in einer Minute nochmals');
+    const L = (daten.elements || []).map(e => {
+      const t = e.tags || {}, pos = e.center || e;
+      return { spital: t.name || t['official_name'] || '', notfall: t.emergency || '',
+        adresse: [[t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' '), [t['addr:postcode'], t['addr:city']].filter(Boolean).join(' ')].filter(Boolean).join(', '),
+        tel: t['contact:phone'] || t.phone || '', lat: pos.lat, lon: pos.lon, km: skKm(k, { lat: pos.lat, lon: pos.lon }) };
+    }).filter(x => x.spital && x.notfall !== 'no');
+    // zuerst Spitäler mit Notfallstation, dann solche ohne Angabe
+    L.sort((a, b) => (b.notfall === 'yes') - (a.notfall === 'yes') || a.km - b.km);
+    const mitNotfall = L.filter(x => x.notfall === 'yes');
+    skTreffer = (mitNotfall.length >= 3 ? mitNotfall : [...mitNotfall, ...L.filter(x => x.notfall !== 'yes').sort((a, b) => a.km - b.km)]).slice(0, 3).sort((a, b) => (b.notfall === 'yes') - (a.notfall === 'yes') || a.km - b.km);
+    box.innerHTML = !skTreffer.length ? '<div class="muted klein" style="margin-top:6px">Kein Spital im Umkreis von 40 km gefunden.</div>'
+      : `<div class="sk-treffer">${skTreffer.map((x, i) => `<button class="sk-treffer-zeile" onclick="skSpitalWaehlen(${i})">
+          <b>${esc(x.spital)}</b> <span class="muted klein">${x.km.toFixed(1)} km</span>
+          ${x.notfall === 'yes' ? '<span class="tag-ok">Notfall</span>' : '<span class="tag-sub">Notfall unbekannt</span>'}
+          <span class="muted klein" style="display:block">${esc([x.adresse, x.tel && 'Tel. ' + x.tel].filter(Boolean).join(' · ') || 'keine Adresse / Telefon in OpenStreetMap')}</span></button>`).join('')}
+        <label class="bz-box" style="margin:6px 0 0"><input type="checkbox" id="sk-merken" checked> <span class="klein">Für diesen Ort in den Einstellungen merken</span></label>
+        <div class="muted klein">Quelle: OpenStreetMap – bitte kurz prüfen.</div></div>`;
+  } catch (e) { toast(e && e.message && !/fetch/i.test(e.message) ? e.message + '.' : 'Spitalsuche nicht erreichbar (Internetverbindung?).'); }
+  btn.disabled = false; btn.textContent = '📍 Nächstes Spital suchen';
+}
+async function skSpitalWaehlen(i) {
+  const p = findP(skPid), s = p.sicherheit, x = skTreffer[i];
+  if (!x) return;
+  // Adresse fehlt oder ohne Ort in OpenStreetMap: über die Koordinaten des Spitals nachschlagen
+  if (!/\d{4} \S/.test(x.adresse) && x.lat) {
+    try {
+      const a = (await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=${x.lat}&lon=${x.lon}`).then(r => r.json())).address || {};
+      const neu = [[a.road, a.house_number].filter(Boolean).join(' '), [a.postcode, a.town || a.city || a.village].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+      if (neu) x.adresse = neu;
+    } catch (e) { /* ohne Adresse weiter */ }
+  }
+  const eintrag = { spital: x.spital, adresse: x.adresse, tel: x.tel };
+  if ($('sk-merken')?.checked) {
+    // als Ort die PLZ der Baustelle, sonst der Ortsname nach der letzten Komma
+    const plz = (String(p.ort).match(/\b(\d{4})\b/) || [])[1], ortName = String(p.ort).split(',').pop().replace(/\d{4}/, '').trim();
+    const o = { id: uid(), orte: plz || ortName, ...eintrag };
+    skV().orte.push(o);
+    s.spitalId = o.id;
+    toast(`${x.spital} für ${o.orte} gespeichert.`);
+  } else { s.spitalEigen = eintrag; s.spitalId = 'eigen'; toast(`${x.spital} übernommen.`); }
+  save();
+  $('sk-spital-box').innerHTML = skSpitalBox(p);
 }
 const skSpitalText = o => o ? [o.spital, o.adresse, o.tel && 'Tel. ' + o.tel].filter(Boolean).join(', ') : '';
 let skPid = null;
@@ -6474,7 +6565,7 @@ function skFrageHtml(ctx, f) {
   return `<div class="sk-frage${w === 'nein' ? ' nein' : ''}" id="sk-${ctx}-f-${k}">
     <div class="sk-f-kopf"><span>${esc(frage)}</span>
       <div class="sk-jn">${Object.entries(SK_ANTW).filter(([a]) => a !== 'na' || na).map(([a, l]) =>
-        `<button class="${a}${w === a ? ' on' : ''}" onclick="skAntw('${ctx}','${k}','${a}')">${l}</button>`).join('')}</div></div>
+        `<button class="${a}${w === a ? ' on' : ''}" ${a === 'na' ? 'title="Trifft auf dieser Baustelle nicht zu"' : ''} onclick="skAntw('${ctx}','${k}','${a}')">${l}</button>`).join('')}</div></div>
     <div class="sk-subs">${mass.map(([m, l]) => `<label><input type="checkbox" ${z.x[k + '.' + m] ? 'checked' : ''} onchange="skX('${ctx}','${k}.${m}',this.checked)"> <span>${esc(l)}</span></label>`).join('')}</div>
     ${ctx === 'r' ? `<input class="sk-notiz" value="${esc(z.n[k])}" placeholder="${w === 'nein' ? 'Was wird unternommen? (wichtig bei «Nein»)' : 'Feststellung / weitere Massnahme (optional)'}" data-n="${k}" oninput="skNotiz(this)">` : ''}
   </div>`;
@@ -6524,32 +6615,14 @@ function skAnh(i, op, v) {
   $('sk-anhang').innerHTML = skAnhangHtml();
   if (op === 'add') { const t = $('sk-anhang').querySelectorAll('tr:last-child input'); t[0]?.focus(); }
 }
-// Mitarbeitende mit Ausbildung und Unterschrift (Instruktionsnachweis)
-function skMaHtml() {
-  const L = findP(skPid).sicherheit.ma;
-  return `${L.map((m, i) => `<div class="sk-ma">
-      <div class="sk-ma-daten">
-        <div><label>Name</label><input list="sk-namen" value="${esc(m.name)}" placeholder="Vorname Name" oninput="skMa(${i},'name',this.value)"></div>
-        <div><label>Funktion</label><input list="sk-funktionen" value="${esc(m.funktion)}" placeholder="z.B. Monteur" oninput="skMa(${i},'funktion',this.value)"></div>
-        <div class="sk-ma-ausb">${SK_AUSB.map(([k, l]) => `<label><input type="checkbox" ${m[k] ? 'checked' : ''} onchange="skMa(${i},'${k}',this.checked)"> ${l}</label>`).join('')}</div>
-        <button class="ck-btn" title="Person entfernen" onclick="skMa(${i},'del')">✕</button>
-      </div>
-      ${skSigHtml(`ma.${i}.u`, `ma.${i}.datum`, m.datum, 'Unterschrift', true)}
-    </div>`).join('')}
-    <button class="sec sm" style="margin-top:8px" onclick="skMa(0,'add')">+ Mitarbeitende/r</button>
-    ${L.length ? '' : '<div class="muted klein" style="margin-top:6px">Ohne Einträge bleibt die Tabelle im PDF leer zum Unterschreiben von Hand.</div>'}`;
-}
-function skMa(i, op, v) {
-  const L = findP(skPid).sicherheit.ma;
-  if (op === 'add') L.push({ name: '', funktion: 'Monteur', psaga: false, hab: false, kran: false, u: '', datum: '' });
-  else if (op === 'del') L.splice(i, 1);
-  else { L[i][op] = v; save(); return; }
+// Baustellenverantwortlicher Monteur: Auswahl aus den Einstellungen oder leer lassen (dann füllt er Name und Firma von Hand aus)
+const SK_MO_TEXT = 'Ich bin für diese Baustelle verantwortlich, kenne dieses Sicherheitskonzept und habe alle Mitarbeitenden auf der Baustelle darüber instruiert.';
+function skMonteurWahl(el) {
+  const s = findP(skPid).sicherheit, m = skV().monteure[el.value];
+  s.monteur = m ? m.name : ''; s.monteurFirma = m ? m.firma : '';
   save();
-  $('sk-ma').innerHTML = skMaHtml();
-  skPads();
-  if (op === 'add') { const t = $('sk-ma').querySelectorAll('.sk-ma:last-of-type input'); t[0]?.focus(); }
 }
-// Unterschriftenfeld: pfad zeigt in p.sicherheit (z.B. «uPl», «ma.0.u»), datumPfad wird beim Unterschreiben mit heute gefüllt
+// Unterschriftenfeld: pfad zeigt in p.sicherheit (z.B. «uMonteur»), datumPfad wird beim Unterschreiben mit heute gefüllt
 function skSigHtml(pfad, datumPfad, datum, titel, klein) {
   const u = skPfad(findP(skPid).sicherheit, pfad);
   return `<div class="sk-sig${klein ? ' klein' : ''}">
@@ -6602,8 +6675,7 @@ function skDialog(pid) {
   const f = k => `data-s="${k}" value="${esc(s[k])}" oninput="skSet(this)"`;
   const chk = (k, l) => `<label class="bz-box"><input type="checkbox" data-s="${k}" ${s[k] ? 'checked' : ''} onchange="skSet(this)"> <span>${l}</span></label>`;
   const auto = (l, w, fehlt = 'fehlt im Projekt') => `<div><small>${l}</small>${w ? `<b>${esc(w)}</b>` : `<span class="kunde-fehlt" style="display:block;margin:0">${fehlt}</span>`}</div>`;
-  const namen = [...new Set([...leuteImProjekt(p).filter(x => x.gruppe === 'ckw' || x.gruppe === 'montage').map(x => x.name),
-    ...S().kontakte.filter(c => c.art === 'intern' || c.art === 'sub').map(kontaktName)].filter(Boolean))];
+  const moListe = v.monteure;
   const nr = (n, t, extra = '') => `<h3 class="sk-h"><span>${n}</span>${t}${extra}</h3>`;
   d.style.width = 'min(900px, calc(100vw - 24px))';
   d.innerHTML = `<div class="aa sk">
@@ -6622,11 +6694,7 @@ function skDialog(pid) {
     ${nr(2, 'Notfall')}
     <div class="sk-notruf"><span><b>144</b> Sanität</span><span><b>1414</b> Rega</span><span><b>118</b> Feuerwehr</span><span><b>117</b> Polizei</span></div>
     <div class="grid" style="margin-top:10px">
-      <div><label>Nächstes Spital</label><select data-s="spitalId" onchange="skSet(this)">
-        <option value="">Automatisch nach Ort${skSpitalFuer(p.ort) ? ': ' + esc(skSpitalFuer(p.ort).spital) : ''}</option>
-        ${v.orte.map(o => `<option value="${o.id}" ${s.spitalId === o.id ? 'selected' : ''}>${esc(o.spital)}${o.orte ? ' (' + esc(o.orte) + ')' : ''}</option>`).join('')}
-        <option value="-" ${s.spitalId === '-' ? 'selected' : ''}>Keins angeben</option></select>
-        <div id="sk-spital" style="margin-top:6px">${skSpitalHinweis(p)}</div></div>
+      <div id="sk-spital-box" style="grid-column:1/-1">${skSpitalBox(p)}</div>
       <div><label>Nächster Arzt <span class="muted klein">optional</span></label><input ${f('arzt')} placeholder="Name, Ort, Telefon"></div>
       <div><label>Sammelplatz</label><input ${f('sammelplatz')} placeholder="z.B. Vorplatz beim Hauseingang"></div>
       <div><label>Erste-Hilfe-Material</label><input ${f('ersteHilfe')} placeholder="z.B. Im Firmenfahrzeug"></div>
@@ -6640,22 +6708,21 @@ function skDialog(pid) {
       <div class="sk-stopp"><b>STOPP</b>${SK_STOPP.map(t => `<div>☒ ${t}</div>`).join('')}</div></div>
 
     ${nr(4, 'Gefährdungsermittlung', ' <span id="sk-offen"></span>')}
-    <div class="muted klein" style="margin:-4px 0 8px">Ja = sicher. Bei «Nein» eine Massnahme eintragen. Massnahmen ankreuzen, die auf dieser Baustelle gelten.</div>
+    <div class="muted klein" style="margin:-4px 0 8px">Ja = sicher. Bei «Nein» eine Massnahme eintragen. «Entfällt» = betrifft diese Baustelle nicht. Massnahmen ankreuzen, die auf dieser Baustelle gelten.</div>
     <div id="sk-fragen">${skFragen(p).map(q => skFrageHtml('r', q)).join('')}</div>
 
     ${nr(5, 'Objektspezifische Massnahmen', ' <span class="muted klein" style="font-weight:400">optional</span>')}
     <div id="sk-anhang">${skAnhangHtml()}</div>
 
-    ${nr(6, 'Instruktion der Mitarbeitenden')}
-    <div class="muted klein" style="margin:-4px 0 8px">Jede Person bestätigt mit ihrer Unterschrift, dass sie über dieses Sicherheitskonzept instruiert wurde.</div>
-    <div id="sk-ma">${skMaHtml()}</div>
-    <datalist id="sk-namen">${namen.map(n => `<option value="${esc(n)}">`).join('')}</datalist>
-    <datalist id="sk-funktionen"><option value="Monteur"><option value="Baustellenverantwortlicher"><option value="Elektriker"><option value="Lernende/r"><option value="Temporär"></datalist>
-
-    ${nr(7, 'Unterschriften')}
-    <div class="sk-unter2">
-      <div><div class="sk-wer"><b>${esc(a.pl)}</b><span>Projektleiter – erstellt und Umsetzung kontrolliert</span></div>${skSigHtml('uPl', 'plDatum', s.plDatum, 'Unterschrift Projektleiter')}</div>
-      <div><div class="sk-wer"><input list="sk-namen" ${f('monteur')} placeholder="Name Monteur"><span>Baustellenverantwortlicher Monteur</span></div>${skSigHtml('uMonteur', 'moDatum', s.moDatum, 'Unterschrift Monteur')}</div>
+    ${nr(6, 'Baustellenverantwortlicher Monteur')}
+    <div class="sk-mo">
+      <div><label>Monteur</label><select onchange="skMonteurWahl(this)">
+        <option value="">– leer lassen, Monteur füllt von Hand aus –</option>
+        ${moListe.map((m, i) => `<option value="${i}" ${s.monteur && m.name === s.monteur && (m.firma || '') === (s.monteurFirma || '') ? 'selected' : ''}>${esc(m.name)}${m.firma ? ' · ' + esc(m.firma) : ''}</option>`).join('')}
+        ${s.monteur && !moListe.some(m => m.name === s.monteur && (m.firma || '') === (s.monteurFirma || '')) ? `<option selected disabled>${esc(s.monteur)}${s.monteurFirma ? ' · ' + esc(s.monteurFirma) : ''}</option>` : ''}
+      </select><div class="muted klein" style="margin-top:4px">Liste in Einstellungen › Vorlagen › Dokumente › Sicherheitskonzept.</div>
+      <p class="sk-mo-text">${SK_MO_TEXT}</p></div>
+      ${skSigHtml('uMonteur', 'moDatum', s.moDatum, 'Unterschrift Monteur')}
     </div>
   </div>
   <div class="row" style="margin-top:16px;justify-content:space-between">
@@ -6671,7 +6738,7 @@ function skDialog(pid) {
   requestAnimationFrame(skPads);
 }
 
-// Sicherheitskonzept als PDF (A4): Baustelle, Notfall, Regeln, Gefährdungsermittlung, Massnahmen, Instruktion, Unterschriften
+// Sicherheitskonzept als PDF (A4): Baustelle, Notfall, Regeln, Gefährdungsermittlung, Massnahmen, Bestätigung des Monteurs
 function skPdf(pid) {
   if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
   const p = findP(pid), s = skBereit(p), a = skAuto(p);
@@ -6760,10 +6827,10 @@ function skPdf(pid) {
   const F = skFragen(p);
   const massText = q => [q[2].filter(([m]) => s.x[q[0] + '.' + m]).map(([, l]) => l).join(' · '), s.n[q[0]]].filter(Boolean).join('\n');
   doc.autoTable({ ...tabStil, startY: y,
-    head: [['Gefährdung', { content: 'Ja', styles: { halign: 'center' } }, { content: 'Nein', styles: { halign: 'center' } }, { content: 'NA', styles: { halign: 'center' } }, 'Massnahmen / Feststellungen']],
+    head: [['Gefährdung', { content: 'Ja', styles: { halign: 'center' } }, { content: 'Nein', styles: { halign: 'center' } }, { content: 'Entfällt', styles: { halign: 'center', fontSize: 7.8 } }, 'Massnahmen / Feststellungen']],
     body: F.map(q => [q[1], '', '', '', massText(q)]),
     styles: { ...tabStil.styles, fontSize: 8.8, valign: 'middle' },
-    columnStyles: { 0: { cellWidth: 74 }, 1: { cellWidth: 10 }, 2: { cellWidth: 11 }, 3: { cellWidth: 10 }, 4: { textColor: 45 } },
+    columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 10 }, 2: { cellWidth: 11 }, 3: { cellWidth: 14 }, 4: { textColor: 45 } },
     didParseCell: d => { if (d.section === 'body' && s.a[F[d.row.index][0]] === 'nein') d.cell.styles.fillColor = [253, 238, 236]; },
     didDrawCell: d => {
       if (d.section !== 'body' || d.column.index < 1 || d.column.index > 3) return;
@@ -6783,40 +6850,24 @@ function skPdf(pid) {
     y = doc.lastAutoTable.finalY + 7;
   }
 
-  // 6 Instruktion: eingetragene Personen, darunter leere Zeilen zum Unterschreiben von Hand (mindestens 4)
-  titel('Instruktion der Mitarbeitenden', 40);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(80);
-  doc.text('Mit der Unterschrift bestätigen die Mitarbeitenden, dass sie über dieses Sicherheitskonzept instruiert wurden.', M, y); y += 3;
-  const MA = s.ma.filter(m => m.name || m.u);
-  const zeilen = [...MA, ...Array.from({ length: Math.max(0, 4 - MA.length) }, () => null)];
-  doc.autoTable({ ...tabStil, startY: y, head: [['Name', 'Funktion', 'Ausbildung', 'Datum', 'Unterschrift']],
-    body: zeilen.map(m => m ? [m.name, m.funktion || '', SK_AUSB.filter(([k]) => m[k]).map(([, l]) => l).join(', '), m.datum ? fmt(m.datum) : '', ''] : ['', '', '', '', '']),
-    styles: { ...tabStil.styles, minCellHeight: 12 },
-    columnStyles: { 0: { cellWidth: 44 }, 1: { cellWidth: 32 }, 2: { cellWidth: 30 }, 3: { cellWidth: 22 } },
-    didDrawCell: d => {
-      const m = zeilen[d.row.index];
-      if (d.section !== 'body' || d.column.index !== 4 || !m || !m.u) return;
-      const h = d.cell.height - 2, w = Math.min(d.cell.width - 4, h * SK_PAD_W / SK_PAD_H);
-      try { doc.addImage(m.u, 'PNG', d.cell.x + 2, d.cell.y + 1, w, w * SK_PAD_H / SK_PAD_W); } catch (e) { /* ohne Bild */ }
-    } });
-  y = doc.lastAutoTable.finalY + 8;
-
-  // 7 Unterschriften Projektleiter und Monteur nebeneinander
-  titel('Unterschriften', 48);
-  const kw = (B - 6) / 2, kh = 36;
-  [[a.pl, 'Projektleiter – erstellt und Umsetzung kontrolliert', s.plDatum, s.uPl], [s.monteur, 'Baustellenverantwortlicher Monteur', s.moDatum, s.uMonteur]].forEach(([name, rolle, dat, u], i) => {
-    const kx = M + i * (kw + 6);
-    doc.setDrawColor(...LINIE); doc.setLineWidth(0.3); doc.roundedRect(kx, y, kw, kh, 2, 2);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(110); doc.text(rolle, kx + 4, y + 5.5);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(...AA_TXT); doc.text(name || '', kx + 4, y + 11);
-    const ly = y + kh - 7;
-    doc.setDrawColor(130); doc.setLineWidth(0.3); doc.line(kx + 4, ly, kx + 26, ly); doc.line(kx + 30, ly, kx + kw - 4, ly);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(120); doc.text('Datum', kx + 4, ly + 3.8); doc.text('Unterschrift', kx + 30, ly + 3.8);
-    doc.setFontSize(9.5); doc.setTextColor(25); if (dat) doc.text(fmt(dat), kx + 4, ly - 1.5);
-    if (u) { try { const uh = 15, uw = Math.min(uh * SK_PAD_W / SK_PAD_H, kw - 36); doc.addImage(u, 'PNG', kx + 30, ly - uw * SK_PAD_H / SK_PAD_W + 1, uw, uw * SK_PAD_H / SK_PAD_W); } catch (e) { /* ohne Bild */ } }
-  });
+  // 6 Bestätigung des baustellenverantwortlichen Monteurs: Name/Firma vorausgefüllt oder leer zum Ausfüllen von Hand
+  titel('Baustellenverantwortlicher Monteur', 56);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.3);
+  const mt = doc.splitTextToSize(SK_MO_TEXT, B - 10), kh = 40 + mt.length * 4.2;
+  doc.setDrawColor(...AA_DUNKEL); doc.setLineWidth(0.4); doc.roundedRect(M, y, B, kh, 2, 2);
+  doc.setTextColor(50); doc.text(mt, M + 5, y + 7);
+  const l1 = y + 10 + mt.length * 4.2 + 8, l2 = l1 + 17, c1 = M + 5, c2 = M + 76, c3 = M + 138, re = W - M - 5;
+  doc.setDrawColor(130); doc.setLineWidth(0.3);
+  doc.line(c1, l1, c2 - 6, l1); doc.line(c2, l1, c3 - 6, l1); doc.line(c3, l1, re, l1); doc.line(c1, l2, c2 + 40, l2);
+  doc.setFontSize(7.5); doc.setTextColor(120);
+  doc.text('Name', c1, l1 + 3.8); doc.text('Firma', c2, l1 + 3.8); doc.text('Datum', c3, l1 + 3.8); doc.text('Unterschrift', c1, l2 + 3.8);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(...AA_TXT);
+  if (s.monteur) doc.text(s.monteur, c1, l1 - 1.8);
+  doc.setFont('helvetica', 'normal');
+  if (s.monteurFirma) doc.text(s.monteurFirma, c2, l1 - 1.8);
+  if (s.moDatum) doc.text(fmt(s.moDatum), c3, l1 - 1.8);
+  if (s.uMonteur) { try { const uh = 13, uw = uh * SK_PAD_W / SK_PAD_H; doc.addImage(s.uMonteur, 'PNG', c1 + 4, l2 - uh + 1, uw, uh); } catch (e) { /* ohne Bild */ } }
   y += kh + 4;
-
   const n = doc.getNumberOfPages();
   for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(140);
     doc.text(`${S().firma || ''} · Sicherheitskonzept ${p.nummer} · ${p.name}`, M, 289); doc.text(`Seite ${i} / ${n}`, W - M, 289, { align: 'right' }); }
@@ -6834,13 +6885,15 @@ function viewSkVorlage() {
     <h4 class="aa-h">Spitäler je Ort</h4>
     <div class="muted klein" style="margin-bottom:6px">Bei «Orte / PLZ» mehrere mit Komma trennen, auch PLZ-Bereiche – z.B. <i>Luzern, Kriens, 6000-6048</i>. Das Spital wird nach der Adresse des Projekts gewählt.</div>
     <div id="sk-orte">${skOrteHtml()}</div>
+    <h4 class="aa-h">Baustellenverantwortliche Monteure <span class="muted">zur Auswahl im Sicherheitskonzept</span></h4>
+    <div id="sk-monteure">${skMonteureHtml()}</div>
     <h4 class="aa-h">Notfall</h4>
     <div class="grid">${feld('sammelplatz', 'Sammelplatz', 'z.B. Vorplatz beim Hauseingang')}${feld('ersteHilfe', 'Erste-Hilfe-Material', 'z.B. Im Firmenfahrzeug')}${feld('feuerloescher', 'Feuerlöscher', 'z.B. Im Firmenfahrzeug')}
       <div style="align-self:end"><label class="bz-box"><input type="checkbox" ${v.notfallkarte ? 'checked' : ''} onchange="skV().notfallkarte=this.checked;save()"> <span>Notfallkarte wird abgegeben</span></label></div></div>
     <h4 class="aa-h">Gefährdungsermittlung <span class="muted">Antworten und Massnahmen, die schon gesetzt sind</span></h4>
     <div class="muted klein" style="margin-bottom:6px">Fragen zu Dach, DC und Wetter erscheinen nur bei PV-Projekten, die Batterie-Frage nur bei Batterienachrüstungen.</div>
     ${SK_FRAGEN.map(q => skFrageHtml('s', q)).join('')}
-    <div class="row" style="margin-top:14px"><button class="sec" onclick="if(confirm('Vorgaben auf den Standard zurücksetzen? Die Spitäler bleiben.')){const o=skV().orte;S().sicherheit=vorlageKopie(SK_VORLAGE);S().sicherheit.orte=o;save();render()}">Standard laden</button></div>
+    <div class="row" style="margin-top:14px"><button class="sec" onclick="if(confirm('Vorgaben auf den Standard zurücksetzen? Spitäler und Monteure bleiben.')){const o=skV().orte,m=skV().monteure;S().sicherheit=vorlageKopie(SK_VORLAGE);S().sicherheit.orte=o;S().sicherheit.monteure=m;save();render()}">Standard laden</button></div>
   </div>`;
 }
 function skOrteHtml() {
@@ -6851,6 +6904,24 @@ function skOrteHtml() {
       <td><button class="ck-btn" title="Spital entfernen" onclick="skOrt(${i},'del')">✕</button></td></tr>`).join('')}</table>`
     : '<div class="muted klein">Noch keine Spitäler hinterlegt.</div>'}
     <button class="sec sm" style="margin-top:8px" onclick="skOrt(0,'add')">+ Spital</button>`;
+}
+function skMonteureHtml() {
+  const L = skV().monteure;
+  return `${L.length ? `<table class="aa-stunden ab-tab ab-edit"><tr><th>Name</th><th>Firma</th><th style="width:34px"></th></tr>
+    ${L.map((m, i) => `<tr>${[['name', 'Vorname Name'], ['firma', 'z.B. CKW']].map(([k, ph]) =>
+      `<td><input value="${esc(m[k])}" placeholder="${ph}" oninput="skMo(${i},'${k}',this.value)"></td>`).join('')}
+      <td><button class="ck-btn" title="Monteur entfernen" onclick="skMo(${i},'del')">✕</button></td></tr>`).join('')}</table>`
+    : '<div class="muted klein">Noch keine Monteure hinterlegt.</div>'}
+    <button class="sec sm" style="margin-top:8px" onclick="skMo(0,'add')">+ Monteur</button>`;
+}
+function skMo(i, op, v) {
+  const L = skV().monteure;
+  if (op === 'add') L.push({ name: '', firma: '' });
+  else if (op === 'del') L.splice(i, 1);
+  else { L[i][op] = v; save(); return; }
+  save();
+  $('sk-monteure').innerHTML = skMonteureHtml();
+  if (op === 'add') { const t = $('sk-monteure').querySelectorAll('tr:last-child input'); t[0]?.focus(); }
 }
 function skOrt(i, op, v) {
   const L = skV().orte;
