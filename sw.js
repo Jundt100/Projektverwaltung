@@ -1,5 +1,14 @@
 // Netz zuerst (damit Änderungen auf GitHub sofort ankommen), bei fehlender Verbindung aus dem Cache
-const CACHE = 'ckw-projekte-v35'; // v35: Projektliste mit Filtern (Art, Kunde, Termin, Status), Dashboard ohne Unterseite Projekte
+const CACHE = 'ckw-projekte-v45'; // v45: Terminplan auf dem Handy mit schmaler Namensspalte (Daten darunter)
+// v44: Bogenanzeigen (Checkliste, DB, Leistung) als dicker Bogen mit Symbol
+// v43: neue Symbole Meldewesen und Gerüst
+// v42: Offerten mit mehreren Zählern (Haus, Allgemein, Mieter, WP)
+// v41: PowerKeeper nur bis 249,6 kWh und nur zu SH50CX / SH80CX
+// v39: Batterie Sungrow PowerKeeper in den Offerten
+// v38: Offerten mit WR-Liste, passenden Batterien, Netzanschluss; Seitenwechsel federnd
+// v37: neue Kategorie Offerten (Aufnahme PVA, Eigenverbrauchsoptimierung) mit A4-PDF
+// v36: Wechselrichter-Bibliothek mit Datenblättern abgeglichen (u.a. SH80CX 10 MPPT, SH5–12T 2 MPPT)
+// v35: Projektliste mit Filtern (Art, Kunde, Termin, Status), Dashboard ohne Unterseite Projekte
 // v34: Ertragsberechnung mit PVGIS (über eigenen Proxy) und Ertragsprotokoll
 // v33: Sunwoda All-in-One, Produkte mit kVA/kWh/Anzahl, WR-Auswahl → Stringplan
 // v32: Stringplan manuell verstringen, breitere Eingabe-Karten

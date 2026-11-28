@@ -118,7 +118,10 @@
   .xg { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
   .xg-inner { position: relative; width: max-content; }
   .xg-row { display: flex; border-bottom: 1px solid #e8ecf1; min-height: 32px; }
-  .xg-left { position: sticky; left: 0; z-index: 3; display: grid; grid-template-columns: 1fr 96px 96px; width: 480px; flex-shrink: 0; background: #fff; border-right: 2px solid var(--line); font-size: 13px; }
+  /* --lw: Breite der linken Spalte (Name, Start, Ende); auf dem Handy schmal, damit die Balken Platz haben */
+  .xg { --lw: 480px; }
+  .xg-dat { display: none; }
+  .xg-left { position: sticky; left: 0; z-index: 3; display: grid; grid-template-columns: 1fr 96px 96px; width: var(--lw); flex-shrink: 0; background: #fff; border-right: 2px solid var(--line); font-size: 13px; }
   .xg-left > div { padding: 5px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; align-self: center; }
   .xg-row.task .xg-left { cursor: pointer; }
   .xg-row.task .xg-left > div:first-child { padding-left: 22px; }
@@ -331,6 +334,32 @@
   .pk2-zeile { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 6px; }
   .pk2-zeile b { color: var(--text); }
   .pk2 .progress { margin-top: 0; }
+  /* Offerten: Aufnahme mit Antwort-Knöpfen, Unterpunkte eingerückt */
+  .of-kunde { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 14px; margin-bottom: 14px; }
+  .of-kunde .of-geb { grid-column: 1 / -1; }
+  .of-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; align-items: start; }
+  .of-grid .of-breit { grid-column: 1 / -1; }
+  .of-abschnitt h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 16px; }
+  .of-abschnitt h3 .of-ok { margin-left: auto; font-style: normal; color: var(--ok, #2e8b6a); font-size: 14px; }
+  .of-feld { margin-top: 10px; }
+  .of-feld:first-of-type { margin-top: 0; }
+  .of-l { font-size: 12.5px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+  .of-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .of-pill { background: var(--card, #fff); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; font-size: 13.5px; font-weight: 500; min-height: 34px; }
+  .of-pill:hover { border-color: var(--muted); background: var(--card, #fff); }
+  .of-pill.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .of-pill.mehr.on::before { content: '✓ '; }
+  .of-kinder { margin: 8px 0 2px 6px; padding: 2px 0 4px 12px; border-left: 2px solid var(--line); }
+  .of-feld .sp-in { max-width: 260px; }
+  .of-feld .sp-in input { width: 100%; }
+  .of-select { width: 100%; max-width: 360px; }
+  .of-feld textarea { width: 100%; }
+  .of-wr { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+  .of-wr-kopf { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .of-x { background: none; border: 0; color: var(--muted); padding: 2px 6px; font-size: 14px; min-height: 0; }
+  .of-x:hover { color: #c0392b; background: none; }
+  .of-hinweis { font-size: 12.5px; color: var(--muted); }
+  @media (max-width: 700px) { .of-grid { grid-template-columns: 1fr; } }
   /* Projektkarten im Dashboard: Checkliste gross, Controlling und Fortschritt klein darunter */
   .dp-karte { cursor: pointer; }
   .dp-anz { display: flex; flex-direction: column; align-items: center; gap: 2px; }
@@ -604,7 +633,8 @@
   .sv-row:last-child { border-bottom: none; }
   .sv-row.sv-alt { box-shadow: inset 3px 0 0 var(--danger); padding-left: 10px; }
   .frage { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: #f6f8ea; border: 1px solid #e1eab5; }
-  @media (prefers-reduced-motion: no-preference) { .gw-liste:not([hidden]) { animation: aufgehen .18s cubic-bezier(.2, .8, .2, 1); } }
+  @media (prefers-reduced-motion: no-preference) { .gw-liste:not([hidden]) { animation: feder-klein .45s var(--feder), blende .16s ease-out; } }
+  @keyframes feder-klein { from { transform: translateY(-8px) scale(.98); transform-origin: top center; } }
   .zeitfeld { display: flex; align-items: center; gap: 6px; }
   .zeitfeld input { min-width: 0; }
   .wk-zeit { display: block; font-size: 11px; color: var(--text); }
@@ -618,11 +648,17 @@
   .kpi { cursor: pointer; }
   .funke { position: fixed; width: var(--g); height: var(--g); margin: calc(var(--g) / -2) 0 0 calc(var(--g) / -2); border-radius: 50%; pointer-events: none; z-index: 60; animation: funke .75s cubic-bezier(.15, .7, .3, 1) forwards; }
   .of-item { max-height: 90px; }
+  /* Feder: schiesst knapp 4 % über das Ziel und schwingt weich zurück (Browser ohne linear(): einfache Überschwing-Kurve) */
+  :root { --feder: cubic-bezier(.3, 1.25, .5, 1); }
+  @supports (animation-timing-function: linear(0, 1)) {
+    :root { --feder: linear(0, .058, .192, .357, .521, .668, .79, .883, .95, .994, 1.021, 1.034, 1.038, 1.037, 1.032, 1.026, 1.019, 1.013, 1.009, 1.005, 1.002, 1); }
+  }
   @media (prefers-reduced-motion: no-preference) {
-    /* Seiten- und Tabwechsel: ein Element blendet ein statt vieler einzelner Karten (backwards: danach kein transform mehr) */
-    .rein { animation: seite-rein .28s cubic-bezier(.2, .7, .2, 1) backwards; will-change: opacity, transform; }
+    /* Seiten- und Tabwechsel: die ganze Seite federt als ein Stück herein – Bewegung mit Feder, Deckkraft kurz und ruhig */
+    .rein { animation: feder-hoch .55s var(--feder) backwards, blende .2s ease-out backwards; will-change: opacity, transform; }
     .rein .progress div, .rein .prog div { animation: wachsen .6s cubic-bezier(.2, .7, .2, 1) .1s backwards; transform-origin: left center; }
-    .rein .gauge .g-l { animation: blende .25s calc(var(--i) * 10ms + .1s) backwards; }
+    .rein .gauge .g-fill { animation: bogen-wachsen .9s var(--feder) .1s backwards; }
+    .g-fill { transition: stroke-dasharray .6s var(--feder), stroke .4s; }
     .progress div, .prog div { transition: width .6s cubic-bezier(.2, .7, .2, 1), background-color .3s; }
     .xg-bar i { transition: width .6s cubic-bezier(.2, .7, .2, 1); }
     .g-l { transition: stroke .5s; }
@@ -646,8 +682,8 @@
     nav a:hover svg { transform: scale(1.12); }
     .layout { transition: grid-template-columns .28s cubic-bezier(.2, .7, .2, 1); }
     input, select, textarea { transition: border-color .15s, box-shadow .15s, background-color .15s; }
-    dialog[open] { animation: aufgehen .26s cubic-bezier(.2, .8, .2, 1); }
-    dialog[open]::backdrop { animation: blende .26s ease; }
+    dialog[open] { animation: feder-auf .5s var(--feder), blende .18s ease-out; }
+    dialog[open]::backdrop { animation: blende .25s ease; }
     .login-card { animation: aufgehen .45s cubic-bezier(.2, .8, .2, 1); }
     .toast { transition: opacity .25s, transform .25s cubic-bezier(.2, .8, .2, 1); transform: translateX(-50%) translateY(10px); }
     .toast.show { transform: translateX(-50%) translateY(0); }
@@ -666,8 +702,11 @@
   @keyframes pulsieren { 50% { box-shadow: 0 0 0 4px rgba(192, 57, 43, .12); } }
   @keyframes hochgleiten { from { opacity: .3; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes seite-rein { from { opacity: 0; transform: translateY(10px); } }
-  @keyframes von-rechts { from { opacity: 0; transform: translateX(14px); } }
-  @keyframes von-links { from { opacity: 0; transform: translateX(-14px); } }
+  @keyframes von-rechts { from { transform: translateX(22px); } }
+  @keyframes von-links { from { transform: translateX(-22px); } }
+  @keyframes feder-hoch { from { transform: translateY(18px); } }
+  @keyframes bogen-wachsen { from { stroke-dasharray: 0 100; } }
+  @keyframes feder-auf { from { transform: translateY(14px) scale(.95); } }
   @keyframes geist-raus { to { opacity: 0; transform: translateY(-6px); } }
   @keyframes streifen { from { background-size: 5px 0%; } }
   /* Seitenwechsel: alte Seite als «Geist» darüber, blendet aus */
@@ -688,12 +727,9 @@
   .pk-kopf { border-left-color: transparent !important; background-image: linear-gradient(var(--pf), var(--pf)); background-repeat: no-repeat; background-origin: border-box; background-size: 5px 100%; }
   @media (prefers-reduced-motion: no-preference) {
     /* neue Seite: oberste Blöcke nacheinander (max. 7 gestaffelt) */
-    .rein.gestaffelt { animation: none; }
-    .rein.gestaffelt > * { animation: seite-rein .3s cubic-bezier(.2, .7, .2, 1) calc(70ms + var(--n, 0) * 40ms) backwards; }
-    .rein.gestaffelt > .pk-kopf { animation: seite-rein .3s cubic-bezier(.2, .7, .2, 1) calc(70ms + var(--n, 0) * 40ms) backwards,
-      streifen .55s cubic-bezier(.2, .7, .2, 1) calc(160ms + var(--n, 0) * 40ms) backwards; }
-    .rein.von-r { animation-name: von-rechts; }
-    .rein.von-l { animation-name: von-links; }
+    .rein.gestaffelt > .pk-kopf { animation: streifen .6s var(--feder) .12s backwards; }
+    .rein.von-r { animation-name: von-rechts, blende; }
+    .rein.von-l { animation-name: von-links, blende; }
     .gleiter { transition: transform .32s cubic-bezier(.3, .9, .3, 1), width .32s cubic-bezier(.3, .9, .3, 1), height .32s cubic-bezier(.3, .9, .3, 1), opacity .2s; }
     /* Projektkarte drückt sich beim Klick leicht ein */
     .pcard:active, .dp-karte:active { transform: translateY(-1px) scale(.98); transition-duration: .08s; }
@@ -855,9 +891,23 @@
     nav a { padding: 8px 10px; font-size: 13px; white-space: nowrap; }
     .side-foot { display: none; }
     main { padding: 16px 16px 60px; }
-    .xg-left { width: 230px; grid-template-columns: 1fr 64px; }
+    .xg { --lw: 230px; }
+    .xg-left { grid-template-columns: 1fr 64px; }
     .xg-left > div:nth-child(3) { display: none; }
     .cal-bar { font-size: 10px; padding: 0 3px; }
+  }
+  /* Handy: links nur der Name (Daten klein darunter), die Balken bekommen den Rest der Breite */
+  @media (max-width: 600px) {
+    .xg { --lw: 128px; }
+    .card > .xg { margin-left: -16px; margin-right: -16px; border-radius: 0; }
+    .xg-left { grid-template-columns: 1fr; font-size: 12px; }
+    .xg-left > div:nth-child(n+2) { display: none; }
+    .xg-left > div { padding: 4px 6px; }
+    .xg-row.task .xg-left > div:first-child { padding-left: 9px; }
+    .xg-group .xg-left .muted, .xg-group .xg-left .tag-ext, .xg-group .xg-left .tag-int, .xg-group .xg-left .tag-sub { display: none; }
+    .xg-dat { display: block; font-size: 10.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+    .xg-row.task .xg-bar { top: calc(50% - 8px); }
+    .xg-row.task .xg-ms { top: calc(50% - 6.5px); }
   }
   /* schmale Ansicht: Menü nur mit Symbolen (Name als Tooltip), gleichmässig verteilt; Anmeldung als eine kurze Zeile */
   @media (max-width: 800px) {
@@ -920,7 +970,7 @@
   }
   /* Untermenüs in der Leiste: nur bei der offenen Hauptseite ausgeklappt */
   nav .nav-pfeil { margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 400; }
-  .nav-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 8px 22px; padding-left: 12px; border-left: 2px solid #e3e2dc; animation: navSub .2s ease; }
+  .nav-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 8px 22px; padding-left: 12px; border-left: 2px solid #e3e2dc; animation: feder-klein .45s var(--feder), blende .16s ease-out; }
   .nav-sub a { font-size: 13px; padding: 6px 10px; border-radius: 9px; color: var(--muted); }
   .nav-sub a:hover { color: var(--text); background: #efeee9; }
   .nav-sub a.on { color: var(--text); font-weight: 600; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
@@ -1695,6 +1745,7 @@ function load() {
 }
 function migrate(d) {
   d.projects = d.projects || [];
+  d.offerten = Array.isArray(d.offerten) ? d.offerten : [];
   d.settings = Object.assign({}, DEFAULT_SETTINGS, d.settings || {});
   if (!Array.isArray(d.settings.standardGewerke)) d.settings.standardGewerke = stdKopie();
   Object.entries(CHK_FELD).forEach(([art, f]) => { if (typeof d.settings[f] !== 'string') d.settings[f] = CHK_STANDARD[art]; });
@@ -1985,17 +2036,19 @@ const ICONS = {
 ICONS.woche = '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 14h3M13 14h3M8 17h3"/>';
 ICONS.kontakte = '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2c3 .2 5.5 2.2 5.5 5.3"/>';
 ICONS.controlling = '<path d="M4 19h16"/><path d="M5 15l4-5 4 3 6-7"/><circle cx="19" cy="6" r="1.5"/>';
+ICONS.offerten = '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>';
 // Wochenplan und Monatskalender sind ein Menüpunkt «Termine» (oben umschaltbar Woche / Monat)
-const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Termine'], ['einstellungen', 'Einstellungen']];
+const NAV = [['dashboard', 'Dashboard'], ['projekte', 'Projekte'], ['offerten', 'Offerten'], ['controlling', 'Controlling'], ['kontakte', 'Kontakte'], ['woche', 'Termine'], ['einstellungen', 'Einstellungen']];
 // Untermenüs: klappen in der Leiste auf, wenn die Hauptseite offen ist (Adresse #/seite/unterseite)
 const NAV_SUB = {
   dashboard: [['checklisten', 'Checklisten'], ['db', 'DB-Übersicht'], ['kalender', 'Kalender'], ['jahr', 'Jahresübersicht']],
   projekte: [['offen', 'Laufend / Offen'], ['abgeschlossen', 'Abgeschlossen']],
+  offerten: [['offen', 'Offen'], ['offeriert', 'Offeriert'], ['erledigt', 'Erledigt']],
   controlling: [['kontrollieren', 'Kontrollieren'], ['db', 'DB-Übersicht']],
   kontakte: [['kunde', 'Kunden'], ['intern', 'Intern CKW'], ['sub', 'Subunternehmer'], ['extern', 'Extern']],
   einstellungen: [['allgemein', 'Allgemein'], ['vorlagen', 'Vorlagen'], ['auswertung', 'Auswertung']]
 };
-const unterSeite = () => { const r = route(); return r.page === 'projekt' ? '' : (r.id || ''); };
+const unterSeite = () => { const r = route(); return r.page === 'projekt' || r.page === 'offerte' ? '' : (r.id || ''); };
 // Leeren-Knopf in Suchfeldern (erscheint nur, wenn etwas eingetippt ist)
 const SUCH_X = `<button type="button" class="such-x" title="Suche leeren" aria-label="Suche leeren" onmousedown="event.preventDefault()" onclick="suchLeeren(this)">✕</button>`;
 function suchLeeren(b) { const i = b.previousElementSibling; if (!i) return; i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); i.focus(); }
@@ -2071,7 +2124,7 @@ function zaehlerStarten(wurzel) {
 function render(opt = {}) {
   const r = route();
   chkKeys = [];
-  const active = r.page === 'projekt' ? 'projekte' : r.page === 'termine' ? 'woche' : r.page;
+  const active = r.page === 'projekt' ? 'projekte' : r.page === 'offerte' ? 'offerten' : r.page === 'termine' ? 'woche' : r.page;
   if (r.page === 'woche' || r.page === 'termine') ui.terminLetzte = r.page;
   const sub = unterSeite();
   if (r.page === 'kontakte') ui.kart = KONTAKT_ARTEN.some(a => a[0] === sub) ? sub : '';
@@ -2084,17 +2137,19 @@ function render(opt = {}) {
   $('sideToggle').textContent = sideCollapsed ? '»' : '«';
   $('brandSub').textContent = `${S().firma} · ${S().name}`;
   renderSide();
-  const p = r.page === 'projekt' && findP(r.id);
+  const p = r.page === 'projekt' && findP(r.id), of = r.page === 'offerte' && findO(r.id);
   const html =
     p ? viewProjekt(p) :
+    of ? viewOfferte(of) :
     r.page === 'projekte' ? viewProjekte() :
+    r.page === 'offerten' || r.page === 'offerte' ? viewOfferten() :
     r.page === 'controlling' ? viewControlling() :
     r.page === 'termine' ? viewKalender() :
     r.page === 'woche' ? viewWoche() :
     r.page === 'kontakte' ? viewKontakte() :
     r.page === 'einstellungen' ? viewEinstellungen() : viewDashboard();
   // schmale Ansicht: Untermenü als Knopfreihe oben auf der Seite (die Leiste zeigt dort nur Symbole)
-  const subMobil = !p && NAV_SUB[active] ? `<div class="sub-mobil"><a href="#/${active}" class="${sub ? '' : 'on'}">Übersicht</a>${subLinks(active)}</div>` : '';
+  const subMobil = !p && !of && NAV_SUB[active] ? `<div class="sub-mobil"><a href="#/${active}" class="${sub ? '' : 'on'}">Übersicht</a>${subLinks(active)}</div>` : '';
   ui.pop = null;
   // andere Seite: neu aufbauen und kurz einblenden · anderer Tab, Monat usw.: nur Geändertes abgleichen,
   // Kopf und Tabs bleiben stehen, nur der Tab-Inhalt blendet ein · sonst: nur abgleichen, ohne Bewegung.
@@ -2104,7 +2159,7 @@ function render(opt = {}) {
   ui.seite = seite; ui.ansicht = ansicht;
   const app = $('app');
   // alte Seite blendet kurz aus (bevor nach oben gescrollt wird, damit sie an ihrem Platz bleibt)
-  if (neueSeite && app.childElementCount && !wenigBewegung()) seiteAusblenden(app);
+  // (früher blendete die alte Seite als Kopie aus – zwei Bewegungen gleichzeitig wirkten unruhig; jetzt federt nur die neue Seite herein)
   if (opt.nachOben) scrollTo(0, 0);
   if (neueSeite) { app.innerHTML = subMobil + html; einblenden(app, 'gestaffelt'); zaehlerStarten(app); }
   else {
@@ -2170,21 +2225,26 @@ function schieber() {
 addEventListener('resize', () => schieber());
 if (window.ResizeObserver) new ResizeObserver(() => schieber()).observe(document.getElementById('nav') || document.body);
 
-// Halbkreis-Anzeige aus Strichen
-// o.mini: kleine Anzeige (grössere Schrift im Verhältnis), o.farbe: Strichfarbe, o.wert: eigener Text statt «pct%»
+// Halbkreis-Anzeige: dicker Bogen mit runden Enden (Rest grau), Symbol in der Mitte, Prozent und Text unter dem Bogen
+// o.mini: kleine Anzeige (grössere Schrift im Verhältnis), o.farbe: Bogenfarbe, o.wert: eigener Text statt «pct%», o.icon: Symbol in der Mitte
+const GAUGE_ICON = {
+  check: '<circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.3l2.6 2.6 5-5.2"/>',
+  db: '<path d="M4 16.5l5-5 3.2 3.2L19 8"/><path d="M14.5 8H19v4.5"/>',
+  leistung: '<path d="M13 3 5.5 13.5H11L10 21l7.5-10.5H12z"/>',
+  bauzeit: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  aus: '<path d="M7.5 12h9"/>'
+};
 function gauge(pct, label, o = {}) {
-  let s = '';
-  const farbe = o.farbe || '#18181b', mini = !!o.mini;
-  for (let i = 0, n = mini ? 24 : 40; i <= n; i++) {
-    const a = Math.PI * (1 - i / n), c = Math.cos(a), sn = Math.sin(a);
-    const an = i / n * 100 <= pct && pct > 0;
-    s += `<line class="g-l ${an ? 'an' : ''}" style="--i:${i}" x1="${(100 + 68 * c).toFixed(1)}" y1="${(100 - 68 * sn).toFixed(1)}" x2="${(100 + 86 * c).toFixed(1)}" y2="${(100 - 86 * sn).toFixed(1)}"
-      stroke="${an ? farbe : '#d6d4cb'}" stroke-width="${mini ? 5 : 2.6}" stroke-linecap="round"/>`;
-  }
-  const wert = o.wert != null ? `>${esc(o.wert)}` : ` data-zahl="${pct}" data-suffix="%">${pct}%`;
-  return `<svg class="gauge${mini ? ' gauge-mini' : ''}" viewBox="0 0 200 ${mini ? 120 : 112}" width="${mini ? 112 : 230}" role="img" aria-label="${label} ${o.wert || pct + '%'}">${s}
-    <text x="100" y="${mini ? 92 : 88}" text-anchor="middle" font-size="${mini ? 31 : 28}" font-weight="600" fill="${mini && pct > 0 ? farbe : '#18181b'}" font-family="Inter, sans-serif"${wert}</text>
-    <text x="100" y="${mini ? 116 : 106}" text-anchor="middle" font-size="${mini ? 21 : 11}" fill="#74747c" font-family="Inter, sans-serif">${label}</text></svg>`;
+  const farbe = o.farbe || '#18181b', mini = !!o.mini, p = Math.max(0, Math.min(100, +pct || 0));
+  const ic = GAUGE_ICON[o.icon] || GAUGE_ICON.check, bogen = 'M22 100 A78 78 0 0 1 178 100', sw = mini ? 26 : 20;
+  const wert = o.wert != null ? `>${esc(o.wert)}` : ` data-zahl="${p}" data-suffix="%">${p}%`;
+  return `<svg class="gauge${mini ? ' gauge-mini' : ''}" viewBox="0 0 200 ${mini ? 166 : 160}" width="${mini ? 104 : 200}" role="img" aria-label="${label} ${o.wert || p + '%'}">
+    <path d="${bogen}" fill="none" stroke="#e7e6e1" stroke-width="${sw}" stroke-linecap="round"/>
+    ${p > 0 ? `<path class="g-fill" d="${bogen}" pathLength="100" fill="none" stroke="${farbe}" stroke-width="${sw}" stroke-linecap="round" style="stroke-dasharray:${p} 100"/>` : ''}
+    <circle cx="100" cy="80" r="${mini ? 24 : 21}" fill="${farbe}" fill-opacity=".13"/>
+    <g transform="translate(100 80) scale(${mini ? 1.55 : 1.3}) translate(-12 -12)" fill="none" stroke="${farbe}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</g>
+    <text x="100" y="${mini ? 140 : 134}" text-anchor="middle" font-size="${mini ? 36 : 28}" font-weight="600" fill="${mini && p > 0 ? farbe : '#18181b'}" font-family="Inter, sans-serif"${wert}</text>
+    <text x="100" y="${mini ? 164 : 154}" text-anchor="middle" font-size="${mini ? 21 : 12}" fill="#74747c" font-family="Inter, sans-serif">${label}</text></svg>`;
 }
 function renderSide() {
   const b = backup, st = S();
@@ -2427,11 +2487,11 @@ function dashProjekte(today) {
       ${modulAn(p, 'checkliste') ? `<span class="dp-klein-chk" title="Checkliste erledigt"><i style="width:${ck.pct}%"></i><b>${ck.pct}%</b></span>` : ''}
     </div>`;
     // Controlling: Füllung = DB-Prognose im Verhältnis zum DB aus dem Verkauf
-    let ct = gauge(0, modulAn(p, 'controlling') ? 'kein Controlling' : 'Controlling aus', { mini: true, wert: '–', farbe: DP_FARBE.n }), prog, progL;
+    let ct = gauge(0, modulAn(p, 'controlling') ? 'kein Controlling' : 'Controlling aus', { mini: true, wert: '–', farbe: DP_FARBE.n, icon: 'db' }), prog, progL;
     if (ktMitDaten(p) && modulAn(p, 'controlling')) {
       const i = ktInfo(p), c = i.c;
       const fill = c.dbProgPct == null || !c.dbPlanPct ? 0 : Math.max(0, Math.min(100, Math.round(c.dbProgPct / c.dbPlanPct * 100)));
-      ct = gauge(fill, 'DB · ' + i.st.lbl, { mini: true, wert: c.dbProgPct == null ? '–' : ktPct(c.dbProgPct), farbe: DP_FARBE[i.st.cls] });
+      ct = gauge(fill, 'DB · ' + i.st.lbl, { mini: true, wert: c.dbProgPct == null ? '–' : ktPct(c.dbProgPct), farbe: DP_FARBE[i.st.cls], icon: 'db' });
       prog = c.prog; progL = 'Leistung';
     } else {
       prog = vorbei ? 100 : lauf ? Math.round((diffDays(s.start, today) + 1) / (diffDays(s.start, s.ende) + 1) * 100) : 0; progL = 'Bauzeit';
@@ -2450,10 +2510,10 @@ function dashProjekte(today) {
       <div class="row" style="margin-top:14px"><button onclick="event.stopPropagation();openProjekt('${id}')">Projekt öffnen</button>
         ${vorbei ? `<button class="sec" onclick="event.stopPropagation();ktAbschlussDialog('${id}')">✓ Projekt abschliessen</button>` : ''}</div>
     </div>
-    <div class="dp-anz">${modulAn(p, 'checkliste') ? gauge(ck.pct, 'Checkliste erledigt') : gauge(0, 'Checkliste aus', { wert: '–', farbe: DP_FARBE.n })}
+    <div class="dp-anz">${modulAn(p, 'checkliste') ? gauge(ck.pct, 'Checkliste erledigt', { icon: 'check' }) : gauge(0, 'Checkliste aus', { wert: '–', farbe: DP_FARBE.n, icon: 'aus' })}
       <div class="dp-mini">
         <div onclick="event.stopPropagation();ui.tab='controlling';nav('projekt/${id}')">${ct}</div>
-        <div>${gauge(prog, progL, { mini: true, farbe: '#3d6fb6' })}</div>
+        <div>${gauge(prog, progL, { mini: true, farbe: '#3d6fb6', icon: progL === 'Leistung' ? 'leistung' : 'bauzeit' })}</div>
       </div></div>
     </div></div>`;
   }).join('');
@@ -2690,6 +2750,402 @@ function viewProjekte() {
 function filterProjekte(q) {
   ui.q = q; q = q.toLowerCase();
   document.querySelectorAll('.pcard').forEach(c => c.style.display = c.dataset.q.includes(q) ? '' : 'none');
+}
+
+// ---------- Offerten: Aufnahmen beim Kunden (PV-Anlage, Eigenverbrauchsoptimierung) ----------
+// Jede Offerte ist ein eigener Datensatz (state.offerten). In der Cloud liegt sie wie ein Projekt als eigenes Dokument, markiert mit _offerte.
+// Formular aus einem Schema: wahl = eine Antwort, mehr = mehrere, zahl/text/lang = Eingabe, wr = Wechselrichter-Modell der gewählten Marke.
+// Unterpunkte (3. Wert einer Antwort) erscheinen nur, wenn die Antwort gewählt ist – und nur sie kommen ins PDF.
+const OF_ARTEN = { pva: 'Aufnahme PVA', evo: 'Eigenverbrauchsoptimierung' };
+const OF_ART_INFO = { pva: ['☀', 'Neue PV-Anlage, Erweiterung'], evo: ['🔋', 'Batterie, Steuerung, Ansteuerung'] };
+const OF_STATUS = { offen: 'Offen', offeriert: 'Offeriert', auftrag: 'Auftrag erhalten', abgelehnt: 'Abgelehnt' };
+const OF_SUB = { offen: ['offen'], offeriert: ['offeriert'], erledigt: ['auftrag', 'abgelehnt'] };
+const OF_MARKEN = ['Sungrow', 'SMA', 'Huawei', 'Fronius', 'GoodWe', 'Sunwoda'];
+// Batterien mit ihren Kapazitätsstufen (Herstellerangaben, Stand 11/2026) und den WR-Marken, an denen sie laufen
+const OF_BATTERIEN = [
+  { id: 'sg-sbr', b: 'Sungrow', m: 'SBR (Hochvolt)', kwh: [9.6, 12.8, 16, 19.2, 22.4, 25.6], wr: ['Sungrow'] },
+  { id: 'sg-sbh', b: 'Sungrow', m: 'SBH', kwh: [10, 15, 20, 25, 30, 35, 40], wr: ['Sungrow'] },
+  // PowerKeeper (Gewerbe, zu SH-CX): Pakete à 12,48 kWh, Systeme 49,9–249,6 kWh (Datenblatt ST050CF–ST250CF)
+  // nur: Batterie gibt es nur zu diesen WR-Modellen (erscheint erst, wenn ein passendes Modell gewählt ist)
+  { id: 'sg-pk', b: 'Sungrow', m: 'PowerKeeper (Gewerbe)', kwh: [49.9, 62.4, 74.9, 99.8, 149.8, 199.7, 249.6], wr: ['Sungrow'], nur: /^SH(50|80)CX\b/ },
+  { id: 'hw-s0', b: 'Huawei', m: 'LUNA2000-S0', kwh: [5, 10, 15, 20, 25, 30], wr: ['Huawei'] },
+  { id: 'hw-s1', b: 'Huawei', m: 'LUNA2000-S1', kwh: [6.9, 13.8, 20.7], wr: ['Huawei'] },
+  { id: 'fr-reserva', b: 'Fronius', m: 'Reserva', kwh: [6.3, 9.5, 12.6, 15.8], wr: ['Fronius'] },
+  { id: 'byd-hvs', b: 'BYD', m: 'Battery-Box Premium HVS', kwh: [5.1, 7.7, 10.2, 12.8], wr: ['Fronius', 'SMA', 'GoodWe', 'Sungrow'] },
+  { id: 'byd-hvm', b: 'BYD', m: 'Battery-Box Premium HVM', kwh: [8.3, 11, 13.8, 16.6, 19.3, 22.1], wr: ['Fronius', 'SMA', 'GoodWe', 'Sungrow'] },
+  { id: 'sma-hs', b: 'SMA', m: 'Home Storage', kwh: [3.3, 6.6, 9.8, 13.1, 16.4], wr: ['SMA'] },
+  { id: 'gw-lynxf', b: 'GoodWe', m: 'Lynx Home F', kwh: [6.6, 9.8, 13.1, 16.4], wr: ['GoodWe'] },
+  { id: 'sw-sunesss', b: 'Sunwoda', m: 'SunESS Power Batteriemodule', kwh: [], wr: ['Sunwoda'] }
+];
+const ofOpt = L => L.map(x => Array.isArray(x) ? x : [x, x]);
+const ofJn = (ja = [], nein = []) => [['ja', 'Ja', ja], ['nein', 'Nein', nein]];
+// Werte liegen in o.d; Schlüssel mit Punkt («awr.0.marke») zeigen in die Wechselrichter-Liste
+const ofGet = (d, k) => String(k).split('.').reduce((x, s) => x == null ? undefined : x[s], d);
+function ofPut(d, k, v) {
+  const p = String(k).split('.'), last = p.pop(); let x = d;
+  p.forEach((s, i) => { if (x[s] == null) x[s] = /^\d+$/.test(p[i + 1] ?? last) ? [] : {}; x = x[s]; });
+  x[last] = v;
+}
+// Antworten können von anderen Antworten abhängen: o als Funktion, 4. Wert = Bedingung
+const ofOpts = (f, d) => (typeof f.o === 'function' ? f.o(d) : f.o).filter(x => !x[3] || x[3](d));
+// batteriefähige Wechselrichter (Hybrid) in der Bibliothek erkennen
+const ofIstHybrid = m => !!m && (/\((Hybrid|All-in-One)\)/.test(m.m) || (m.b === 'Fronius' && / Plus$/.test(m.m))
+  || (m.b === 'Huawei' && /-(MAP0|MB0|KTL-M1|KTL-L1)$/.test(m.m)) || (m.b === 'GoodWe' && /-ET$/.test(m.m)));
+const ofIstEvo = d => Array.isArray(d.awr);
+// Eigenverbrauchsoptimierung: Wechselrichter wie sie nachher laufen (ersetzt = neuer WR)
+const ofWrEff = d => (d.awr || []).map((w, i) => { const neu = w.ersetzen === 'ja', m = neu ? spBibFind(w.neu_modell) : null;
+  return { i, marke: (neu ? w.neu_marke : w.marke) || '', name: neu ? (m ? m.m : w.neu_modell || '') : w.modell || '', hybrid: neu ? ofIstHybrid(m) : w.hybrid === 'ja' }; });
+const ofHybride = d => ofWrEff(d).filter(w => w.hybrid && w.marke);
+const ofBatWr = d => { const h = ofHybride(d); return h.find(w => String(w.i) === d.bat_an) || h[0]; };
+// Marke, nach der die Batterien gefiltert werden
+function ofBatMarke(d) {
+  if (!ofIstEvo(d)) return d.wr_marke || '';
+  const w = ofBatWr(d); if (w) return w.marke;
+  return d.bat_kop === 'ac' ? d.bat_ac_marke || '' : d.bat_kop === 'dc' ? d.dc_wr_marke || '' : '';
+}
+// WR-Modell, an dem die Batterie hängt (für Batterien, die es nur zu bestimmten Modellen gibt)
+function ofBatWrModell(d) {
+  const bib = (k, mk) => { const m = spBibFind(d[k]); return m && m.b === d[mk] ? m.m : String(d[k] || '').includes('|') ? '' : String(d[k] || ''); };
+  if (!ofIstEvo(d)) return bib('wr_modell', 'wr_marke');
+  const w = ofBatWr(d); if (w) return w.name;
+  return d.bat_kop === 'dc' ? bib('dc_wr_modell', 'dc_wr_marke') : '';
+}
+const ofFronius = d => d.wr_marke === 'Fronius' || ofWrEff(d).some(w => w.marke === 'Fronius') || (ofIstEvo(d) && !ofHybride(d).length && d.bat_kop === 'dc' && d.dc_wr_marke === 'Fronius');
+const OF_BAT_MODELL = { k: 'bat_modell', t: 'wahl', l: 'Batterie', wenn: d => !ofIstEvo(d) || !!ofBatMarke(d),
+  o: d => { const m = ofBatMarke(d), wm = ofBatWrModell(d);
+    return OF_BATTERIEN.filter(b => (!m || b.wr.includes(m)) && (!b.nur || b.nur.test(wm))).map(b => [b.id, `${b.b} ${b.m}`]); } };
+const ofBatAkt = d => ofOpts(OF_BAT_MODELL, d).some(x => x[0] === d.bat_modell) ? OF_BATTERIEN.find(b => b.id === d.bat_modell) : null;
+const OF_BAT_KAP = { k: 'bat_kwh', t: 'kap', l: 'Kapazität', wenn: d => !!ofBatAkt(d) };
+const OF_NS = { k: 'ns', t: 'wahl', l: 'Notstrom', o: ofJn([{ k: 'ns_art', t: 'wahl', l: 'Art', o: [
+  ['full', 'FullBackup', [{ k: 'ns_full', t: 'wahl', l: 'Ausführung', o: ofOpt(['Fronius bis 32 A', 'Envitec bis 63 A']) }]],
+  ['dose', 'Notstrom-Steckdose', [{ k: 'ns_dose', t: 'wahl', l: 'Steckdose', o: ofOpt(['Immer Strom', 'Nur Notstrom']) }]]] }]) };
+const OF_BAT_TIPP = { k: 'bat_tipp', t: 'hinweis', l: '', pdf: false, v: d => ofIstEvo(d)
+  ? (!ofWrEff(d).some(w => w.marke) ? 'Zuerst die bestehenden Wechselrichter erfassen.' : !ofBatMarke(d) ? 'Kopplung und Marke wählen – dann erscheinen die passenden Batterien.' : '')
+  : (!d.wr_marke ? 'Wechselrichter-Marke wählen – dann erscheinen nur die passenden Batterien.' : '') };
+const OF_STEUERUNG = [['solarmanager', 'Solarmanager'], ['solarlog', 'Solar-Log'], ['sgo', 'SmartGridOne']];
+const OF_STEUER_INFO = { solarmanager: 'EFH, einfache Steuerung und Überwachung CKW', solarlog: 'Gewerbe und Industrie', sgo: 'Komplexe Systeme und Einbindungen' };
+const ofWr = k => [{ k: k + '_marke', t: 'wahl', l: 'Marke', o: ofOpt(OF_MARKEN) }, { k: k + '_modell', t: 'wr', l: 'Modell', marke: k + '_marke' }];
+const OF_LSG = { k: 'lsg_art', t: 'wahl', l: 'Umfang', o: ofOpt(['Komplett', 'Vorbereitung bis zur Ladestation', 'Nur Sicherung', 'Ersetzen']) };
+const OF_ABSCHNITTE = {
+  module: { i: '☀', t: 'Module', f: [
+    { k: 'mod_wp', t: 'wahl', l: 'Leistung', o: [...Array.from({ length: 13 }, (_, i) => 450 + i * 5).map(w => [String(w), w + ' Wp']), ['andere', 'Andere', [{ k: 'mod_wp_x', t: 'zahl', l: 'Leistung', e: 'Wp' }]]] },
+    { k: 'mod_optik', t: 'wahl', l: 'Optik', o: [['ss', 'Schwarz / Schwarz'], ['ws', 'Weiss / Schwarz']] },
+    { k: 'mod_anz', t: 'zahl', l: 'Anzahl Module (ca.)', e: 'Stk.' }] },
+  wr: { i: '⚡', t: 'Wechselrichter', f: ofWr('wr') },
+  bat: { i: '🔋', t: 'Batteriespeicher', f: [{ k: 'bat', t: 'wahl', l: 'Batterie', o: ofJn([OF_BAT_TIPP, OF_BAT_MODELL, OF_BAT_KAP, OF_NS]) }] },
+  // Eigenverbrauchsoptimierung: Hybrid-WR vorhanden → DC daran; sonst AC-gekoppelt oder DC mit neuem Hybrid-WR
+  batEvo: { i: '🔋', t: 'Batteriespeicher', f: [{ k: 'bat', t: 'wahl', l: 'Batterie', o: ofJn([
+    { k: 'bat_an', t: 'wahl', l: 'Batterie an', wenn: d => ofHybride(d).length > 1, o: d => ofHybride(d).map(w => [String(w.i), `WR ${w.i + 1}: ${w.marke} ${w.name}`.trim()]) },
+    { k: 'bat_dc', t: 'hinweis', l: 'Kopplung', v: d => { const w = ofBatWr(d); return w ? `DC am bestehenden Hybrid-WR (WR ${w.i + 1}${w.name ? ': ' + w.name : ''})` : ''; } },
+    { k: 'bat_kop', t: 'wahl', l: 'Kopplung', wenn: d => !ofHybride(d).length, o: [
+      ['ac', 'AC-gekoppelt', [{ k: 'bat_ac_marke', t: 'wahl', l: 'Marke Batteriesystem', o: ofOpt(OF_MARKEN) }]],
+      ['dc', 'DC mit neuem Hybrid-WR', [{ k: 'dc_wr_marke', t: 'wahl', l: 'Marke neuer WR', o: ofOpt(OF_MARKEN) }, { k: 'dc_wr_modell', t: 'wr', l: 'Modell (Hybrid)', marke: 'dc_wr_marke', hybrid: true }]]] },
+    OF_BAT_TIPP, OF_BAT_MODELL, OF_BAT_KAP, OF_NS]) }] },
+  lsg: { i: '🚙', t: 'Ladestation', f: [{ k: 'lsg', t: 'wahl', l: 'Ladestation', o: ofJn([OF_LSG]) }] },
+  inet: { i: '🌐', t: 'Internet', f: [{ k: 'inet', t: 'wahl', l: 'Verbindung', o: ofOpt(['Modem vom Kunden', 'GSM-Router', 'Offline']) }] },
+  dach: { i: '🏠', t: 'Dach', f: [
+    { k: 'dach_form', t: 'wahl', l: 'Dachform', o: [
+      ['schraeg', 'Schrägdach', [{ k: 'dach_ein', t: 'wahl', l: 'Eindeckung', o: [
+        ['ziegel', 'Ziegel', [{ k: 'ziegel', t: 'wahl', l: 'Ziegel', o: [...ofOpt(['Biberschwanz', 'Falzziegel', 'Doppelfalzziegel', 'Pfannenziegel', 'Flachziegel']), ['andere', 'Andere', [{ k: 'ziegel_x', t: 'text', l: 'Welcher', ph: 'Typ / Hersteller' }]]] }]],
+        ...ofOpt(['Eternit / Faserzementschiefer', 'Welleternit', 'Trapezblech', 'Sandwichpaneel', 'Blech (Stehfalz)'])] }]],
+      ['flach', 'Flachdach', [{ k: 'flach_ein', t: 'wahl', l: 'Eindeckung', o: ofOpt(['Kies', 'Folie / Bitumen ohne Kies', 'Begrünt', 'Trapezblech', 'Sandwichpaneel']) }]]] },
+    { k: 'dach_alter', t: 'wahl', l: 'Alter des Dachs', o: [['u50', 'Unter 50 Jahren'], ['ue50', 'Über 50 Jahren', [{ k: 'dach_san', t: 'wahl', l: 'Zustand', o: ofOpt(['In Ordnung', 'Sanierungsbedürftig']) }]]] }] },
+  schnee: { i: '❄', t: 'Schneefang', f: [{ k: 'schnee', t: 'wahl', l: 'Schneeschutz', o: ofJn([
+    { k: 'schnee_art', t: 'wahl', l: 'Art', o: ofOpt(['Schneefang', 'Schneestopp']) },
+    { k: 'schnee_seiten', t: 'wahl', l: 'Seiten', o: [['alle', 'Alle Seiten'], ['einzelne', 'Einzelne Seiten', [{ k: 'schnee_txt', t: 'text', l: 'Welche', ph: 'z.B. Süd und West' }]]] }]) }] },
+  geruest: { i: '🪜', t: 'Gerüst', f: [{ k: 'geruest', t: 'wahl', l: 'Gerüst', o: [['ja', 'Ja'], ['nein', 'Nein', [{ k: 'geruest_nein', t: 'wahl', l: 'Weil', o: ofOpt(['Bauseits', 'Braucht keins']) }]]] }] },
+  steuer: { i: '🧠', t: 'Ansteuerung / Überwachung', f: [{ k: 'steuer_ja', t: 'wahl', l: 'Steuerung', o: ofJn([
+    { k: 'steuerung', t: 'wahl', l: 'System', o: OF_STEUERUNG },
+    { k: 'ansteuer', t: 'mehr', l: 'Ansteuerung', o: [
+      ['schuetz', 'Ansteuerung Schütz', [{ k: 'schuetz_an', t: 'mehr', l: 'Schütz für', o: ofOpt(['Boiler', 'Wärmepumpe']) }]],
+      ['ohmpilot', 'Ohmpilot', [{ k: 'boiler_alter', t: 'zahl', l: 'Alter des Boilers', e: 'Jahre' }], ofFronius],
+      ['zaehler', 'Zusätzlicher Zähler', [{ k: 'zaehler_an', t: 'mehr', l: 'Zähler für', o: ofOpt(['Wärmepumpe', 'Ladestation', 'Weitere']) }]]] }]) }] },
+  verbrauch: { i: '📊', t: 'Stromverbrauch', f: [
+    { k: 'verbrauch', t: 'zahl', l: 'Stromverbrauch heute', e: 'kWh/Jahr' },
+    { k: 'wp', t: 'wahl', l: 'Wärmepumpe', o: ofJn([{ k: 'wp_kwh', t: 'zahl', l: 'Verbrauch Wärmepumpe', e: 'kWh/Jahr' }]) },
+    { k: 'eauto', t: 'wahl', l: 'Elektroauto', o: ofJn([{ k: 'eauto_km', t: 'zahl', l: 'Fahrleistung', e: 'km/Jahr' }]) }] },
+  netz: { i: '🔢', t: 'Netzanschluss', f: [
+    // mehrere Zähler, je mit Zuordnung (Haus, Allgemein, Mieter …, WP); im PDF eine Zeile pro Zähler
+    { k: 'zlist', t: 'liste', l: 'Zähler', zeile: z => [z.art === 'andere' ? z.art_x || 'Andere' : z.art, z.nr].filter(x => String(x || '').trim()).join(' · '), f: [
+      { k: 'art', t: 'wahl', l: 'Zähler für', o: [...ofOpt(['Haus', 'Allgemein', ...[1, 2, 3, 4, 5, 6].map(n => 'Mieter ' + n), 'WP']), ['andere', 'Andere', [{ k: 'art_x', t: 'text', l: 'Bezeichnung', ph: 'z.B. Ladestation, Gewerbe' }]]] },
+      { k: 'nr', t: 'text', l: 'Zählernummer', ph: 'z.B. 12345678' }] },
+    { k: 'hak', t: 'wahl', l: 'HAK-Grösse', o: [...[25, 40, 63, 80, 100, 125, 160].map(a => [String(a), a + ' A']), ['andere', 'Andere', [{ k: 'hak_x', t: 'zahl', l: 'HAK-Grösse', e: 'A' }]]] }] },
+  hv: { i: '🔌', t: 'HV', f: [{ k: 'hv', t: 'mehr', l: 'Hausverteilung', o: ofOpt(['Zusätzliche UV PVA', 'Zusätzlicher Zählerplatz für LSG', 'HKN über 30 kVA']) }] },
+  meld: { i: '📋', t: 'Meldewesen', f: [{ k: 'meld', t: 'mehr', l: 'Meldungen', o: ofOpt(['PVA', 'Batterie', 'Ladestation']) }] },
+  elektro: { i: '👷', t: 'Elektriker', f: [{ k: 'elektro', t: 'wahl', l: 'Elektriker', o: [['intern', 'Intern (CKW)'], ['extern', 'Extern / Bauseits', [{ k: 'elektro_firma', t: 'text', l: 'Firma', ph: 'Name der Firma (falls bekannt)' }]]] }] },
+  notiz: { i: '📝', t: 'Bemerkungen', f: [{ k: 'notiz', t: 'lang', l: 'Bemerkungen', ph: 'Wünsche des Kunden, Besonderheiten vor Ort …' }] },
+  // Eigenverbrauchsoptimierung
+  // bestehende PV-Anlage ist Pflicht: ein oder mehrere Wechselrichter, je mit «batteriefähig» und «bleibt / wird ersetzt»
+  alt: { i: '🔎', t: 'Bestehende Anlage', f: [{ k: 'awr', t: 'liste', l: 'Wechselrichter', f: [
+    { k: 'marke', t: 'wahl', l: 'Marke', o: ofOpt([...OF_MARKEN, 'Andere']) },
+    { k: 'modell', t: 'wrtext', l: 'Typ', marke: 'marke', ph: 'z.B. Symo 8.2-3-M' },
+    { k: 'kwp', t: 'zahl', l: 'PV-Leistung', e: 'kWp' },
+    { k: 'jahr', t: 'zahl', l: 'Baujahr', e: '' },
+    { k: 'hybrid', t: 'wahl', l: 'Batteriefähig', o: [['ja', 'Ja (Hybrid)'], ['nein', 'Nein']] },
+    { k: 'ersetzen', t: 'wahl', l: 'Wechselrichter', o: [['nein', 'Bleibt'], ['ja', 'Wird ersetzt', [{ k: 'neu_marke', t: 'wahl', l: 'Neue Marke', o: ofOpt(OF_MARKEN) }, { k: 'neu_modell', t: 'wr', l: 'Neues Modell', marke: 'neu_marke' }]]] }] }] },
+  steuerEvo: { i: '🧠', t: 'Steuerung / Ansteuerung', f: [{ k: 'steuer_ja', t: 'wahl', l: 'Steuerung', o: ofJn([
+    { k: 'steuerung', t: 'wahl', l: 'System', o: OF_STEUERUNG },
+    { k: 'ansteuer_evo', t: 'mehr', l: 'Ansteuerung', o: [
+      ['boiler', 'Boiler', [{ k: 'boiler_art', t: 'wahl', l: 'Boiler über', o: [['Schütz', 'Schütz'], ['Ohmpilot', 'Ohmpilot', null, ofFronius]] }, { k: 'boiler_alter', t: 'zahl', l: 'Alter des Boilers', e: 'Jahre' }]],
+      ['wp', 'Wärmepumpe', [{ k: 'wp_typ', t: 'wahl', l: 'Typ WP', o: ofOpt(['Luft/Wasser', 'Sole/Wasser', 'Wasser/Wasser']) },
+        { k: 'wp_hersteller', t: 'text', l: 'Hersteller / Modell WP', ph: 'z.B. Viessmann Vitocal 250-A' },
+        { k: 'wp_sg', t: 'wahl', l: 'SG-Ready', o: ofOpt(['Vorhanden', 'Nicht vorhanden', 'Unbekannt']) }]],
+      ['lsg', 'Ladestation', [OF_LSG]],
+      ['zaehler', 'Zusätzlicher Zähler']] }]) }] }
+};
+const OF_SCHEMA = { pva: ['module', 'wr', 'bat', 'lsg', 'inet', 'dach', 'schnee', 'geruest', 'steuer', 'verbrauch', 'netz', 'hv', 'meld', 'elektro', 'notiz'],
+  evo: ['alt', 'batEvo', 'steuerEvo', 'inet', 'verbrauch', 'netz', 'hv', 'meld', 'elektro', 'notiz'] };
+const OF_GEBAEUDE = { pva: ['EFH', 'MFH', 'Gewerbe / Industrie', 'Landwirtschaft'], evo: ['EFH', 'MFH', 'Industrie / Gewerbe'] };
+// ältere Aufnahmen auf das neue Formular umstellen
+function ofMigr(o) {
+  if (o._v >= 3) return o;
+  const d = o.d || (o.d = {});
+  // v3: eine Zählernummer → Zählerliste
+  if (d.zaehler_nr && !Array.isArray(d.zlist)) { d.zlist = [{ art: 'Haus', nr: d.zaehler_nr }]; delete d.zaehler_nr; }
+  if (o._v >= 2) { o._v = 3; return o; }
+  if (d.elektro === 'bauseits') d.elektro = 'extern';
+  if (!d.steuer_ja && (d.steuerung || (d.ansteuer || []).length || (d.ansteuer_evo || []).length)) d.steuer_ja = 'ja';
+  if (o.art === 'evo' && !Array.isArray(d.awr)) d.awr = [{ marke: d.alt_marke || '', modell: d.alt_modell || '', kwp: d.alt_kwp || '', jahr: d.alt_jahr || '',
+    ersetzen: d.wr_ersetzen || '', neu_marke: d.wr_marke || '', neu_modell: d.wr_modell || '' }];
+  if (o.art === 'evo') ['alt_pv', 'alt_marke', 'alt_modell', 'alt_kwp', 'alt_jahr', 'wr_ersetzen', 'wr_marke', 'wr_modell'].forEach(k => delete d[k]);
+  if (d.bat_marke && !d.bat_modell) { const b = OF_BATTERIEN.filter(x => x.b === d.bat_marke); if (b.length === 1) d.bat_modell = b[0].id; }
+  o._v = 3; return o;
+}
+const offerten = () => { if (!Array.isArray(state.offerten)) state.offerten = []; state.offerten.forEach(ofMigr); return state.offerten; };
+// Felder eines Listeneintrags bekommen den Pfad davor («awr.1.»)
+function ofPre(f, pre) {
+  const g = { ...f, k: pre + f.k };
+  if (f.marke) g.marke = pre + f.marke;
+  if (Array.isArray(f.o)) g.o = f.o.map(([w, l, c, wenn]) => [w, l, c && c.map(x => ofPre(x, pre)), wenn]);
+  return g;
+}
+const ofKapOpts = d => { const b = ofBatAkt(d); return b ? b.kwh.map(k => [String(k), spZahl(k, k % 1 ? 1 : 0) + ' kWh']) : []; };
+const findO = id => offerten().find(o => o.id === id);
+// ausgewählte Antworten eines Felds samt sichtbarer Unterpunkte (für Liste, Fortschritt und PDF)
+function ofWerte(d, f, tiefe = 0, out = []) {
+  if (f.wenn && !f.wenn(d)) return out;
+  const v = ofGet(d, f.k);
+  if (f.t === 'wahl' || f.t === 'mehr') {
+    const gew = ofOpts(f, d).filter(([w]) => f.t === 'mehr' ? (v || []).includes(w) : v === w);
+    if (!gew.length) return out;
+    out.push({ l: f.l, v: gew.map(x => x[1]).join(', '), tiefe });
+    gew.forEach(([, , c]) => (c || []).forEach(cf => ofWerte(d, cf, tiefe + 1, out)));
+  } else if (f.t === 'liste' && f.zeile) {
+    (v || []).forEach((it, i) => { const t = f.zeile(it || {}); if (t) out.push({ l: `${f.l} ${i + 1}`, v: t, tiefe }); });
+  } else if (f.t === 'liste') {
+    (v || []).forEach((_, i) => { const sub = []; f.f.forEach(cf => ofWerte(d, ofPre(cf, `${f.k}.${i}.`), tiefe + 1, sub));
+      if (sub.length) out.push({ l: `${f.l} ${i + 1}`, v: '', tiefe }, ...sub); });
+  } else if (f.t === 'hinweis') { const t = f.pdf === false ? '' : f.v(d); if (t) out.push({ l: f.l, v: t, tiefe }); }
+  else if (f.t === 'wr') { const m = spBibFind(v);
+    if (m && m.b === ofGet(d, f.marke)) out.push({ l: f.l, v: `${m.m} · ${spZahl(m.ac, m.ac % 1 ? 1 : 0)} kW`, tiefe });
+    else if (!m && String(v || '').trim()) out.push({ l: f.l, v: String(v).trim(), tiefe }); }
+  else if (f.t === 'kap') { if (String(v ?? '').trim()) { const n = spNum(v); out.push({ l: f.l, v: spZahl(n, n % 1 ? 1 : 0) + ' kWh', tiefe }); } }
+  else if (String(v ?? '').trim()) out.push({ l: f.l, v: String(v).trim() + (f.e ? ' ' + f.e : ''), tiefe });
+  return out;
+}
+function ofAbschnittWerte(o, key) {
+  const A = OF_ABSCHNITTE[key], d = o.d || {}, out = [];
+  A.f.forEach(f => ofWerte(d, f, 0, out));
+  if (key === 'module') { const wp = d.mod_wp === 'andere' ? spNum(d.mod_wp_x) : spNum(d.mod_wp), n = spNum(d.mod_anz);
+    if (wp && n) out.push({ l: 'Leistung total (ca.)', v: spZahl(wp * n / 1000, 1) + ' kWp', tiefe: 0 }); }
+  return out;
+}
+const ofFortschritt = o => { const L = OF_SCHEMA[o.art].filter(k => k !== 'notiz'); return { n: L.filter(k => ofAbschnittWerte(o, k).length).length, t: L.length }; };
+function ofSpeichern(o) { o.geaendert = todayIso(); save(); render(); }
+function ofWahl(id, k, w, mehr) {
+  const o = findO(id), d = o.d || (o.d = {}), alt = ofGet(d, k);
+  if (mehr) { const L = Array.isArray(alt) ? alt : []; ofPut(d, k, L.includes(w) ? L.filter(x => x !== w) : [...L, w]); }
+  else ofPut(d, k, alt === w ? '' : w);   // nochmals tippen = Auswahl aufheben
+  ofSpeichern(o);
+}
+function ofSet(id, k, v) {
+  const o = findO(id);
+  if (k.startsWith('o.')) o[k.slice(2)] = String(v).trim();
+  else {
+    const d = o.d || (o.d = {}); ofPut(d, k, v);
+    // bekannter Typ eingetragen: batteriefähig gleich vorschlagen
+    const m = /^awr\.(\d+)\.modell$/.exec(k), b = m && spBib().find(x => x.m.toLowerCase() === String(v).trim().toLowerCase());
+    if (b) d.awr[m[1]].hybrid = ofIstHybrid(b) ? 'ja' : 'nein';
+  }
+  ofSpeichern(o);
+}
+function ofListePlus(id, k) { const o = findO(id), d = o.d || (o.d = {}), L = Array.isArray(ofGet(d, k)) ? ofGet(d, k) : []; if (!L.length) L.push({}); L.push({}); ofPut(d, k, L); ofSpeichern(o); }
+function ofListeWeg(id, k, i) {
+  const o = findO(id), L = ofGet(o.d, k) || [], w = L[i];
+  if (w && Object.values(w).some(x => String(x || '').trim()) && !confirm(`Eintrag ${i + 1} entfernen?`)) return;
+  L.splice(i, 1); if (k === 'awr' && o.d.bat_an) o.d.bat_an = ''; ofSpeichern(o);
+}
+function ofFeld(o, f) {
+  const d = o.d || {}, v = ofGet(d, f.k), id = o.id;
+  if (f.wenn && !f.wenn(d)) return '';
+  const kopf = f.l ? `<div class="of-l">${esc(f.l)}</div>` : '';
+  if (f.t === 'hinweis') { const t = f.v(d); return t ? `<div class="of-feld of-hinweis">${f.l ? `<b>${esc(f.l)}:</b> ` : ''}${esc(t)}</div>` : ''; }
+  if (f.t === 'liste') {
+    const L = Array.isArray(v) && v.length ? v : [{}];
+    return `<div class="of-feld">${L.map((_, i) => `<div class="of-wr"><div class="of-wr-kopf"><b>${esc(f.l)} ${i + 1}</b>${L.length > 1 ? `<button type="button" class="of-x" title="Entfernen" onclick="ofListeWeg('${id}','${f.k}',${i})">✕</button>` : ''}</div>
+      ${f.f.map(cf => ofFeld(o, ofPre(cf, `${f.k}.${i}.`))).join('')}</div>`).join('')}
+      <button type="button" class="sec sm" onclick="ofListePlus('${id}','${f.k}')">+ ${esc(f.l)} hinzufügen</button></div>`;
+  }
+  const O = f.t === 'kap' ? ofKapOpts(d) : f.t === 'wahl' || f.t === 'mehr' ? ofOpts(f, d) : null;
+  if (O && O.length) {
+    const mehr = f.t === 'mehr', an = w => mehr ? (v || []).includes(w) : v === w;
+    const pills = O.map(([w, l]) => `<button type="button" class="of-pill${an(w) ? ' on' : ''}${mehr ? ' mehr' : ''}" onclick="ofWahl('${id}','${f.k}','${esc(w)}',${mehr})">${esc(l)}</button>`).join('');
+    const kinder = O.filter(([w, , c]) => c && c.length && an(w)).map(([, , c]) => `<div class="of-kinder">${c.map(cf => ofFeld(o, cf)).join('')}</div>`).join('');
+    const info = f.k === 'steuerung' && v ? `<div class="muted klein" style="margin-top:4px">${esc(OF_STEUER_INFO[v] || '')}</div>` : '';
+    return `<div class="of-feld">${kopf}<div class="of-pills">${pills}</div>${info}${kinder}</div>`;
+  }
+  if (O && f.t !== 'kap') return '';
+  if (f.t === 'kap') f = { ...f, e: 'kWh' };   // Batterie ohne bekannte Stufen: Kapazität eintippen
+  if (f.t === 'wr') {
+    const marke = ofGet(d, f.marke);
+    if (!marke) return '';
+    const B = spBib().filter(x => x.b === marke && (!f.hybrid || ofIstHybrid(x))).sort((a, b) => a.m.localeCompare(b.m, 'de', { numeric: true }));
+    if (B.length) return `<div class="of-feld">${kopf}<select class="of-select" onchange="ofSet('${id}','${f.k}',this.value)"><option value="">– noch offen –</option>${B.map(x => `<option value="${esc(x.id)}" ${x.id === v ? 'selected' : ''}>${esc(x.m)} · ${spZahl(x.ac, x.ac % 1 ? 1 : 0)} kW</option>`).join('')}</select></div>`;
+    f = { ...f, ph: f.hybrid ? 'Hybrid-WR, z.B. Sunny Tripower Smart Energy 10.0' : 'Typ eintragen' };   // nichts in der Bibliothek: Typ eintippen
+  }
+  if (f.t === 'wrtext') {
+    const dl = 'dl-' + f.k.replace(/\W/g, '-'), marke = ofGet(d, f.marke);
+    return `<div class="of-feld">${kopf}<input class="of-select" list="${dl}" value="${esc(v || '')}" placeholder="${esc(f.ph || '')}" onchange="ofSet('${id}','${f.k}',this.value)">
+      <datalist id="${dl}">${spBib().filter(x => !marke || x.b === marke).map(x => `<option value="${esc(x.m)}">`).join('')}</datalist></div>`;
+  }
+  if (f.t === 'lang') return `<div class="of-feld">${kopf}<textarea rows="4" placeholder="${esc(f.ph || '')}" onchange="ofSet('${id}','${f.k}',this.value)">${esc(v || '')}</textarea></div>`;
+  return `<div class="of-feld of-feld-in">${kopf}<span class="sp-in"><input value="${esc(v ?? '')}" ${f.t === 'zahl' ? 'inputmode="decimal"' : ''} placeholder="${esc(f.ph || '')}" onchange="ofSet('${id}','${f.k}',this.value)">${f.e ? `<i>${esc(f.e)}</i>` : ''}</span></div>`;
+}
+function ofStatusTag(o) { const c = { offen: 'tag-sub', offeriert: 'tag-warn', auftrag: 'tag-ok', abgelehnt: 'tag-sub' }[o.status] || 'tag-sub';
+  return `<span class="${c}" style="margin:0">${esc(OF_STATUS[o.status] || 'Offen')}</span>`; }
+function viewOfferten() {
+  const sub = OF_SUB[unterSeite()] ? unterSeite() : '', q = (ui.oq || '').toLowerCase();
+  const L = offerten().filter(o => !sub || OF_SUB[sub].includes(o.status || 'offen'))
+    .filter(o => !q || [o.name, o.adresse, o.nummer, OF_ARTEN[o.art]].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => String(b.datum || '').localeCompare(String(a.datum || '')));
+  const titel = { offen: 'Offene Offerten', offeriert: 'Offeriert', erledigt: 'Erledigte Offerten' }[sub] || 'Offerten';
+  return `<div class="page-head"><div><h1>${titel}</h1><div class="muted" style="margin-top:4px">Aufnahmen beim Kunden · Grundlage für die Offerte</div></div>
+    <div class="row"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input placeholder="Kunde, Adresse …" value="${esc(ui.oq || '')}" oninput="ui.oq=this.value;render()">${SUCH_X}</div>
+      <button class="plus" title="Neue Aufnahme" onclick="ofNeuDialog()">+</button></div></div>
+  ${L.length ? `<div class="projects">${L.map(o => { const f = ofFortschritt(o), pct = Math.round(f.n / f.t * 100);
+    return `<div class="pcard pk2" style="--c:${o.art === 'pva' ? '#e8a020' : '#2e8b6a'}" onclick="location.hash='#/offerte/${o.id}'">
+      <div class="pk2-kopf"><b class="pk2-nr">${OF_ART_INFO[o.art][0]} ${esc(OF_ARTEN[o.art])}</b>${ofStatusTag(o)}</div>
+      <div class="pk2-adr">${esc(o.name || 'Ohne Namen')}</div>
+      <div class="pk2-ort">${o.adresse ? esc(o.adresse) : '<span class="muted">Adresse fehlt</span>'}</div>
+      ${o.gebaeude ? `<div class="pk2-name">${esc(o.gebaeude)}</div>` : ''}
+      <div class="pk2-luft"></div>
+      <div class="pk2-fuss"><div class="pk2-zeile"><span>📅 Aufnahme ${o.datum ? fmt(o.datum) : '–'}</span><b>${f.n}/${f.t}</b></div>
+        <div class="progress"><div style="width:${pct}%"></div></div></div></div>`; }).join('')}</div>`
+    : `<div class="card empty">${offerten().length ? 'Keine Offerten in dieser Ansicht.' : 'Noch keine Aufnahmen – klicke auf <b>+</b>, um die erste Aufnahme zu erfassen.'}</div>`}`;
+}
+function viewOfferte(o) {
+  const id = o.id, f = (k, l, ph = '', typ = 'text') => `<label class="sp-f"><span>${l}</span><input type="${typ}" value="${esc(o[k] || '')}" placeholder="${ph}" onchange="ofSet('${id}','o.${k}',this.value)"></label>`;
+  const geb = OF_GEBAEUDE[o.art];
+  return `<div class="row" style="justify-content:space-between;margin-bottom:14px">
+      <button class="sec sm" onclick="nav('offerten')">← Alle Offerten</button>
+      <div class="row"><select style="width:auto" onchange="ofSet('${id}','o.status',this.value)" title="Status">${Object.entries(OF_STATUS).map(([k, l]) => `<option value="${k}" ${(o.status || 'offen') === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+        <button class="sm" onclick="ofPdf('${id}')">📄 PDF</button>
+        <button class="sec sm" onclick="ofZuProjekt('${id}')" title="Aus dieser Aufnahme ein Projekt anlegen">→ Projekt</button>
+        <button class="danger sm" onclick="ofLoeschen('${id}')">Löschen</button></div></div>
+    <div class="page-head" style="margin-bottom:12px"><div><div class="muted">${OF_ART_INFO[o.art][0]} ${esc(OF_ARTEN[o.art])}</div><h1>${esc(o.name || 'Ohne Namen')}</h1></div></div>
+    <div class="card of-kunde">
+      ${f('name', 'Kunde', 'Vorname Name / Firma')}${f('adresse', 'Adresse', 'Strasse, PLZ Ort')}${f('telefon', 'Telefon', '', 'tel')}${f('email', 'E-Mail', '', 'email')}
+      ${f('datum', 'Datum der Aufnahme', '', 'date')}${f('nummer', 'Offert-Nr.', 'optional')}
+      <div class="of-feld of-geb"><div class="of-l">${o.art === 'evo' ? 'Kunde ist' : 'Gebäude'}</div><div class="of-pills">${geb.map(g => `<button type="button" class="of-pill${o.gebaeude === g ? ' on' : ''}" onclick="ofSet('${id}','o.gebaeude',findO('${id}').gebaeude==='${g}'?'':'${g}')">${g}</button>`).join('')}</div></div>
+    </div>
+    <div class="of-grid">${OF_SCHEMA[o.art].map(k => { const A = OF_ABSCHNITTE[k], fertig = k !== 'notiz' && ofAbschnittWerte(o, k).length;
+      return `<div class="card of-abschnitt${k === 'notiz' ? ' of-breit' : ''}"><h3><span>${A.i}</span>${esc(A.t)}${fertig ? '<i class="of-ok">✓</i>' : ''}</h3>${A.f.map(x => ofFeld(o, x)).join('')}</div>`; }).join('')}</div>
+    <div class="row" style="justify-content:flex-end;margin-top:4px"><button onclick="ofPdf('${id}')">📄 Aufnahme als PDF</button></div>`;
+}
+function ofNeuDialog() {
+  const d = $('dlg'), kunden = (S().kontakte || []).filter(c => c.art === 'kunde');
+  d.innerHTML = `<h2>Neue Aufnahme</h2>
+    <label>Was nimmst du auf?</label>
+    <div class="art-wahl" id="of-art" style="grid-template-columns:1fr 1fr">${Object.entries(OF_ARTEN).map(([k, l], i) =>
+      `<button type="button" data-art="${k}" class="${i ? '' : 'on'}" onclick="ui.ofArt='${k}';document.querySelectorAll('#of-art button').forEach(b=>b.classList.toggle('on',b.dataset.art==='${k}'))"><span class="art-ic">${OF_ART_INFO[k][0]}</span><b>${l}</b><small>${OF_ART_INFO[k][1]}</small></button>`).join('')}</div>
+    <div class="grid" style="grid-template-columns:1fr;margin-top:14px">
+      <div><label>Kunde *</label><input id="of-name" list="of-kunden" placeholder="Name oder Firma – bestehende Kunden werden vorgeschlagen">
+        <datalist id="of-kunden">${kunden.map(c => `<option value="${esc(kontaktName(c))}">`).join('')}</datalist></div>
+      <div><label>Adresse</label><input id="of-adr" placeholder="Strasse, PLZ Ort"></div>
+    </div>
+    <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="sec" onclick="$('dlg').close()">Abbrechen</button><button onclick="ofNeu()">Aufnahme erstellen</button></div>`;
+  ui.ofArt = 'pva';
+  d.showModal(); $('of-name').focus();
+  d.onkeydown = e => { if (e.key === 'Enter') ofNeu(); };
+}
+function ofNeu() {
+  const name = val('of-name');
+  if (!name) return toast('Bitte den Kunden eintragen.');
+  const k = (S().kontakte || []).find(c => c.art === 'kunde' && kontaktName(c) === name);
+  const o = { id: uid(), _offerte: true, art: ui.ofArt || 'pva', status: 'offen', name, adresse: val('of-adr') || (k && k.adresse) || '', telefon: k ? k.telefon || '' : '', email: k ? k.email || '' : '',
+    kundeId: k ? k.id : '', datum: todayIso(), nummer: '', gebaeude: '', d: (ui.ofArt || 'pva') === 'evo' ? { awr: [{}] } : {}, _v: 3, erstellt: todayIso() };
+  offerten().push(o); save(); $('dlg').close(); location.hash = '#/offerte/' + o.id;
+}
+function ofLoeschen(id) {
+  const o = findO(id);
+  if (!confirm(`Aufnahme «${o.name}» löschen?`)) return;
+  state.offerten = offerten().filter(x => x !== o); save(); nav('offerten'); toast('Aufnahme gelöscht.');
+}
+// Auftrag erhalten: Projekt-Dialog mit Kunde und Adresse vorausfüllen
+function ofZuProjekt(id) {
+  const o = findO(id);
+  neuesProjektDialog();
+  npArt(o.art === 'evo' ? 'batterie' : 'pv');
+  $('np-name').value = o.name || ''; $('np-ort').value = o.adresse || '';
+  if ((o.status || 'offen') !== 'auftrag') { o.status = 'auftrag'; save(); }
+}
+// A4: Kopf, Kundendaten, danach alle Themen in zwei Spalten (nur gewählte Antworten; leere Themen grau «nicht erfasst»)
+function ofPdf(id) {
+  if (!window.jspdf) return toast('PDF-Bibliothek nicht geladen (Internetverbindung?).');
+  const o = findO(id), { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'mm', format: 'a4' }), W = 210, H = 297, M = 14, B = W - 2 * M;
+  let y = pdfAaKopf(doc, o.nummer || '–', [['Aufnahme', o.datum ? fmt(o.datum) : '–'], ['Projektleiter', S().name || '']], `${OF_ARTEN[o.art]}: ${o.name || ''}`, 'Offert-Nr');
+  doc.autoTable({ startY: y - 2, margin: { left: M, right: M }, theme: 'plain', styles: { fontSize: 8.8, cellPadding: { top: 0.8, bottom: 0.8, left: 1.5, right: 1.5 }, textColor: 30 },
+    body: [['Kunde', o.name || '', 'Telefon', o.telefon || ''], ['Adresse', o.adresse || '', 'E-Mail', o.email || ''], [o.art === 'evo' ? 'Kunde ist' : 'Gebäude', o.gebaeude || '–', 'Status', OF_STATUS[o.status || 'offen']]],
+    columnStyles: { 0: { cellWidth: 20, fontStyle: 'bold', textColor: 110 }, 1: { cellWidth: B / 2 - 20 }, 2: { cellWidth: 18, fontStyle: 'bold', textColor: 110 } },
+    didDrawPage: () => {} });
+  y = doc.lastAutoTable.finalY + 3;
+  doc.setDrawColor(215); doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 4;
+  // Themen in zwei Spalten: jedes Thema in die kürzere Spalte
+  const gap = 6, cw = (B - gap) / 2, LH = 3.7, keys = OF_SCHEMA[o.art];
+  const notiz = keys.includes('notiz') ? String((o.d || {}).notiz || '').trim() : '';
+  const col = [y, y];
+  const block = key => {
+    const A = OF_ABSCHNITTE[key], W8 = ofAbschnittWerte(o, key);
+    doc.setFontSize(8.3);
+    const zeilen = W8.length ? W8.flatMap(z => doc.splitTextToSize(z.v ? `${z.l}: ${z.v}` : z.l, cw - 4 - z.tiefe * 3.5).map((t, i) => ({ t, tiefe: z.tiefe, erste: i === 0, l: z.l }))) : [{ t: 'nicht erfasst', leer: true, tiefe: 0, erste: true }];
+    return { A, zeilen, h: 6.5 + zeilen.length * LH + 2.5 };
+  };
+  keys.filter(k => k !== 'notiz').forEach(k => {
+    const b = block(k);
+    let c = col[0] <= col[1] ? 0 : 1;
+    if (col[c] + b.h > H - 14) { c = 1 - c; if (col[c] + b.h > H - 14) { doc.addPage(); col[0] = col[1] = 16; c = 0; } }
+    const x = M + c * (cw + gap); let yy = col[c];
+    doc.setFillColor(244, 243, 239); doc.roundedRect(x, yy, cw, 5.6, 1.2, 1.2, 'F');
+    doc.setFillColor(...(b.zeilen[0].leer ? [200, 200, 200] : AA_DUNKEL)); doc.rect(x, yy, 1.2, 5.6, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.3); doc.setTextColor(...AA_TXT); doc.text(b.A.t, x + 3, yy + 3.9);
+    yy += 5.6 + 3.2;
+    b.zeilen.forEach(z => {
+      const zx = x + 2 + z.tiefe * 3.5;
+      doc.setFontSize(8.3);
+      if (z.leer) { doc.setFont('helvetica', 'italic'); doc.setTextColor(150); doc.text(z.t, zx, yy); }
+      else if (z.erste && z.t.startsWith(z.l + ':')) {
+        if (z.tiefe) { doc.setTextColor(170); doc.text('›', zx - 2.6, yy); }
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(110); doc.text(z.l + ':', zx, yy);
+        const lw = doc.getTextWidth(z.l + ':') + 1.2;
+        doc.setFont('helvetica', 'bold'); doc.setTextColor(30); doc.text(z.t.slice(z.l.length + 1).trim(), zx + lw, yy);
+      } else { doc.setFont('helvetica', 'bold'); doc.setTextColor(30); doc.text(z.t, zx, yy); }
+      yy += LH;
+    });
+    col[c] = yy + 2.5;
+  });
+  // Bemerkungen über die ganze Breite
+  y = Math.max(col[0], col[1]) + 1;
+  const nl = notiz ? doc.splitTextToSize(notiz, B - 4) : ['–'];
+  if (y + 10 + nl.length * LH > H - 14) { doc.addPage(); y = 16; }
+  doc.setFillColor(244, 243, 239); doc.roundedRect(M, y, B, 5.6, 1.2, 1.2, 'F'); doc.setFillColor(...AA_DUNKEL); doc.rect(M, y, 1.2, 5.6, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9.3); doc.setTextColor(...AA_TXT); doc.text('Bemerkungen', M + 3, y + 3.9);
+  y += 9; doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor(notiz ? 30 : 150); doc.text(nl, M + 2, y);
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(140);
+    doc.text(`${S().firma || ''} · ${OF_ARTEN[o.art]} · ${o.name || ''} · Stand ${fmt(o.geaendert || o.datum || todayIso())}`, M, H - 7); if (n > 1) doc.text(`Seite ${i} / ${n}`, W - M, H - 7, { align: 'right' }); }
+  doc.save(`${OF_ARTEN[o.art]} ${o.name || ''} ${o.datum || ''}`.trim().replace(/[\\/:*?"<>|]+/g, '-') + '.pdf');
+  toast('Aufnahme als PDF gespeichert.');
 }
 
 function neuesProjektDialog() {
@@ -3401,9 +3857,10 @@ const LIB=[];
   add('Sungrow','SG50CX-P2',50,4,2,1100,140);
   add('Sungrow','SG125CX-P2',125,12,2,1100,140);
   add('Sungrow','SG150CX',150,7,3,1100,140);
+  // SH15–25T: max. PV-Leistung 30 / 30 / 40 kWp (Datenblatt, geprüft 11/2026)
   add('Sungrow','SH15T (Hybrid)',15,3,'2/2/1',1000,200);
-  add('Sungrow','SH20T (Hybrid)',20,3,'2/2/1',1000,200);
-  add('Sungrow','SH25T (Hybrid)',25,3,'2/2/1',1000,200);
+  add('Sungrow','SH20T (Hybrid)',20,3,'2/2/1',1000,150);
+  add('Sungrow','SH25T (Hybrid)',25,3,'2/2/1',1000,160);
   // Huawei
   add('Huawei','SUN2000-5K-MAP0',5,2,1,1100,180);
   add('Huawei','SUN2000-6K-MAP0',6,2,1,1100,183.3);
@@ -3418,8 +3875,9 @@ const LIB=[];
   add('Huawei','SUN2000-30K-MC0',30,4,2,1100,150,'Überbelegung nicht im Datenblatt, 150 % angenommen');
   add('Huawei','SUN2000-40K-MC0',40,4,2,1100,150,'Überbelegung nicht im Datenblatt, 150 % angenommen');
   // SMA
-  add('SMA','Sunny Tripower X 50',50,5,2,1100,150);
-  add('SMA','Sunny Tripower X 60',60,5,2,1100,150);
+  // STP X 50/60: max. Eingangsspannung 1000 V laut SMA-Datenblatt (geprüft 11/2026)
+  add('SMA','Sunny Tripower X 50',50,5,2,1000,150);
+  add('SMA','Sunny Tripower X 60',60,5,2,1000,150);
   add('SMA','Sunny Tripower CORE2 STP 125-70',125,12,2,1100,150);
   // Fronius
   [3,4,5,6,8,10,12].forEach(p=>add('Fronius','Symo GEN24 '+p+'.0 SC',p,2,'2/1',1000,150));
@@ -3439,33 +3897,52 @@ return { ORI, KF_OPTIONS, defaults, migrate, plan, wrInputs, LIB, cloneSt };
 // Pro Projekt mehrere Stringpläne (p.stringplaene), jeder mit eigenem Stand (Module, Flächen, Wechselrichter). Änderungen speichern sofort.
 const SP_OC = ['#4a76a8', '#cf9610', '#dc5c24', '#8556b6'];   // Norden, Osten, Süden, Westen
 const SP_PAL = ['#2e8b6a', '#3b82c4', '#d9822b', '#8e5bb5', '#c0467a', '#6f8f1c', '#169cae', '#a8643a', '#5d6bd1', '#b29a1e'];
-// zusätzliche Wechselrichter (Ergänzung zur Bibliothek des Stringplaners) – Werte vor dem Bestellen mit dem Datenblatt prüfen
+// zusätzliche Wechselrichter (Ergänzung zur Bibliothek des Stringplaners)
+// Nov. 2026 mit den Herstellerdatenblättern abgeglichen (MPPT, Eingänge je MPPT, max. DC-Spannung, max. PV-Leistung).
+// Was sich nicht bestätigen liess, hat einen eigenen Hinweis (8. Wert).
+const SP_OK = 'Datenblatt geprüft (11/2026)';
 const SP_EXTRA = [
   ['Huawei', 'SUN2000-3KTL-M1', 3, 2, 1, 1100, 150], ['Huawei', 'SUN2000-4KTL-M1', 4, 2, 1, 1100, 150], ['Huawei', 'SUN2000-5KTL-M1', 5, 2, 1, 1100, 150],
   ['Huawei', 'SUN2000-6KTL-M1', 6, 2, 1, 1100, 150], ['Huawei', 'SUN2000-8KTL-M1', 8, 2, 1, 1100, 150], ['Huawei', 'SUN2000-10KTL-M1', 10, 2, 1, 1100, 150],
   ['Huawei', 'SUN2000-100KTL-M2', 100, 10, 2, 1100, 150],
   ['Sungrow', 'SG15RT', 15, 2, 2, 1100, 150], ['Sungrow', 'SG17RT', 17, 2, 2, 1100, 150], ['Sungrow', 'SG20RT', 20, 2, 2, 1100, 150],
   ['SMA', 'Sunny Tripower X 12', 12, 3, 2, 1000, 150], ['SMA', 'Sunny Tripower X 15', 15, 3, 2, 1000, 150], ['SMA', 'Sunny Tripower X 20', 20, 3, 2, 1000, 150], ['SMA', 'Sunny Tripower X 25', 25, 3, 2, 1000, 150],
-  ['GoodWe', 'GW5K-ET', 5, 2, 1, 1000, 150], ['GoodWe', 'GW8K-ET', 8, 2, 1, 1000, 150], ['GoodWe', 'GW10K-ET', 10, 2, 1, 1000, 150],
-  // Fronius GEN24 Plus (Symo dreiphasig, Primo einphasig) und Primo GEN24
+  // GoodWe ET: 2 MPPT, Strings je MPPT 1/1 (5 kW) bzw. 1/2 (8 und 10 kW)
+  ['GoodWe', 'GW5K-ET', 5, 2, 1, 1000, 150], ['GoodWe', 'GW8K-ET', 8, 2, '1/2', 1000, 150], ['GoodWe', 'GW10K-ET', 10, 2, '1/2', 1000, 150],
+  // Fronius GEN24 Plus (Symo dreiphasig) und Primo GEN24 (einphasig, 2 MPPT mit je 2 DC-Anschlüssen, max. 600 V)
   ...[3, 4, 5, 6, 8, 10, 12].map(p => ['Fronius', `Symo GEN24 ${p}.0 Plus`, p, 2, '2/1', 1000, 150]),
-  ...[3, 3.6, 4, 4.6, 5, 6].flatMap(p => [['Fronius', `Primo GEN24 ${p.toFixed(1)}`, p, 2, '2/1', 600, 150], ['Fronius', `Primo GEN24 ${p.toFixed(1)} Plus`, p, 2, '2/1', 600, 150]]),
+  ...[3, 3.6, 4, 4.6, 5, 6].flatMap(p => [['Fronius', `Primo GEN24 ${p.toFixed(1)}`, p, 2, '2/2', 600, 150], ['Fronius', `Primo GEN24 ${p.toFixed(1)} Plus`, p, 2, '2/2', 600, 150]]),
   // Huawei SUN2000 (einphasig L1, dreiphasig M2/M3/M0, Gewerbe/Grossanlagen)
   ...[2, 3, 3.68, 4, 4.6, 5, 6].map(p => ['Huawei', `SUN2000-${p}KTL-L1`, p, 2, 1, 600, 150]),
   ...[12, 15, 17, 20].map(p => ['Huawei', `SUN2000-${p}KTL-M2`, p, 2, 2, 1080, 130]),
-  ...[30, 36, 40, 50].map(p => ['Huawei', `SUN2000-${p}KTL-M3`, p, 4, 2, 1100, 150]),
+  ...[30, 36, 40, 50].map(p => ['Huawei', `SUN2000-${p}KTL-M3`, p, 4, 2, 1100, 150, 'Werte nicht bestätigt – mit Datenblatt prüfen']),
   ['Huawei', 'SUN2000-60KTL-M0', 60, 6, 2, 1100, 150], ['Huawei', 'SUN2000-100KTL-M1', 100, 10, 2, 1100, 150], ['Huawei', 'SUN2000-115KTL-M2', 115, 10, 2, 1100, 150],
-  ['Huawei', 'SUN2000-150K-MG0', 150, 14, 2, 1100, 150], ['Huawei', 'SUN2000-215KTL-H3', 200, 9, 2, 1500, 150], ['Huawei', 'SUN2000-330KTL-H1', 300, 6, 4, 1500, 150],
+  // 150K-MG0: 7 MPPT × 3 Eingänge; 215KTL-H3: 3 MPPT mit 4/5/5; 330KTL-H1: 6 MPPT mit 4/5/5/4/5/5
+  ['Huawei', 'SUN2000-150K-MG0', 150, 7, 3, 1100, 150], ['Huawei', 'SUN2000-215KTL-H3', 200, 3, '4/5/5', 1500, 150], ['Huawei', 'SUN2000-330KTL-H1', 300, 6, '4/5/5/4/5/5', 1500, 150],
   // SMA Tripower CORE
-  ['SMA', 'Sunny Tripower CORE2 STP 110-60', 110, 12, 2, 1100, 150], ['SMA', 'Sunny Tripower CORE1 STP 50-41', 50, 6, 2, 1000, 150],
+  ['SMA', 'Sunny Tripower CORE2 STP 110-60', 110, 12, 2, 1100, 150], ['SMA', 'Sunny Tripower CORE1 STP 50-41', 50, 6, 2, 1000, 150, 'Werte nicht bestätigt – mit Datenblatt prüfen'],
   // Sungrow
   ['Sungrow', 'SG50CX', 50, 5, 2, 1100, 140], ['Sungrow', 'SG110CX', 110, 9, 2, 1100, 140],
-  ['Sungrow', 'SH50CX (Hybrid)', 50, 4, 2, 1100, 150], ['Sungrow', 'SH80CX (Hybrid)', 80, 6, 2, 1100, 150],
-  ['Sungrow', 'SH12T (Hybrid)', 12, 3, '2/1/1', 1000, 200], ['Sungrow', 'SH10T (Hybrid)', 10, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH8T (Hybrid)', 8, 3, '1/1/1', 1000, 200],
-  ['Sungrow', 'SH6T (Hybrid)', 6, 3, '1/1/1', 1000, 200], ['Sungrow', 'SH5T (Hybrid)', 5, 3, '1/1/1', 1000, 200],
-  // Sunwoda SunESS Power All-in-One (Hybrid-WR dreiphasig, 2 MPPT, max. 1000 V, Batterie 5-kWh-Module)
-  ...[5, 6, 8, 10, 12, 15].map(p => ['Sunwoda', `SunESS Power SW${p}KH3UT (All-in-One)`, p, 2, p >= 12 ? '2/1' : 1, 1000, 150])
-].map(([b, m, ac, mppt, inp, umax, dc]) => ({ id: b + '|' + m, b, m, ac, mppt, inp, umax, dc, note: 'ergänzt – mit Datenblatt prüfen' }));
+  // SH80CX: 10 MPPT (40 A je MPPT); SH50CX: Datenblatt nicht gefunden
+  ['Sungrow', 'SH50CX (Hybrid)', 50, 4, 2, 1100, 150, 'Anzahl MPPT nicht bestätigt – unbedingt mit Datenblatt prüfen'], ['Sungrow', 'SH80CX (Hybrid)', 80, 10, 2, 1100, 150, 'MPPT laut Datenblatt; Eingänge je MPPT und Überbelegung prüfen'],
+  // SH5–12T: 2 MPPT (nicht 3), Strings je MPPT 1/1 bzw. 2/1, max. PV 200 %
+  ['Sungrow', 'SH12T (Hybrid)', 12, 2, '2/1', 1000, 200], ['Sungrow', 'SH10T (Hybrid)', 10, 2, '2/1', 1000, 200], ['Sungrow', 'SH8T (Hybrid)', 8, 2, '1/1', 1000, 200, 'Strings je MPPT (1/1) mit Datenblatt prüfen'],
+  ['Sungrow', 'SH6T (Hybrid)', 6, 2, '2/1', 1000, 200], ['Sungrow', 'SH5T (Hybrid)', 5, 2, '1/1', 1000, 200],
+  // Sunwoda SunESS Power All-in-One (dreiphasig, 2 MPPT mit 1/2 Strings, max. 1000 V; max. PV 15 kW beim 10er, 22,5 kW beim 12er und 15er)
+  ...[5, 6, 8].map(p => ['Sunwoda', `SunESS Power SW${p}KH3UT (All-in-One)`, p, 2, '1/2', 1000, 150, 'Strings je MPPT und Überbelegung mit Datenblatt prüfen']),
+  ['Sunwoda', 'SunESS Power SW10KH3UT (All-in-One)', 10, 2, '1/2', 1000, 150], ['Sunwoda', 'SunESS Power SW12KH3UT (All-in-One)', 12, 2, '1/2', 1000, 187.5],
+  ['Sunwoda', 'SunESS Power SW15KH3UT (All-in-One)', 15, 2, '1/2', 1000, 150]
+].map(([b, m, ac, mppt, inp, umax, dc, note]) => ({ id: b + '|' + m, b, m, ac, mppt, inp, umax, dc, note: note || SP_OK }));
+// Korrigierte Bibliothekswerte in bestehende Stringpläne übernehmen (nur WR, die noch mit einem Bibliotheksmodell verknüpft sind)
+function spBibAbgleich(st) {
+  let neu = false, mpptNeu = false;
+  (st.wrs || []).forEach(w => { const m = w.model && spBibFind(w.model);
+    if (m && (w.ac !== m.ac || w.mppt !== m.mppt || String(w.inputs) !== String(m.inp) || w.umax !== m.umax || w.dcmax !== m.dc)) {
+      if (w.mppt !== m.mppt) mpptNeu = true;
+      Object.assign(w, { ac: m.ac, mppt: m.mppt, inputs: m.inp, umax: m.umax, dcmax: m.dc }); neu = true; } });
+  if (mpptNeu && st.man) st.man = null; // andere MPPT-Zahl: manuelle Auslegung neu beginnen
+  return neu;
+}
 function spBib() {
   const eigene = (S().wrEigene || []).map(x => ({ id: 'my:' + x.id, b: 'Meine Wechselrichter', m: x.m, ac: +x.ac || 0, mppt: +x.mppt || 0, inp: x.inp, umax: +x.umax || 0, dc: +x.dc || 0, note: '' }));
   const ids = new Set(SP.LIB.map(x => x.id));
@@ -3597,6 +4074,7 @@ function viewStringplan(p) {
   if (!x) return `<div class="card sp-leer"><h3 style="margin-top:0">Stringplan</h3>
     <p class="muted">Module auf die Wechselrichter verteilen, mit Prüfung der Leerlaufspannung bei Kälte. Du kannst pro Projekt mehrere Varianten speichern und als PDF ausgeben.</p>
     <button onclick="spNeu('${pid}')">＋ Ersten Stringplan anlegen</button></div>`;
+  if (spBibAbgleich(x.st)) { save(); setTimeout(() => toast('Wechselrichter-Werte nach Datenblatt-Prüfung aktualisiert.'), 0); }
   const st = x.st, r = spRechnen(st);
   const N = st.groups.reduce((a, g) => a + (+g.n || 0), 0), kwp = st.groups.reduce((a, g) => a + (+g.n || 0) * ((st.types[g.t] || st.types[0]).pmax || 0), 0) / 1000;
   const feld = (label, wert, on, einheit = '', extra = '') => `<label class="sp-f"><span>${label}</span><span class="sp-in"><input value="${esc(wert)}" inputmode="decimal" onchange="${on}" ${extra}>${einheit ? `<i>${einheit}</i>` : ''}</span></label>`;
@@ -6064,14 +6542,14 @@ function gantt(p, termine, opt = {}) {
         : `<div class="xg-bar" style="left:${l + 1}px;width:${(diffDays(t.start, t.ende) + 1) * w - 2}px;background:${g.farbe}" title="${esc(t.titel)}: ${fmt(t.start)} – ${fmt(t.ende)}${zeitTxt(t) ? ', ' + zeitTxt(t) : ''}"></div>`;
       const pl = t.pl ? `<div class="xg-pl" style="left:${l - 3}px" title="Ich bin vor Ort: ${fmt(t.start)}${t.plZeit ? ' ab ' + t.plZeit : ''}"></div>` : '';
       const vor = t.nach && p.termine.find(x => x.id === t.nach);
-      return row('task', `<div title="${esc(t.titel)}${vor ? ' – startet nach: ' + esc(vor.titel) : ''}">${vor ? '<span class="muted">↳ </span>' : ''}${t.meilenstein ? '◆ ' : ''}${esc(t.titel)}${zeitTxt(t) ? `<span class="muted"> · ${zeitTxt(t)}</span>` : ''}</div>
+      return row('task', `<div title="${esc(t.titel)}${vor ? ' – startet nach: ' + esc(vor.titel) : ''}">${vor ? '<span class="muted">↳ </span>' : ''}${t.meilenstein ? '◆ ' : ''}${esc(t.titel)}${zeitTxt(t) ? `<span class="muted"> · ${zeitTxt(t)}</span>` : ''}<span class="xg-dat">${t.meilenstein || t.start === t.ende ? fmt(t.start).slice(0, 6) : fmt(t.start).slice(0, 6) + '–' + fmt(t.ende).slice(0, 6)}</span></div>
           <div>${fmt(t.start)}</div><div>${fmt(t.ende)}</div>`,
         bar + pl, tint(g.farbe, '14'), opt.vorschau ? '' : `onclick="ui.editTermin='${t.id}';render();scrollTo(0,0)" title="Klicken zum Bearbeiten"`);
     }).join('');
   }).join('');
 
-  const ti = idx(todayIso()), LW = innerWidth <= 800 ? 230 : 480;
-  const heute = ti >= 0 && ti < ax.tage ? `<div class="xg-today" style="left:${LW + ti * w + w / 2 - 1}px" title="Heute"></div>` : '';
+  const ti = idx(todayIso());
+  const heute = ti >= 0 && ti < ax.tage ? `<div class="xg-today" style="left:calc(var(--lw) + ${ti * w + w / 2 - 1}px)" title="Heute"></div>` : '';
   return `<div class="xg" data-today="${Math.max(0, ti) * w}" data-w="${w}"><div class="xg-inner">${head}${body}${heute}</div></div>`;
 }
 
@@ -7278,13 +7756,13 @@ function pdfVerlauf(doc, x, y, w, h) {
 // Kopf von Arbeitsauftrag und Abnahmeprotokoll: Logo, Farbverlauf, dunkler Balken, Titel; gibt die nächste y-Position zurück
 const AA_DUNKEL = [55, 71, 79], AA_TXT = [24, 24, 27];
 const pdfAbsatz = (doc, t, w) => String(t || '').split('\n').flatMap(l => l.trim() ? doc.splitTextToSize(l, w) : ['']);
-function pdfAaKopf(doc, nummer, rechts, titel) {
+function pdfAaKopf(doc, nummer, rechts, titel, nrLabel = 'Projekt-Nr') {
   const W = 210, M = 14, B = W - 2 * M;
   pdfLogo(doc, W / 2, 10, 11, true);
   pdfVerlauf(doc, M, 25.5, B, 0.9);
   doc.setFillColor(...AA_DUNKEL); doc.roundedRect(M, 30, B, 9, 2, 2, 'F');
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(255);
-  doc.text(`Projekt-Nr: ${nummer}`, M + 4, 35.8);
+  doc.text(`${nrLabel}: ${nummer}`, M + 4, 35.8);
   let x = W - M - 4;
   [...rechts].reverse().forEach(([l, v]) => { const t = `${l}: ${v}`; doc.text(t, x, 35.8, { align: 'right' }); x -= doc.getTextWidth(t) + 9; });
   doc.setFont('helvetica', 'bold'); doc.setFontSize(19); doc.setTextColor(...AA_TXT);
@@ -8355,10 +8833,13 @@ async function cloudLaden() {
   const ref = nutzerRef();
   const [es, ps] = await Promise.all([ref.collection('daten').doc('einstellungen').get(), ref.collection('projekte').get()]);
   if (es.exists || !ps.empty) {
-    const projekte = ps.docs.map(x => JSON.parse(x.data().json));
-    // Projekte, die nur auf diesem Gerät existieren (z.B. vor der Anmeldung erfasst), bleiben erhalten
+    // Offerten liegen in derselben Sammlung (markiert mit _offerte) – so braucht es keine neuen Firestore-Regeln
+    const alle = ps.docs.map(x => JSON.parse(x.data().json));
+    const projekte = alle.filter(x => !x._offerte), offs = alle.filter(x => x._offerte);
+    // Projekte und Offerten, die nur auf diesem Gerät existieren (z.B. vor der Anmeldung erfasst), bleiben erhalten
     state.projects.forEach(p => { if (!projekte.some(x => x.id === p.id)) projekte.push(p); });
-    state = migrate({ settings: es.exists ? JSON.parse(es.data().json) : state.settings, projects: projekte });
+    (state.offerten || []).forEach(o => { if (!offs.some(x => x.id === o.id)) offs.push(o); });
+    state = migrate({ settings: es.exists ? JSON.parse(es.data().json) : state.settings, projects: projekte, offerten: offs });
     // Stand der Cloud merken, damit nur Abweichungen (lokale Projekte, Umstellungen aus migrate) hochgeladen werden
     cloud.synced = {};
     if (es.exists) cloud.synced[EINST] = es.data().json;
@@ -8381,6 +8862,7 @@ async function cloudSchreiben(alles) {
   const ref = nutzerRef(), batch = cloud.db.batch(), jetzt = firebase.firestore.FieldValue.serverTimestamp();
   const neu = { [EINST]: JSON.stringify(state.settings) };
   state.projects.forEach(p => neu[p.id] = JSON.stringify(p));
+  (state.offerten || []).forEach(o => neu[o.id] = JSON.stringify(Object.assign(o, { _offerte: true })));
   let n = 0;
   Object.entries(neu).forEach(([id, json]) => {
     if (!alles && cloud.synced[id] === json) return;
@@ -8405,13 +8887,13 @@ function cloudAbonnieren() {
     snap.docChanges().forEach(ch => {
       const id = ch.doc.id;
       if (ch.type === 'removed') {
-        if (id in cloud.synced) { delete cloud.synced[id]; state.projects = state.projects.filter(p => p.id !== id); geaendert = true; }
+        if (id in cloud.synced) { delete cloud.synced[id]; state.projects = state.projects.filter(p => p.id !== id); state.offerten = (state.offerten || []).filter(o => o.id !== id); geaendert = true; }
         return;
       }
       const json = ch.doc.data().json;
       if (cloud.synced[id] === json) return; // eigene Änderung
-      const p = JSON.parse(json), i = state.projects.findIndex(x => x.id === id);
-      if (i >= 0) state.projects[i] = p; else state.projects.push(p);
+      const p = JSON.parse(json), L = p._offerte ? (state.offerten || (state.offerten = [])) : state.projects, i = L.findIndex(x => x.id === id);
+      if (i >= 0) L[i] = p; else L.push(p);
       cloud.synced[id] = json; geaendert = true;
     });
     if (geaendert) { state = migrate(state); anwenden(); }
